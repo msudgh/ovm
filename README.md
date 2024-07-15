@@ -1,5 +1,6 @@
 # ovm - an Obsidian vaults manager
 
+![NPM Version](https://img.shields.io/npm/v/ovm)
 [![GitHub Actions Test Workflow Status](https://github.com/msudgh/ovm/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/msudgh/ovm/actions/workflows/test.yml)
 
 ## Table of Contents
