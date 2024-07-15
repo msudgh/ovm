@@ -89,14 +89,15 @@
   },
   "repository": "https://github.com/musdgh/ovm",
   "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
-    "build:watch": "shx rm -rf dist && tsc -b -w",
+    "build": "shx rm -rf dist && tsc -p tsconfig.json",
+    "build:watch": "shx rm -rf dist && tsc -p tsconfig.json -w",
+    "build:release": "shx rm -rf dist && tsc -p tsconfig.release.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write  \"**/*.{ts,json}\"",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
-    "prepack": "oclif manifest && oclif readme",
+    "prepack": "oclif manifest && oclif readme && pnpm run build:release && pnpm run test",
     "test": "mocha",
     "coverage": "nyc --reporter=lcov npm run test"
   },
