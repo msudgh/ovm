@@ -12,3 +12,4 @@ package-lock.json
 .vscode
 coverage
 tsconfig.tsbuildinfo
+cache

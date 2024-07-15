@@ -1,0 +1,104 @@
+{
+  "name": "ovm",
+  "description": "An Obsidian vaults manager",
+  "version": "0.1.0",
+  "author": "Masoud Ghorbani",
+  "bin": {
+    "ovm": "./bin/run.js"
+  },
+  "bugs": "https://github.com/w/ovm/issues",
+  "dependencies": {
+    "@inquirer/core": "^9.0.2",
+    "@inquirer/prompts": "^5.1.2",
+    "@inquirer/type": "^1.4.0",
+    "@oclif/core": "^4.0.12",
+    "@oclif/plugin-help": "^6.2.6",
+    "@oclif/plugin-not-found": "^3.2.11",
+    "@oclif/plugin-plugins": "^5.3.7",
+    "ansi-escapes": "^7.0.0",
+    "async": "^3.2.5",
+    "glob": "^11.0.0",
+    "inquirer": "^10.0.1",
+    "node-fetch-cache": "^4.1.2",
+    "obsidian-utils": "^0.10.2",
+    "winston": "^3.13.1",
+    "yoctocolors-cjs": "^2.1.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@oclif/prettier-config": "^0.2.1",
+    "@oclif/test": "^4.0.4",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/async": "^3.2.24",
+    "@types/chai": "^4.3.16",
+    "@types/inquirer": "^9.0.7",
+    "@types/mocha": "^10.0.7",
+    "@types/mock-fs": "^4.13.4",
+    "@types/node": "^20.14.10",
+    "@types/sinon": "^17.0.3",
+    "@types/validator": "^13.12.0",
+    "chai": "^5.1.1",
+    "eslint": "^9.7.0",
+    "eslint-config-oclif": "^5.2.0",
+    "eslint-config-oclif-typescript": "^3.1.8",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.8.0",
+    "mocha": "^10.6.0",
+    "mock-fs": "^5.2.0",
+    "nyc": "^17.0.0",
+    "obsidian": "1.6.6",
+    "oclif": "^4.14.5",
+    "prettier": "^3.3.3",
+    "shx": "^0.3.4",
+    "sinon": "^18.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^7.16.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "/bin",
+    "/dist",
+    "/oclif.manifest.json"
+  ],
+  "homepage": "https://github.com/msudgh/ovm",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "oclif": {
+    "bin": "ovm",
+    "dirname": "ovm",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins",
+      "@oclif/plugin-not-found"
+    ],
+    "topicSeparator": " ",
+    "topics": {
+      "plugins": {
+        "description": "Manage plugins for Obsidian vaults"
+      }
+    }
+  },
+  "repository": "https://github.com/musdgh/ovm",
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "build:watch": "shx rm -rf dist && tsc -b -w",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write  \"**/*.{ts,json}\"",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "pnpm run lint",
+    "prepack": "oclif manifest && oclif readme",
+    "test": "mocha",
+    "coverage": "nyc --reporter=lcov npm run test"
+  },
+  "types": "dist/index.d.ts"
+}

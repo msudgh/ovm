@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/mocharc.json",
+  "import": ["tsx"],
+  "reporter": "spec",
+  "timeout": 5000,
+  "forbidOnly": true,
+  "watch-files": ["src"],
+  "watch-extensions": ["ts"],
+  "ui": "bdd",
+  "spec": ["src/**/*.test.ts", "src/**/*.spec.ts"]
+}
