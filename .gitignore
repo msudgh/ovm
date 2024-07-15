@@ -13,3 +13,4 @@ package-lock.json
 coverage
 tsconfig.tsbuildinfo
 cache
+*.tgz
