@@ -1,27 +1,32 @@
 import {Flags, flush, handle} from '@oclif/core'
 import {ArgInput} from '@oclif/core/lib/parser'
 import {eachSeries} from 'async'
-import {installPluginFromGithub, isPluginInstalled, Vault} from 'obsidian-utils'
+import {isPluginInstalled, Vault} from 'obsidian-utils'
 import {Config, loadConfig} from '../../providers/config'
 import FactoryCommand from '../../providers/factoryCommand'
-import {findPluginInRegistry, handleExceedRateLimitError} from '../../providers/github'
+import {handleExceedRateLimitError} from '../../providers/github'
+import {pluginsSelector, removePluginDir} from '../../services/plugins'
 import {vaultsSelector} from '../../services/vaults'
 import {logger} from '../../utils/logger'
 
-const description = `Install plugins for Obsidian vaults.`
+const description = `Uninstall plugins for Obsidian vaults.`
 
 type CustomFlags = {
   debug: boolean
   path: string
 }
 
-interface InstallPluginVaultOpts {
+interface UninstallPluginVaultOpts {
   vault: Vault
   config: Config
 }
 
-export default class InstallPlugins extends FactoryCommand {
-  static readonly aliases = ['ip']
+/**
+ * UninstallPlugins class is responsible for uninstalling plugins from Obsidian vaults.
+ * It provides functionality to remove specified plugins.
+ */
+export default class UninstallPlugins extends FactoryCommand {
+  static readonly aliases = ['up']
   static override readonly description = description
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
@@ -37,7 +42,7 @@ export default class InstallPlugins extends FactoryCommand {
     path: Flags.string({
       char: 'p',
       description:
-        'Path or Glob pattern of vaults to install plugins. Default: reads from Obsidian config per environment.',
+        'Path or Glob pattern of vaults to uninstall plugins. Default: reads from Obsidian config per environment.',
       default: '',
     }),
   }
@@ -49,7 +54,7 @@ export default class InstallPlugins extends FactoryCommand {
    */
   public async run() {
     try {
-      const {args, flags} = await this.parse(InstallPlugins)
+      const {args, flags} = await this.parse(UninstallPlugins)
       await this.action(args, flags)
     } catch (error) {
       this.handleError(error)
@@ -60,7 +65,7 @@ export default class InstallPlugins extends FactoryCommand {
 
   /**
    * Main action method for the command.
-   * Loads vaults, selects vaults, and install specified plugins.
+   * Loads vaults, selects vaults, and uninstall specified plugins.
    * @param {ArgInput} args - The arguments passed to the command.
    * @param {CustomFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
@@ -77,41 +82,39 @@ export default class InstallPlugins extends FactoryCommand {
     const selectedVaults = await vaultsSelector(vaults)
     const config = await loadConfig()
     const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
-    const installVaultIterator = async (opts: InstallPluginVaultOpts) => {
+    const uninstallVaultIterator = async (opts: UninstallPluginVaultOpts) => {
       const {vault, config} = opts
-      logger.debug(`Install plugins for vault`, {vault})
-      const installedPlugins = []
+      logger.debug(`Uninstall plugins for vault`, {vault})
+
+      const uninstalledPlugins = []
       const failedPlugins = []
 
-      for (const stagePlugin of config.plugins) {
+      const selectedPlugins = await pluginsSelector(config.plugins)
+
+      for (const stagePlugin of selectedPlugins) {
         const childLogger = logger.child({stagePlugin, vault})
 
-        const pluginInRegistry = await findPluginInRegistry(stagePlugin.id)
-        if (!pluginInRegistry) {
-          throw new Error(`Plugin ${stagePlugin.id} not found in registry`)
-        }
-
-        if (await isPluginInstalled(pluginInRegistry.id, vault.path)) {
-          childLogger.debug(`Plugin already installed`)
+        if (!(await isPluginInstalled(stagePlugin.id, vault.path))) {
+          childLogger.debug(`Plugin not installed`)
           continue
         }
 
         try {
-          await installPluginFromGithub(pluginInRegistry.repo, stagePlugin.version, vault.path)
-          installedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
-          childLogger.info(`Installed plugin`)
+          await removePluginDir(stagePlugin.id, vault.path)
+          uninstalledPlugins.push(stagePlugin)
         } catch (error) {
-          failedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
+          failedPlugins.push(stagePlugin)
           handleExceedRateLimitError(error)
-          childLogger.error(`Failed to install plugin`, {error})
+          childLogger.error(`Failed to uninstall plugin`, {error})
         }
       }
 
-      logger.info(`Installed ${installedPlugins.length} plugins`, {vault})
+      logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, {vault})
 
-      return {installedPlugins, failedPlugins}
+      return {uninstalledPlugins, failedPlugins}
     }
-    eachSeries(vaultsWithConfig, installVaultIterator, (error) => {
+
+    eachSeries(vaultsWithConfig, uninstallVaultIterator, (error) => {
       if (error) {
         logger.debug('Error installing plugins', {error})
         handle(error)

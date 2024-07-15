@@ -1,8 +1,8 @@
-import { readFileSync, writeFileSync } from 'fs'
-import { GitHubPluginVersion } from 'obsidian-utils'
+import {readFileSync, writeFileSync} from 'fs'
+import {GitHubPluginVersion} from 'obsidian-utils'
 import z from 'zod'
-import { DEFAULT_CONFIG_PATH } from '../constants'
-import { logger } from '../utils/logger'
+import {DEFAULT_CONFIG_PATH} from '../constants'
+import {logger} from '../utils/logger'
 
 export type Plugin = {id: string; version: GitHubPluginVersion}
 

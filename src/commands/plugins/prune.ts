@@ -1,12 +1,12 @@
-import { ExitPromptError } from '@inquirer/core'
-import { Command, Flags, flush, handle } from '@oclif/core'
-import { ArgInput } from '@oclif/core/lib/parser'
-import { eachSeries } from 'async'
-import { Vault } from 'obsidian-utils'
-import { Config, loadConfig } from '../../providers/config'
-import { listInstalledPlugins, removePluginDir } from '../../services/plugins'
-import { findVaultsByPatternMatching, findVaultsFromConfig, vaultsSelector } from '../../services/vaults'
-import { logger } from '../../utils/logger'
+import {Flags, flush, handle} from '@oclif/core'
+import {ArgInput} from '@oclif/core/lib/parser'
+import {eachSeries} from 'async'
+import {Vault} from 'obsidian-utils'
+import {Config, loadConfig} from '../../providers/config'
+import FactoryCommand from '../../providers/factoryCommand'
+import {listInstalledPlugins, removePluginDir} from '../../services/plugins'
+import {vaultsSelector} from '../../services/vaults'
+import {logger} from '../../utils/logger'
 
 const description = `Prune plugins for Obsidian vaults.`
 
@@ -20,7 +20,12 @@ interface PrunePluginVaultOpts {
   config: Config
 }
 
-export default class PrunePlugins extends Command {
+/**
+ * PrunePlugins class is responsible for pruning unused plugins from Obsidian vaults.
+ * It extends the FactoryCommand class and provides functionality to list and remove
+ * plugins that are not referenced in the configuration.
+ */
+export default class PrunePlugins extends FactoryCommand {
   static readonly aliases = ['pp']
   static override readonly description = description
   static override readonly examples = [
@@ -42,6 +47,11 @@ export default class PrunePlugins extends Command {
     }),
   }
 
+  /**
+   * Executes the command.
+   * Parses the arguments and flags, and calls the action method.
+   * Handles errors and ensures flushing of logs.
+   */
   public async run() {
     try {
       const {args, flags} = await this.parse(PrunePlugins)
@@ -53,7 +63,14 @@ export default class PrunePlugins extends Command {
     }
   }
 
-  private async action(args: ArgInput, flags: CustomFlags) {
+  /**
+   * Main action method for the command.
+   * Loads vaults, selects vaults, loads configuration, and prunes unused plugins.
+   * @param {ArgInput} args - The arguments passed to the command.
+   * @param {CustomFlags} flags - The flags passed to the command.
+   * @returns {Promise<void>}
+   */
+  private async action(args: ArgInput, flags: CustomFlags): Promise<void> {
     const {debug, path} = flags
 
     if (debug) {
@@ -66,52 +83,26 @@ export default class PrunePlugins extends Command {
     const selectedVaults = await vaultsSelector(vaults)
     const config = await loadConfig()
     const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
+    const prunePluginsIterator = async (opts: PrunePluginVaultOpts) => {
+      const {vault, config} = opts
+      const childLogger = logger.child({vault})
+      const installedPlugins = await listInstalledPlugins(vault.path)
+      const referencedPlugins = config.plugins.map(({id}) => id)
+      const toBePruned = installedPlugins.filter(({id}) => !referencedPlugins.includes(id))
 
-    eachSeries(vaultsWithConfig, this.prune, (error) => {
+      for (const plugin of toBePruned) {
+        childLogger.debug(`Pruning plugin`, {plugin})
+        await removePluginDir(plugin.id, vault.path)
+      }
+
+      childLogger.info(`Pruned ${toBePruned.length} plugins`)
+    }
+
+    eachSeries(vaultsWithConfig, prunePluginsIterator, (error) => {
       if (error) {
         logger.debug('Error pruning plugins', {error})
         handle(error)
       }
     })
-  }
-
-  private async loadVaults(path: string): Promise<Vault[]> {
-    const isPathSpecifiedAndValid = path && path.trim().length > 0
-    let vaults: Vault[] = []
-
-    if (isPathSpecifiedAndValid) {
-      vaults = await findVaultsByPatternMatching(path)
-    } else {
-      vaults = await findVaultsFromConfig()
-    }
-
-    if (vaults.length === 0) {
-      throw new Error(`No vaults found!`)
-    }
-
-    return vaults
-  }
-
-  private async prune({vault, config}: PrunePluginVaultOpts) {
-    const childLogger = logger.child({vault})
-    const installedPlugins = await listInstalledPlugins(vault.path)
-    const referencedPlugins = config.plugins.map(({id}) => id)
-    const toBePruned = installedPlugins.filter(({id}) => !referencedPlugins.includes(id))
-
-    for (const plugin of toBePruned) {
-      childLogger.debug(`Pruning plugin`, {plugin})
-      await removePluginDir(plugin.id, vault.path)
-    }
-
-    childLogger.info(`Pruned ${toBePruned.length} plugins`)
-  }
-
-  private handleError(error: unknown) {
-    if (error instanceof ExitPromptError) {
-      logger.debug('Exit prompt error:', {error})
-    } else if (error instanceof Error) {
-      logger.debug('An error occurred while pruning:', {error})
-      handle(error)
-    }
   }
 }

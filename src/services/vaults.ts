@@ -1,8 +1,8 @@
-import { checkbox } from '@inquirer/prompts'
-import { glob } from 'glob'
-import { findVault, Vault } from 'obsidian-utils'
+import {checkbox} from '@inquirer/prompts'
+import {glob} from 'glob'
+import {findVault, Vault} from 'obsidian-utils'
 import path from 'path'
-import { logger } from '../utils/logger'
+import {logger} from '../utils/logger'
 
 export const findVaultsByPatternMatching = async (pathPattern: string) => {
   if (!pathPattern.endsWith('.obsidian')) {
@@ -27,10 +27,12 @@ export const findVaultsByPatternMatching = async (pathPattern: string) => {
 export const findVaultsFromConfig = findVault
 
 export const vaultsSelector = async (vaults: Vault[]) => {
-  const choices = vaults.map((vault) => ({
-    name: vault.name,
-    value: vault,
-  }))
+  const choices = vaults
+    .map((vault) => ({
+      name: vault.name,
+      value: vault,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const selectedVaults = await checkbox({
     choices,
