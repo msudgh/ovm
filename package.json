@@ -77,7 +77,6 @@
     "commands": "./dist/commands",
     "plugins": [
       "@oclif/plugin-help",
-      "@oclif/plugin-plugins",
       "@oclif/plugin-not-found"
     ],
     "topicSeparator": " ",
@@ -97,7 +96,7 @@
     "format": "prettier --write  \"**/*.{ts,json}\"",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
-    "prepack": "oclif manifest && oclif readme && pnpm run build:release && pnpm run test",
+    "prepack": "oclif manifest && pnpm run build:release && pnpm run test",
     "test": "mocha",
     "coverage": "nyc --reporter=lcov npm run test"
   },
