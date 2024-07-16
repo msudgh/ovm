@@ -4,9 +4,24 @@ import {Vault} from 'obsidian-utils'
 import {findVaultsByPatternMatching, findVaultsFromConfig} from '../services/vaults'
 import {logger} from '../utils/logger'
 
+export type FactoryFlags<T> = T & {
+  debug: boolean
+}
+
 export default class FactoryCommand extends Command {
   run(): Promise<unknown> {
     throw new Error('Method not implemented.')
+  }
+
+  public flagsInterceptor<T>(flags: FactoryFlags<T>): FactoryFlags<T> {
+    const {debug} = flags
+
+    if (debug) {
+      logger.level = 'debug'
+      logger.debug(`Command called`, {flags})
+    }
+
+    return flags
   }
 
   /**

@@ -2,8 +2,8 @@ import {Flags, flush, handle} from '@oclif/core'
 import {ArgInput} from '@oclif/core/lib/parser'
 import {eachSeries} from 'async'
 import {isPluginInstalled, Vault} from 'obsidian-utils'
+import FactoryCommand, {FactoryFlags} from '../../providers/command'
 import {Config, loadConfig} from '../../providers/config'
-import FactoryCommand from '../../providers/factoryCommand'
 import {handleExceedRateLimitError} from '../../providers/github'
 import {pluginsSelector, removePluginDir} from '../../services/plugins'
 import {vaultsSelector} from '../../services/vaults'
@@ -11,8 +11,7 @@ import {logger} from '../../utils/logger'
 
 const description = `Uninstall plugins for Obsidian vaults.`
 
-type CustomFlags = {
-  debug: boolean
+interface UninstallFlags {
   path: string
 }
 
@@ -22,11 +21,11 @@ interface UninstallPluginVaultOpts {
 }
 
 /**
- * UninstallPlugins class is responsible for uninstalling plugins from Obsidian vaults.
+ * Uninstall class is responsible for uninstalling plugins from Obsidian vaults.
  * It provides functionality to remove specified plugins.
  */
-export default class UninstallPlugins extends FactoryCommand {
-  static readonly aliases = ['up']
+export default class Uninstall extends FactoryCommand {
+  static readonly aliases = ['pu', 'plugins:uninstall']
   static override readonly description = description
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
@@ -54,7 +53,7 @@ export default class UninstallPlugins extends FactoryCommand {
    */
   public async run() {
     try {
-      const {args, flags} = await this.parse(UninstallPlugins)
+      const {args, flags} = await this.parse(Uninstall)
       await this.action(args, flags)
     } catch (error) {
       this.handleError(error)
@@ -67,17 +66,13 @@ export default class UninstallPlugins extends FactoryCommand {
    * Main action method for the command.
    * Loads vaults, selects vaults, and uninstall specified plugins.
    * @param {ArgInput} args - The arguments passed to the command.
-   * @param {CustomFlags} flags - The flags passed to the command.
+   * @param {FactoryFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: CustomFlags): Promise<void> {
-    const {debug, path} = flags
+  private async action(args: ArgInput, flags: FactoryFlags<UninstallFlags>): Promise<void> {
+    this.flagsInterceptor(flags)
 
-    if (debug) {
-      logger.level = 'debug'
-      logger.debug(`Command called`, {flags})
-    }
-
+    const {path} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
     const config = await loadConfig()

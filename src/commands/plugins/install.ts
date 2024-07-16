@@ -2,16 +2,15 @@ import {Flags, flush, handle} from '@oclif/core'
 import {ArgInput} from '@oclif/core/lib/parser'
 import {eachSeries} from 'async'
 import {installPluginFromGithub, isPluginInstalled, Vault} from 'obsidian-utils'
+import FactoryCommand, {FactoryFlags} from '../../providers/command'
 import {Config, loadConfig} from '../../providers/config'
-import FactoryCommand from '../../providers/factoryCommand'
 import {findPluginInRegistry, handleExceedRateLimitError} from '../../providers/github'
 import {vaultsSelector} from '../../services/vaults'
 import {logger} from '../../utils/logger'
 
 const description = `Install plugins for Obsidian vaults.`
 
-type CustomFlags = {
-  debug: boolean
+interface InstallFlags {
   path: string
 }
 
@@ -20,8 +19,8 @@ interface InstallPluginVaultOpts {
   config: Config
 }
 
-export default class InstallPlugins extends FactoryCommand {
-  static readonly aliases = ['ip']
+export default class Install extends FactoryCommand {
+  static readonly aliases = ['pi', 'plugins:install']
   static override readonly description = description
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
@@ -49,7 +48,7 @@ export default class InstallPlugins extends FactoryCommand {
    */
   public async run() {
     try {
-      const {args, flags} = await this.parse(InstallPlugins)
+      const {args, flags} = await this.parse(Install)
       await this.action(args, flags)
     } catch (error) {
       this.handleError(error)
@@ -65,14 +64,10 @@ export default class InstallPlugins extends FactoryCommand {
    * @param {CustomFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: CustomFlags): Promise<void> {
-    const {debug, path} = flags
+  private async action(args: ArgInput, flags: FactoryFlags<InstallFlags>): Promise<void> {
+    this.flagsInterceptor(flags)
 
-    if (debug) {
-      logger.level = 'debug'
-      logger.debug(`Command called`, {flags})
-    }
-
+    const {path} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
     const config = await loadConfig()

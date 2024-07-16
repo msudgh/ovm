@@ -2,16 +2,15 @@ import {Flags, flush, handle} from '@oclif/core'
 import {ArgInput} from '@oclif/core/lib/parser'
 import {eachSeries} from 'async'
 import {Vault} from 'obsidian-utils'
+import FactoryCommand, {FactoryFlags} from '../../providers/command'
 import {Config, loadConfig} from '../../providers/config'
-import FactoryCommand from '../../providers/factoryCommand'
 import {listInstalledPlugins, removePluginDir} from '../../services/plugins'
 import {vaultsSelector} from '../../services/vaults'
 import {logger} from '../../utils/logger'
 
 const description = `Prune plugins for Obsidian vaults.`
 
-type CustomFlags = {
-  debug: boolean
+interface PruneFlags {
   path: string
 }
 
@@ -21,12 +20,12 @@ interface PrunePluginVaultOpts {
 }
 
 /**
- * PrunePlugins class is responsible for pruning unused plugins from Obsidian vaults.
+ * Prune class is responsible for pruning unused plugins from Obsidian vaults.
  * It extends the FactoryCommand class and provides functionality to list and remove
  * plugins that are not referenced in the configuration.
  */
-export default class PrunePlugins extends FactoryCommand {
-  static readonly aliases = ['pp']
+export default class Prune extends FactoryCommand {
+  static readonly aliases = ['pp', 'plugins:prune']
   static override readonly description = description
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
@@ -54,7 +53,7 @@ export default class PrunePlugins extends FactoryCommand {
    */
   public async run() {
     try {
-      const {args, flags} = await this.parse(PrunePlugins)
+      const {args, flags} = await this.parse(Prune)
       await this.action(args, flags)
     } catch (error) {
       this.handleError(error)
@@ -70,16 +69,11 @@ export default class PrunePlugins extends FactoryCommand {
    * @param {CustomFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: CustomFlags): Promise<void> {
-    const {debug, path} = flags
+  private async action(args: ArgInput, flags: FactoryFlags<PruneFlags>): Promise<void> {
+    this.flagsInterceptor(flags)
 
-    if (debug) {
-      logger.level = 'debug'
-      logger.debug(`Command called`, {flags})
-    }
-
+    const {path} = flags
     const vaults = await this.loadVaults(path)
-
     const selectedVaults = await vaultsSelector(vaults)
     const config = await loadConfig()
     const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))

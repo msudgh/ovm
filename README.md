@@ -9,8 +9,9 @@
   - [Table of Contents](#table-of-contents)
   - [Usage](#usage)
   - [Commands](#commands)
-    - [`ovm ip`](#ovm-ip)
-    - [`ovm pp`](#ovm-pp)
+    - [`ovm plugins install`](#ovm-plugins-install)
+    - [`ovm plugins prune`](#ovm-plugins-prune)
+    - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
     - [`ovm help [COMMAND]`](#ovm-help-command)
   - [License](#license)
 
@@ -30,13 +31,13 @@ USAGE
 
 ## Commands
 
-### `ovm ip`
+### `ovm plugins install`
 
 Install plugins for Obsidian vaults.
 
 ```
 USAGE
-  $ ovm ip [-d] [-p <value>]
+  $ ovm plugins install [-d] [-p <value>]
 
 FLAGS
   -d, --debug         Enable debugging mode
@@ -47,48 +48,78 @@ DESCRIPTION
   Install plugins for Obsidian vaults.
 
 ALIASES
-  $ ovm ip
-  $ ovm install-plugins
+  $ ovm pi
+  $ ovm plugins install
 
 EXAMPLES
-  $ ovm ip --path=/path/to/vaults
+  $ ovm plugins install --path=/path/to/vaults
 
-  $ ovm ip --path=/path/to/vaults/*/.obsidian
+  $ ovm plugins install --path=/path/to/vaults/*/.obsidian
 
-  $ ovm ip --path=/path/to/vaults/**/.obsidian
+  $ ovm plugins install --path=/path/to/vaults/**/.obsidian
 ```
 
 _See code: [src/commands/plugins/install.ts](src/commands/plugins/install.ts)_
 
-### `ovm pp`
+### `ovm plugins prune`
 
 Prune plugins for Obsidian **vaults**.
 
 ```
 USAGE
-  $ ovm pp [-d] [-p <value>]
+  $ ovm plugins prune [-d] [-p <value>]
 
 FLAGS
   -d, --debug         Enable debugging mode
-  -p, --path=<value>  Path or Glob pattern of vaults to prune plugins. Default: reads from Obsidian
-                      config per environment.
+  -p, --path=<value>  Path or Glob pattern of vaults to prune plugins. Default: reads from Obsidian config
+                      per environment.
 
 DESCRIPTION
   Prune plugins for Obsidian vaults.
 
 ALIASES
   $ ovm pp
-  $ ovm prune-plugins
+  $ ovm plugins prune
 
 EXAMPLES
-  $ ovm pp --path=/path/to/vaults
+  $ ovm plugins prune --path=/path/to/vaults
 
-  $ ovm pp --path=/path/to/vaults/*/.obsidian
+  $ ovm plugins prune --path=/path/to/vaults/*/.obsidian
 
-  $ ovm pp --path=/path/to/vaults/**/.obsidian
+  $ ovm plugins prune --path=/path/to/vaults/**/.obsidian
 ```
 
 _See code: [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)_
+
+### `ovm plugins uninstall`
+
+Install plugins for Obsidian vaults.
+
+```
+USAGE
+  $ ovm plugins uninstall [-d] [-p <value>]
+
+FLAGS
+  -d, --debug         Enable debugging mode
+  -p, --path=<value>  Path or Glob pattern of vaults to uninstall plugins. Default: reads from Obsidian
+                      config per environment.
+
+DESCRIPTION
+  Uninstall plugins for Obsidian vaults.
+
+ALIASES
+  $ ovm pu
+  $ ovm plugins uninstall
+
+EXAMPLES
+  $ ovm plugins uninstall --path=/path/to/vaults
+
+  $ ovm plugins uninstall --path=/path/to/vaults/*/.obsidian
+
+  $ ovm plugins uninstall --path=/path/to/vaults/**/.obsidian
+```
+
+_See code: [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)_
 
 ### `ovm help [COMMAND]`
 
