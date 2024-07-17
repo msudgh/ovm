@@ -1,24 +1,39 @@
-import {ExitPromptError} from '@inquirer/core'
-import {Command, handle} from '@oclif/core'
-import {Vault} from 'obsidian-utils'
-import {findVaultsByPatternMatching, findVaultsFromConfig} from '../services/vaults'
-import {logger} from '../utils/logger'
+import { ExitPromptError } from '@inquirer/core'
+import { Command, Flags, handle } from '@oclif/core'
+import { Vault } from 'obsidian-utils'
+import { findVaultsByPatternMatching, findVaultsFromConfig } from '../services/vaults'
+import { logger } from '../utils/logger'
 
 export type FactoryFlags<T> = T & {
   debug: boolean
+  timestamp: boolean
 }
 
 export default class FactoryCommand extends Command {
+  static readonly commonFlags = {
+    debug: Flags.boolean({
+      char: 'd',
+      default: false,
+      description: 'Enable debugging mode',
+    }),
+    timestamp: Flags.boolean({
+      char: 't',
+      default: false,
+      description: 'Enable timestamp in logs',
+    }),
+  }
+
   run(): Promise<unknown> {
     throw new Error('Method not implemented.')
   }
 
   public flagsInterceptor<T>(flags: FactoryFlags<T>): FactoryFlags<T> {
-    const {debug} = flags
+    const {debug, timestamp} = flags
 
     if (debug) {
       logger.level = 'debug'
       logger.debug(`Command called`, {flags})
+      process.env.ENABLE_TIMESTAMP = timestamp ? 'true' : 'false'
     }
 
     return flags

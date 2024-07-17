@@ -1,17 +1,17 @@
-# ovm - an Obsidian vaults manager
+# ovm - Obsidian vaults manager
 
 ![NPM Version](https://img.shields.io/npm/v/ovm)
 [![GitHub Actions Test Workflow Status](https://github.com/msudgh/ovm/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/msudgh/ovm/actions/workflows/test.yml)
 
-## Table of Contents
+**Table of Contents**
 
-- [ovm - an Obsidian vaults manager](#ovm---an-obsidian-vaults-manager)
-  - [Table of Contents](#table-of-contents)
+- [ovm - Obsidian vaults manager](#ovm---obsidian-vaults-manager)
   - [Usage](#usage)
   - [Commands](#commands)
     - [`ovm plugins install`](#ovm-plugins-install)
     - [`ovm plugins prune`](#ovm-plugins-prune)
     - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
+    - [`ovm reports stats`](#ovm-reports-stats)
     - [`ovm help [COMMAND]`](#ovm-help-command)
   - [License](#license)
 
@@ -35,7 +35,7 @@ USAGE
 
 Install plugins for Obsidian vaults.
 
-```
+```sh-session
 USAGE
   $ ovm plugins install [-d] [-p <value>]
 
@@ -65,7 +65,7 @@ _See code: [src/commands/plugins/install.ts](src/commands/plugins/install.ts)_
 
 Prune plugins for Obsidian **vaults**.
 
-```
+```sh-session
 USAGE
   $ ovm plugins prune [-d] [-p <value>]
 
@@ -93,9 +93,9 @@ _See code: [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)_
 
 ### `ovm plugins uninstall`
 
-Install plugins for Obsidian vaults.
+Uninstall plugins for Obsidian vaults.
 
-```
+```sh-session
 USAGE
   $ ovm plugins uninstall [-d] [-p <value>]
 
@@ -121,11 +121,44 @@ EXAMPLES
 
 _See code: [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)_
 
+### `ovm reports stats`
+
+Stats about number of vaults and installed plugins per vault.
+
+```sh-session
+USAGE
+  $ ovm reports stats [-p <value>] [-o table|json] [-d] [-t]
+
+FLAGS
+  -d, --debug            Enable debugging mode
+  -o, --output=<option>  [default: table] Display the output with a specific transformer.
+                         <options: table|json>
+  -p, --path=<value>     Path or Glob pattern of vaults to get stats from. Default: reads from
+                         Obsidian per vault config per environment.
+  -t, --timestamp        Enable timestamp in logs
+
+DESCRIPTION
+  Stats about number of vaults and installed plugins per vault.
+
+ALIASES
+  $ ovm rs
+  $ ovm reports stats
+
+EXAMPLES
+  $ ovm reports stats --path=/path/to/vaults
+
+  $ ovm reports stats --path=/path/to/vaults/*/.obsidian
+
+  $ ovm reports stats --path=/path/to/vaults/**/.obsidian
+```
+
+_See code: [src/commands/reports/uninstall.ts](src/commands/reports/stats.ts)_
+
 ### `ovm help [COMMAND]`
 
 Display help for ovm commands.
 
-```
+```sh-session
 USAGE
   $ ovm help [COMMAND...] [-n]
 

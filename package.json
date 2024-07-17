@@ -1,6 +1,6 @@
 {
   "name": "ovm",
-  "description": "An Obsidian vaults manager",
+  "description": "Obsidian Vaults Manager",
   "version": "0.1.0-b.3",
   "author": "Masoud Ghorbani",
   "bin": {
@@ -8,8 +8,8 @@
   },
   "bugs": "https://github.com/w/ovm/issues",
   "dependencies": {
-    "@inquirer/core": "^9.0.2",
-    "@inquirer/prompts": "^5.1.2",
+    "@inquirer/core": "^9.0.3",
+    "@inquirer/prompts": "^5.1.3",
     "@inquirer/type": "^1.4.0",
     "@oclif/core": "^4.0.12",
     "@oclif/plugin-help": "^6.2.6",
@@ -83,10 +83,13 @@
     "topics": {
       "plugins": {
         "description": "Manage plugins for Obsidian vaults"
+      },
+      "reports": {
+        "description": "Generate reports for Obsidian vaults"
       }
     }
   },
-  "repository": "https://github.com/musdgh/ovm",
+  "repository": "https://github.com/musdgh/ovm.git",
   "scripts": {
     "build": "shx rm -rf dist && tsc -p tsconfig.json",
     "build:watch": "shx rm -rf dist && tsc -p tsconfig.json -w",
@@ -100,5 +103,8 @@
     "test": "mocha",
     "coverage": "nyc --reporter=lcov npm run test"
   },
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }

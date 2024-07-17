@@ -1,10 +1,11 @@
-import {createLogger, format, transports} from 'winston'
+import { createLogger, format, transports } from 'winston'
 
 const getFormat = () => {
   const jsonLogging = process.env.JSON_LOGGING === 'true'
+  const enableTimestamp = process.env.ENABLE_TIMESTAMP === 'true'
   return format.combine(
     format.colorize(),
-    format.timestamp(),
+    ...(enableTimestamp ? [format.timestamp()] : []),
     jsonLogging ? (format.json(), format.prettyPrint()) : (format.splat(), format.simple()),
   )
 }

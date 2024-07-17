@@ -28,17 +28,13 @@ export default class Install extends FactoryCommand {
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
   ]
   static override readonly flags = {
-    debug: Flags.boolean({
-      char: 'd',
-      default: false,
-      description: 'Enable debugging mode',
-    }),
     path: Flags.string({
       char: 'p',
       description:
         'Path or Glob pattern of vaults to install plugins. Default: reads from Obsidian config per environment.',
       default: '',
     }),
+    ...this.commonFlags,
   }
 
   /**
