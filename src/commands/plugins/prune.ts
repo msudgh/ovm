@@ -8,7 +8,7 @@ import {listInstalledPlugins, removePluginDir} from '../../services/plugins'
 import {vaultsSelector} from '../../services/vaults'
 import {logger} from '../../utils/logger'
 
-const description = `Prune plugins for Obsidian vaults.`
+const description = `Prune plugins from specified vaults.`
 
 interface PruneFlags {
   path: string
@@ -20,9 +20,7 @@ interface PrunePluginVaultOpts {
 }
 
 /**
- * Prune class is responsible for pruning unused plugins from Obsidian vaults.
- * It extends the FactoryCommand class and provides functionality to list and remove
- * plugins that are not referenced in the configuration.
+ * Prune command list and remove plugins that aren't referred in config file.
  */
 export default class Prune extends FactoryCommand {
   static readonly aliases = ['pp', 'plugins:prune']

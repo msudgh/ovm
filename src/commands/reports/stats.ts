@@ -1,13 +1,13 @@
-import { Flags, flush, handle } from '@oclif/core'
-import { ArgInput } from '@oclif/core/lib/parser'
-import { eachSeries, ErrorCallback } from 'async'
-import { isPluginInstalled, Vault } from 'obsidian-utils'
-import FactoryCommand, { FactoryFlags } from '../../providers/command'
-import { Config, loadConfig } from '../../providers/config'
-import { vaultsSelector } from '../../services/vaults'
-import { logger } from '../../utils/logger'
+import {Flags, flush, handle} from '@oclif/core'
+import {ArgInput} from '@oclif/core/lib/parser'
+import {eachSeries, ErrorCallback} from 'async'
+import {isPluginInstalled, Vault} from 'obsidian-utils'
+import FactoryCommand, {FactoryFlags} from '../../providers/command'
+import {Config, loadConfig} from '../../providers/config'
+import {vaultsSelector} from '../../services/vaults'
+import {logger} from '../../utils/logger'
 
-const description = `Stats about number of vaults and installed plugins per vault.`
+const description = `Stats of vaults and installed plugins.`
 
 interface StatsFlags {
   path: string
@@ -64,7 +64,7 @@ export default class Stats extends FactoryCommand {
   private async action(args: ArgInput, flags: FactoryFlags<StatsFlags>): Promise<void> {
     this.flagsInterceptor(flags)
 
-    const {path,output} = flags
+    const {path, output} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
     const config = await loadConfig()
@@ -79,7 +79,7 @@ export default class Stats extends FactoryCommand {
 
       for (const stagePlugin of config.plugins) {
         if (await isPluginInstalled(stagePlugin.id, vault.path)) {
-          installedPlugins[stagePlugin.id] = [...installedPlugins[stagePlugin.id] || [], vault.name]
+          installedPlugins[stagePlugin.id] = [...(installedPlugins[stagePlugin.id] || []), vault.name]
         }
       }
     }
@@ -95,11 +95,10 @@ export default class Stats extends FactoryCommand {
           totalPlugins: config.plugins.length,
         }
 
-
-        if(output === 'table') {
+        if (output === 'table') {
           console.table(totalStats)
           console.table(installedPlugins)
-        } else if(output === 'json') {
+        } else if (output === 'json') {
           console.log(JSON.stringify(totalStats, null, 2))
           console.log(JSON.stringify(installedPlugins, null, 2))
         }

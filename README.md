@@ -12,7 +12,6 @@
     - [`ovm plugins prune`](#ovm-plugins-prune)
     - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
     - [`ovm reports stats`](#ovm-reports-stats)
-    - [`ovm help [COMMAND]`](#ovm-help-command)
   - [License](#license)
 
 ## Usage
@@ -33,146 +32,31 @@ USAGE
 
 ### `ovm plugins install`
 
-Install plugins for Obsidian vaults.
+Install plugins in specified vaults.
 
-```sh-session
-USAGE
-  $ ovm plugins install [-d] [-p <value>]
-
-FLAGS
-  -d, --debug         Enable debugging mode
-  -p, --path=<value>  Path or Glob pattern of vaults to install plugins. Default: reads from Obsidian
-                      config per environment.
-
-DESCRIPTION
-  Install plugins for Obsidian vaults.
-
-ALIASES
-  $ ovm pi
-  $ ovm plugins install
-
-EXAMPLES
-  $ ovm plugins install --path=/path/to/vaults
-
-  $ ovm plugins install --path=/path/to/vaults/*/.obsidian
-
-  $ ovm plugins install --path=/path/to/vaults/**/.obsidian
-```
-
-_See code: [src/commands/plugins/install.ts](src/commands/plugins/install.ts)_
+- _Usage:_ `ovm help plugins install`
+- _See code:_ [src/commands/plugins/install.ts](src/commands/plugins/install.ts)
 
 ### `ovm plugins prune`
 
-Prune plugins for Obsidian **vaults**.
+Prune plugins from specified vaults.
 
-```sh-session
-USAGE
-  $ ovm plugins prune [-d] [-p <value>]
-
-FLAGS
-  -d, --debug         Enable debugging mode
-  -p, --path=<value>  Path or Glob pattern of vaults to prune plugins. Default: reads from Obsidian config
-                      per environment.
-
-DESCRIPTION
-  Prune plugins for Obsidian vaults.
-
-ALIASES
-  $ ovm pp
-  $ ovm plugins prune
-
-EXAMPLES
-  $ ovm plugins prune --path=/path/to/vaults
-
-  $ ovm plugins prune --path=/path/to/vaults/*/.obsidian
-
-  $ ovm plugins prune --path=/path/to/vaults/**/.obsidian
-```
-
-_See code: [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)_
+- _Usage:_ `ovm help plugins prune`
+- _See code:_ [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)
 
 ### `ovm plugins uninstall`
 
-Uninstall plugins for Obsidian vaults.
+Uninstall plugins from specified vaults.
 
-```sh-session
-USAGE
-  $ ovm plugins uninstall [-d] [-p <value>]
-
-FLAGS
-  -d, --debug         Enable debugging mode
-  -p, --path=<value>  Path or Glob pattern of vaults to uninstall plugins. Default: reads from Obsidian
-                      config per environment.
-
-DESCRIPTION
-  Uninstall plugins for Obsidian vaults.
-
-ALIASES
-  $ ovm pu
-  $ ovm plugins uninstall
-
-EXAMPLES
-  $ ovm plugins uninstall --path=/path/to/vaults
-
-  $ ovm plugins uninstall --path=/path/to/vaults/*/.obsidian
-
-  $ ovm plugins uninstall --path=/path/to/vaults/**/.obsidian
-```
-
-_See code: [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)_
+- _Usage:_ `ovm help plugins uninstall`
+- _See code:_ [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)
 
 ### `ovm reports stats`
 
-Stats about number of vaults and installed plugins per vault.
+Stats of vaults and installed plugins.
 
-```sh-session
-USAGE
-  $ ovm reports stats [-p <value>] [-o table|json] [-d] [-t]
-
-FLAGS
-  -d, --debug            Enable debugging mode
-  -o, --output=<option>  [default: table] Display the output with a specific transformer.
-                         <options: table|json>
-  -p, --path=<value>     Path or Glob pattern of vaults to get stats from. Default: reads from
-                         Obsidian per vault config per environment.
-  -t, --timestamp        Enable timestamp in logs
-
-DESCRIPTION
-  Stats about number of vaults and installed plugins per vault.
-
-ALIASES
-  $ ovm rs
-  $ ovm reports stats
-
-EXAMPLES
-  $ ovm reports stats --path=/path/to/vaults
-
-  $ ovm reports stats --path=/path/to/vaults/*/.obsidian
-
-  $ ovm reports stats --path=/path/to/vaults/**/.obsidian
-```
-
-_See code: [src/commands/reports/uninstall.ts](src/commands/reports/stats.ts)_
-
-### `ovm help [COMMAND]`
-
-Display help for ovm commands.
-
-```sh-session
-USAGE
-  $ ovm help [COMMAND...] [-n]
-
-ARGUMENTS
-  COMMAND...  Command to show help for.
-
-FLAGS
-  -n, --nested-commands  Include all nested commands in the output.
-
-DESCRIPTION
-  Display help for ovm.
-```
-
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.4/src/commands/help.ts)_
+- _Usage:_ `ovm help plugins stats`
+- _See code:_ [src/commands/reports/stats.ts](src/commands/reports/stats.ts)
 
 ## License
 

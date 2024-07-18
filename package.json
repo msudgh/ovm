@@ -82,10 +82,10 @@
     "topicSeparator": " ",
     "topics": {
       "plugins": {
-        "description": "Manage plugins for Obsidian vaults"
+        "description": "Manage plugins of the vaults"
       },
       "reports": {
-        "description": "Generate reports for Obsidian vaults"
+        "description": "Reports on vaults"
       }
     }
   },

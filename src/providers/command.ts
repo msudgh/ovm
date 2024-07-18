@@ -1,8 +1,8 @@
-import { ExitPromptError } from '@inquirer/core'
-import { Command, Flags, handle } from '@oclif/core'
-import { Vault } from 'obsidian-utils'
-import { findVaultsByPatternMatching, findVaultsFromConfig } from '../services/vaults'
-import { logger } from '../utils/logger'
+import {ExitPromptError} from '@inquirer/core'
+import {Command, Flags, handle} from '@oclif/core'
+import {Vault} from 'obsidian-utils'
+import {findVaultsByPatternMatching, findVaultsFromConfig} from '../services/vaults'
+import {logger} from '../utils/logger'
 
 export type FactoryFlags<T> = T & {
   debug: boolean

@@ -8,7 +8,7 @@ import {findPluginInRegistry, handleExceedRateLimitError} from '../../providers/
 import {vaultsSelector} from '../../services/vaults'
 import {logger} from '../../utils/logger'
 
-const description = `Install plugins for Obsidian vaults.`
+const description = `Install plugins in specified vaults.`
 
 interface InstallFlags {
   path: string
@@ -19,6 +19,9 @@ interface InstallPluginVaultOpts {
   config: Config
 }
 
+/**
+ * Install command installs specified plugins in vaults.
+ */
 export default class Install extends FactoryCommand {
   static readonly aliases = ['pi', 'plugins:install']
   static override readonly description = description

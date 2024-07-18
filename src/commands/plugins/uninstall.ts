@@ -9,7 +9,7 @@ import {pluginsSelector, removePluginDir} from '../../services/plugins'
 import {vaultsSelector} from '../../services/vaults'
 import {logger} from '../../utils/logger'
 
-const description = `Uninstall plugins for Obsidian vaults.`
+const description = `Uninstall plugins from specified vaults.`
 
 interface UninstallFlags {
   path: string
@@ -21,8 +21,7 @@ interface UninstallPluginVaultOpts {
 }
 
 /**
- * Uninstall class is responsible for uninstalling plugins from Obsidian vaults.
- * It provides functionality to remove specified plugins.
+ * Uninstall command removes specified plugins from vaults.
  */
 export default class Uninstall extends FactoryCommand {
   static readonly aliases = ['pu', 'plugins:uninstall']
