@@ -1,17 +1,19 @@
-import {Flags, flush, handle} from '@oclif/core'
-import {ArgInput} from '@oclif/core/lib/parser'
-import {eachSeries} from 'async'
-import {installPluginFromGithub, isPluginInstalled, Vault} from 'obsidian-utils'
-import FactoryCommand, {FactoryFlags} from '../../providers/command'
-import {Config, loadConfig} from '../../providers/config'
-import {findPluginInRegistry, handleExceedRateLimitError} from '../../providers/github'
-import {vaultsSelector} from '../../services/vaults'
-import {logger} from '../../utils/logger'
+import { Flags, flush, handle } from '@oclif/core'
+import { ArgInput } from '@oclif/core/lib/parser'
+import { eachSeries } from 'async'
+import { installPluginFromGithub, isPluginInstalled, Vault } from 'obsidian-utils'
+import FactoryCommand, { FactoryFlags } from '../../providers/command'
+import { Config, loadConfig } from '../../providers/config'
+import { findPluginInRegistry, handleExceedRateLimitError } from '../../providers/github'
+import { modifyCommunityPlugins } from '../../services/plugins'
+import { vaultsSelector } from '../../services/vaults'
+import { logger } from '../../utils/logger'
 
 const description = `Install plugins in specified vaults.`
 
 interface InstallFlags {
   path: string
+  enable: boolean
 }
 
 interface InstallPluginVaultOpts {
@@ -37,6 +39,11 @@ export default class Install extends FactoryCommand {
         'Path or Glob pattern of vaults to install plugins. Default: reads from Obsidian config per environment.',
       default: '',
     }),
+    enable: Flags.boolean({
+      char: 'e',
+      description: 'Enable the installed plugins',
+      default: false,
+    }),
     ...this.commonFlags,
   }
 
@@ -60,13 +67,13 @@ export default class Install extends FactoryCommand {
    * Main action method for the command.
    * Loads vaults, selects vaults, and install specified plugins.
    * @param {ArgInput} args - The arguments passed to the command.
-   * @param {CustomFlags} flags - The flags passed to the command.
+   * @param {FactoryFlags<InstallFlags>} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
   private async action(args: ArgInput, flags: FactoryFlags<InstallFlags>): Promise<void> {
     this.flagsInterceptor(flags)
 
-    const {path} = flags
+    const {path, enable} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
 
@@ -88,14 +95,20 @@ export default class Install extends FactoryCommand {
           }
 
           if (await isPluginInstalled(pluginInRegistry.id, vault.path)) {
-            childLogger.debug(`Plugin already installed`)
+            childLogger.info(`Plugin already installed`)
             continue
           }
 
           try {
             await installPluginFromGithub(pluginInRegistry.repo, stagePlugin.version, vault.path)
             installedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
-            childLogger.info(`Installed plugin`)
+
+            if (enable) {
+              // Enable the plugin
+              await modifyCommunityPlugins(stagePlugin, vault.path, 'enable')
+            }
+
+            childLogger.debug(`Installed plugin`)
           } catch (error) {
             failedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
             handleExceedRateLimitError(error)
@@ -103,7 +116,9 @@ export default class Install extends FactoryCommand {
           }
         }
 
-        logger.info(`Installed ${installedPlugins.length} plugins`, {vault})
+        if (installedPlugins.length > 0) {
+          logger.info(`Installed ${installedPlugins.length} plugins`, {vault})
+        }
 
         return {installedPlugins, failedPlugins}
       }

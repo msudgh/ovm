@@ -1,8 +1,8 @@
-import {checkbox} from '@inquirer/prompts'
-import {readdir, rm} from 'fs/promises'
-import {vaultPathToPluginsPath} from 'obsidian-utils'
-import {Plugin} from '../providers/config'
-import {logger} from '../utils/logger'
+import { checkbox } from '@inquirer/prompts'
+import { readdir, readFile, rm, writeFile } from 'fs/promises'
+import { vaultPathToPluginsPath } from 'obsidian-utils'
+import { Config, Plugin } from '../providers/config'
+import { logger } from '../utils/logger'
 
 export const removePluginDir = async (pluginId: string, vaultPath: string) => {
   const childLogger = logger.child({pluginId, vaultPath})
@@ -40,4 +40,26 @@ export const pluginsSelector = async (plugins: Plugin[]) => {
   logger.debug('selectedPlugins', {selectedPlugins})
 
   return selectedPlugins
+}
+
+export const modifyCommunityPlugins = async (plugin: Plugin, vaultPath: string, action: 'enable' | 'disable') => {
+  const childLogger = logger.child({plugin, vaultPath, action})
+
+  childLogger.debug(`Modify community plugins json`)
+
+  const communityPluginsDir = `${vaultPath}/.obsidian/community-plugins.json`
+  const content = await readFile(communityPluginsDir)
+  let plugins = JSON.parse(content.toString()) as string[]
+  
+  let actionResult: null | Config = null
+  
+  if (action === 'enable') {
+    plugins.push(plugin.id)
+  } else {
+    plugins = plugins.filter((p) => p !== plugin.id)
+  }
+  
+  await writeFile(communityPluginsDir, JSON.stringify(plugins, null, 2))
+
+  childLogger.debug(`Modify action performed`)
 }
