@@ -69,47 +69,52 @@ export default class Install extends FactoryCommand {
     const {path} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const config = await loadConfig()
-    const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
-    const installVaultIterator = async (opts: InstallPluginVaultOpts) => {
-      const {vault, config} = opts
-      logger.debug(`Install plugins for vault`, {vault})
-      const installedPlugins = []
-      const failedPlugins = []
 
-      for (const stagePlugin of config.plugins) {
-        const childLogger = logger.child({stagePlugin, vault})
+    try {
+      const config = (await loadConfig()) as Config
+      const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
+      const installVaultIterator = async (opts: InstallPluginVaultOpts) => {
+        const {vault, config} = opts
+        logger.debug(`Install plugins for vault`, {vault})
+        const installedPlugins = []
+        const failedPlugins = []
 
-        const pluginInRegistry = await findPluginInRegistry(stagePlugin.id)
-        if (!pluginInRegistry) {
-          throw new Error(`Plugin ${stagePlugin.id} not found in registry`)
+        for (const stagePlugin of config.plugins) {
+          const childLogger = logger.child({stagePlugin, vault})
+
+          const pluginInRegistry = await findPluginInRegistry(stagePlugin.id)
+          if (!pluginInRegistry) {
+            throw new Error(`Plugin ${stagePlugin.id} not found in registry`)
+          }
+
+          if (await isPluginInstalled(pluginInRegistry.id, vault.path)) {
+            childLogger.debug(`Plugin already installed`)
+            continue
+          }
+
+          try {
+            await installPluginFromGithub(pluginInRegistry.repo, stagePlugin.version, vault.path)
+            installedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
+            childLogger.info(`Installed plugin`)
+          } catch (error) {
+            failedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
+            handleExceedRateLimitError(error)
+            childLogger.error(`Failed to install plugin`, {error})
+          }
         }
 
-        if (await isPluginInstalled(pluginInRegistry.id, vault.path)) {
-          childLogger.debug(`Plugin already installed`)
-          continue
-        }
+        logger.info(`Installed ${installedPlugins.length} plugins`, {vault})
 
-        try {
-          await installPluginFromGithub(pluginInRegistry.repo, stagePlugin.version, vault.path)
-          installedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
-          childLogger.info(`Installed plugin`)
-        } catch (error) {
-          failedPlugins.push({repo: pluginInRegistry.repo, version: stagePlugin.version})
-          handleExceedRateLimitError(error)
-          childLogger.error(`Failed to install plugin`, {error})
-        }
+        return {installedPlugins, failedPlugins}
       }
-
-      logger.info(`Installed ${installedPlugins.length} plugins`, {vault})
-
-      return {installedPlugins, failedPlugins}
+      eachSeries(vaultsWithConfig, installVaultIterator, (error) => {
+        if (error) {
+          logger.debug('Error installing plugins', {error})
+          handle(error)
+        }
+      })
+    } catch (error) {
+      this.handleError(error)
     }
-    eachSeries(vaultsWithConfig, installVaultIterator, (error) => {
-      if (error) {
-        logger.debug('Error installing plugins', {error})
-        handle(error)
-      }
-    })
   }
 }

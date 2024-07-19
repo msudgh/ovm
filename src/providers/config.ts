@@ -14,7 +14,7 @@ export const ConfigSchema = z.object({
   plugins: z.array(z.custom<Plugin>()).default([]),
 })
 
-export const loadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<Config> => {
+export const loadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<Config | Error> => {
   return new Promise((resolve, reject) => {
     try {
       const config = readFileSync(configPath)
@@ -30,13 +30,37 @@ export const loadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<Config> =>
     } catch (error) {
       // Handle not found error
       if (error instanceof Error && error.message.includes('ENOENT')) {
-        logger.debug('Config file not found')
-        const defaultConfig = ConfigSchema.parse({})
-        writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2))
-        resolve(defaultConfig)
+        reject(new Error('Config file not found'))
       }
 
+      reject(error)
+    }
+  })
+}
+
+const writeConfig = (config: Config, configPath = DEFAULT_CONFIG_PATH): Promise<void | Error> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const content = JSON.stringify(config, null, 2)
+      writeFileSync(configPath, content)
+      resolve()
+    } catch (error) {
       reject(error as Error)
+    }
+  })
+}
+
+export const createDefaultConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<Config | Error> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const defaultConfig = ConfigSchema.parse({})
+      writeConfig(defaultConfig)
+
+      logger.debug('Default config created', {configPath})
+
+      resolve(defaultConfig)
+    } catch (error) {
+      reject(error)
     }
   })
 }

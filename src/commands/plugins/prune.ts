@@ -69,28 +69,33 @@ export default class Prune extends FactoryCommand {
     const {path} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const config = await loadConfig()
-    const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
-    const prunePluginsIterator = async (opts: PrunePluginVaultOpts) => {
-      const {vault, config} = opts
-      const childLogger = logger.child({vault})
-      const installedPlugins = await listInstalledPlugins(vault.path)
-      const referencedPlugins = config.plugins.map(({id}) => id)
-      const toBePruned = installedPlugins.filter(({id}) => !referencedPlugins.includes(id))
 
-      for (const plugin of toBePruned) {
-        childLogger.debug(`Pruning plugin`, {plugin})
-        await removePluginDir(plugin.id, vault.path)
+    try {
+      const config = (await loadConfig()) as Config
+      const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
+      const prunePluginsIterator = async (opts: PrunePluginVaultOpts) => {
+        const {vault, config} = opts
+        const childLogger = logger.child({vault})
+        const installedPlugins = await listInstalledPlugins(vault.path)
+        const referencedPlugins = config.plugins.map(({id}) => id)
+        const toBePruned = installedPlugins.filter(({id}) => !referencedPlugins.includes(id))
+
+        for (const plugin of toBePruned) {
+          childLogger.debug(`Pruning plugin`, {plugin})
+          await removePluginDir(plugin.id, vault.path)
+        }
+
+        childLogger.info(`Pruned ${toBePruned.length} plugins`)
       }
 
-      childLogger.info(`Pruned ${toBePruned.length} plugins`)
+      eachSeries(vaultsWithConfig, prunePluginsIterator, (error) => {
+        if (error) {
+          logger.debug('Error pruning plugins', {error})
+          handle(error)
+        }
+      })
+    } catch (error) {
+      this.handleError(error)
     }
-
-    eachSeries(vaultsWithConfig, prunePluginsIterator, (error) => {
-      if (error) {
-        logger.debug('Error pruning plugins', {error})
-        handle(error)
-      }
-    })
   }
 }

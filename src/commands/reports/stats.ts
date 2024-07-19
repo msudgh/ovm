@@ -67,44 +67,49 @@ export default class Stats extends FactoryCommand {
     const {path, output} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const config = await loadConfig()
-    const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
 
-    type InstalledPlugins = Record<string, Array<string>>
-    const installedPlugins: InstalledPlugins = {}
+    try {
+      const config = (await loadConfig()) as Config
+      const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
 
-    const statsVaultIterator = async (opts: {vault: Vault; config: Config}) => {
-      const {vault, config} = opts
-      logger.debug(`Checking stats for vault`, {vault})
+      type InstalledPlugins = Record<string, Array<string>>
+      const installedPlugins: InstalledPlugins = {}
 
-      for (const stagePlugin of config.plugins) {
-        if (await isPluginInstalled(stagePlugin.id, vault.path)) {
-          installedPlugins[stagePlugin.id] = [...(installedPlugins[stagePlugin.id] || []), vault.name]
+      const statsVaultIterator = async (opts: {vault: Vault; config: Config}) => {
+        const {vault, config} = opts
+        logger.debug(`Checking stats for vault`, {vault})
+
+        for (const stagePlugin of config.plugins) {
+          if (await isPluginInstalled(stagePlugin.id, vault.path)) {
+            installedPlugins[stagePlugin.id] = [...(installedPlugins[stagePlugin.id] || []), vault.name]
+          }
         }
       }
-    }
 
-    const statsVaultErrorCallback: ErrorCallback<Error> = (error) => {
-      if (error) {
-        logger.debug('Error getting stats', {error})
-        handle(error)
-        return error
-      } else {
-        const totalStats = {
-          totalVaults: selectedVaults.length,
-          totalPlugins: config.plugins.length,
-        }
+      const statsVaultErrorCallback: ErrorCallback<Error> = (error) => {
+        if (error) {
+          logger.debug('Error getting stats', {error})
+          handle(error)
+          return error
+        } else {
+          const totalStats = {
+            totalVaults: selectedVaults.length,
+            totalPlugins: config.plugins.length,
+          }
 
-        if (output === 'table') {
-          console.table(totalStats)
-          console.table(installedPlugins)
-        } else if (output === 'json') {
-          console.log(JSON.stringify(totalStats, null, 2))
-          console.log(JSON.stringify(installedPlugins, null, 2))
+          if (output === 'table') {
+            console.table(totalStats)
+            console.table(installedPlugins)
+          } else if (output === 'json') {
+            console.log(JSON.stringify(totalStats, null, 2))
+            console.log(JSON.stringify(installedPlugins, null, 2))
+          }
         }
       }
-    }
 
-    eachSeries(vaultsWithConfig, statsVaultIterator, statsVaultErrorCallback)
+      eachSeries(vaultsWithConfig, statsVaultIterator, statsVaultErrorCallback)
+    } catch (error) {
+      this.handleError(error)
+    }
   }
 }

@@ -1,13 +1,17 @@
-import {ExitPromptError} from '@inquirer/core'
-import {Command, Flags, handle} from '@oclif/core'
-import {Vault} from 'obsidian-utils'
-import {findVaultsByPatternMatching, findVaultsFromConfig} from '../services/vaults'
-import {logger} from '../utils/logger'
+import { ExitPromptError } from '@inquirer/core'
+import { Command, Flags, handle } from '@oclif/core'
+import { Vault } from 'obsidian-utils'
+import { DEFAULT_CONFIG_PATH } from '../constants'
+import { findVaultsByPatternMatching, findVaultsFromConfig } from '../services/vaults'
+import { logger } from '../utils/logger'
 
-export type FactoryFlags<T> = T & {
+export type CommonFlags = {
   debug: boolean
   timestamp: boolean
+  config: string
 }
+
+export type FactoryFlags<T> = T & CommonFlags
 
 export default class FactoryCommand extends Command {
   static readonly commonFlags = {
@@ -20,6 +24,12 @@ export default class FactoryCommand extends Command {
       char: 't',
       default: false,
       description: 'Enable timestamp in logs',
+    }),
+    config: Flags.file({
+      char: 'c',
+      description: 'Path to the configuration file',
+      default: DEFAULT_CONFIG_PATH,
+      required: false,
     }),
   }
 

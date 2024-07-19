@@ -70,45 +70,50 @@ export default class Uninstall extends FactoryCommand {
     const {path} = flags
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const config = await loadConfig()
-    const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
-    const uninstallVaultIterator = async (opts: UninstallPluginVaultOpts) => {
-      const {vault, config} = opts
-      logger.debug(`Uninstall plugins for vault`, {vault})
 
-      const uninstalledPlugins = []
-      const failedPlugins = []
+    try {
+      const config = (await loadConfig()) as Config
+      const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
+      const uninstallVaultIterator = async (opts: UninstallPluginVaultOpts) => {
+        const {vault, config} = opts
+        logger.debug(`Uninstall plugins for vault`, {vault})
 
-      const selectedPlugins = await pluginsSelector(config.plugins)
+        const uninstalledPlugins = []
+        const failedPlugins = []
 
-      for (const stagePlugin of selectedPlugins) {
-        const childLogger = logger.child({stagePlugin, vault})
+        const selectedPlugins = await pluginsSelector(config.plugins)
 
-        if (!(await isPluginInstalled(stagePlugin.id, vault.path))) {
-          childLogger.debug(`Plugin not installed`)
-          continue
+        for (const stagePlugin of selectedPlugins) {
+          const childLogger = logger.child({stagePlugin, vault})
+
+          if (!(await isPluginInstalled(stagePlugin.id, vault.path))) {
+            childLogger.debug(`Plugin not installed`)
+            continue
+          }
+
+          try {
+            await removePluginDir(stagePlugin.id, vault.path)
+            uninstalledPlugins.push(stagePlugin)
+          } catch (error) {
+            failedPlugins.push(stagePlugin)
+            handleExceedRateLimitError(error)
+            childLogger.error(`Failed to uninstall plugin`, {error})
+          }
         }
 
-        try {
-          await removePluginDir(stagePlugin.id, vault.path)
-          uninstalledPlugins.push(stagePlugin)
-        } catch (error) {
-          failedPlugins.push(stagePlugin)
-          handleExceedRateLimitError(error)
-          childLogger.error(`Failed to uninstall plugin`, {error})
-        }
+        logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, {vault})
+
+        return {uninstalledPlugins, failedPlugins}
       }
 
-      logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, {vault})
-
-      return {uninstalledPlugins, failedPlugins}
+      eachSeries(vaultsWithConfig, uninstallVaultIterator, (error) => {
+        if (error) {
+          logger.debug('Error installing plugins', {error})
+          handle(error)
+        }
+      })
+    } catch (error) {
+      this.handleError(error)
     }
-
-    eachSeries(vaultsWithConfig, uninstallVaultIterator, (error) => {
-      if (error) {
-        logger.debug('Error installing plugins', {error})
-        handle(error)
-      }
-    })
   }
 }
