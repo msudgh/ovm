@@ -25,6 +25,9 @@
     "coverage": "nyc --reporter=lcov npm run test"
   },
   "keywords": [
+    "obsidian",
+    "vaults",
+    "cli",
     "oclif"
   ],
   "bin": {
