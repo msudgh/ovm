@@ -6,8 +6,8 @@
   "license": "MIT",
   "author": "Masoud Ghorbani",
   "homepage": "https://github.com/msudgh/ovm",
-  "bugs": "https://github.com/w/ovm/issues",
-  "repository": "https://github.com/musdgh/ovm.git",
+  "bugs": "https://github.com/msudgh/ovm/issues",
+  "repository": "https://github.com/msudgh/ovm.git",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
