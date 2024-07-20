@@ -62,9 +62,16 @@ export default class Stats extends FactoryCommand {
    * @param {FactoryFlags<StatsFlags>} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: FactoryFlags<StatsFlags>): Promise<void> {
+  private async action(
+    args: ArgInput,
+    flags: FactoryFlags<StatsFlags>,
+  ): Promise<void> {
     const { path, output } = flags
-    const { success: loadConfigSuccess, data: config, error: loadConfigError } = await safeLoadConfig()
+    const {
+      success: loadConfigSuccess,
+      data: config,
+      error: loadConfigError,
+    } = await safeLoadConfig()
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })
       process.exit(1)
@@ -76,13 +83,19 @@ export default class Stats extends FactoryCommand {
 
     const installedPlugins: InstalledPlugins = {}
 
-    const statsVaultIterator = async (opts: { vault: Vault; config: Config }) => {
+    const statsVaultIterator = async (opts: {
+      vault: Vault
+      config: Config
+    }) => {
       const { vault, config } = opts
       logger.debug(`Checking stats for vault`, { vault })
 
       for (const stagePlugin of config.plugins) {
         if (await isPluginInstalled(stagePlugin.id, vault.path)) {
-          installedPlugins[stagePlugin.id] = [...(installedPlugins[stagePlugin.id] || []), vault.name]
+          installedPlugins[stagePlugin.id] = [
+            ...(installedPlugins[stagePlugin.id] || []),
+            vault.name,
+          ]
         }
       }
     }

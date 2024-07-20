@@ -64,9 +64,16 @@ export default class Uninstall extends FactoryCommand {
    * @param {FactoryFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: FactoryFlags<UninstallFlags>): Promise<void> {
+  private async action(
+    args: ArgInput,
+    flags: FactoryFlags<UninstallFlags>,
+  ): Promise<void> {
     const { path } = flags
-    const { success: loadConfigSuccess, data: config, error: loadConfigError } = await safeLoadConfig()
+    const {
+      success: loadConfigSuccess,
+      data: config,
+      error: loadConfigError,
+    } = await safeLoadConfig()
 
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })
