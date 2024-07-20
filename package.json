@@ -20,9 +20,9 @@
     "format:write": "prettier -w \"**/*.{ts,json}\"",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
-    "prepack": "oclif manifest && pnpm run build:release && pnpm run test",
-    "test": "mocha",
-    "coverage": "nyc --reporter=lcov npm run test"
+    "prepack": "oclif manifest && pnpm run build:release && pnpm run test:unit",
+    "test:unit": "mocha",
+    "test:coverage": "nyc --reporter=lcov npm run test:unit"
   },
   "keywords": [
     "obsidian",
