@@ -1,13 +1,13 @@
-import {Flags, flush, handle} from '@oclif/core'
-import {ArgInput} from '@oclif/core/lib/parser'
-import {eachSeries} from 'async'
-import {isPluginInstalled, Vault} from 'obsidian-utils'
-import FactoryCommand, {FactoryFlags} from '../../providers/command'
-import {Config, loadConfig} from '../../providers/config'
-import {handleExceedRateLimitError} from '../../providers/github'
-import {pluginsSelector, removePluginDir} from '../../services/plugins'
-import {vaultsSelector} from '../../services/vaults'
-import {logger} from '../../utils/logger'
+import { Flags, flush, handle } from '@oclif/core'
+import { ArgInput } from '@oclif/core/lib/parser'
+import { eachSeries } from 'async'
+import { isPluginInstalled, Vault } from 'obsidian-utils'
+import FactoryCommand, { FactoryFlags } from '../../providers/command'
+import { Config, safeLoadConfig } from '../../providers/config'
+import { handleExceedRateLimitError } from '../../providers/github'
+import { pluginsSelector, removePluginDir } from '../../services/plugins'
+import { vaultsSelector } from '../../services/vaults'
+import { logger } from '../../utils/logger'
 
 const description = `Uninstall plugins from specified vaults.`
 
@@ -48,8 +48,8 @@ export default class Uninstall extends FactoryCommand {
    */
   public async run() {
     try {
-      const {args, flags} = await this.parse(Uninstall)
-      await this.action(args, flags)
+      const { args, flags } = await this.parse(Uninstall)
+      await this.action(args, this.flagsInterceptor(flags))
     } catch (error) {
       this.handleError(error)
     } finally {
@@ -65,16 +65,20 @@ export default class Uninstall extends FactoryCommand {
    * @returns {Promise<void>}
    */
   private async action(args: ArgInput, flags: FactoryFlags<UninstallFlags>): Promise<void> {
-    this.flagsInterceptor(flags)
+    const { path } = flags
+    const { success: loadConfigSuccess, data: config, error: loadConfigError } = await safeLoadConfig()
 
-    const {path} = flags
+    if (!loadConfigSuccess) {
+      logger.error('Failed to load config', { error: loadConfigError })
+      process.exit(1)
+    }
+
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const config = await loadConfig()
-    const vaultsWithConfig = selectedVaults.map((vault) => ({vault, config}))
+    const vaultsWithConfig = selectedVaults.map((vault) => ({ vault, config }))
     const uninstallVaultIterator = async (opts: UninstallPluginVaultOpts) => {
-      const {vault, config} = opts
-      logger.debug(`Uninstall plugins for vault`, {vault})
+      const { vault, config } = opts
+      logger.debug(`Uninstall plugins for vault`, { vault })
 
       const uninstalledPlugins = []
       const failedPlugins = []
@@ -82,7 +86,7 @@ export default class Uninstall extends FactoryCommand {
       const selectedPlugins = await pluginsSelector(config.plugins)
 
       for (const stagePlugin of selectedPlugins) {
-        const childLogger = logger.child({stagePlugin, vault})
+        const childLogger = logger.child({ stagePlugin, vault })
 
         if (!(await isPluginInstalled(stagePlugin.id, vault.path))) {
           childLogger.debug(`Plugin not installed`)
@@ -95,18 +99,18 @@ export default class Uninstall extends FactoryCommand {
         } catch (error) {
           failedPlugins.push(stagePlugin)
           handleExceedRateLimitError(error)
-          childLogger.error(`Failed to uninstall plugin`, {error})
+          childLogger.error(`Failed to uninstall plugin`, { error })
         }
       }
 
-      logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, {vault})
+      logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, { vault })
 
-      return {uninstalledPlugins, failedPlugins}
+      return { uninstalledPlugins, failedPlugins }
     }
 
     eachSeries(vaultsWithConfig, uninstallVaultIterator, (error) => {
       if (error) {
-        logger.debug('Error installing plugins', {error})
+        logger.debug('Error installing plugins', { error })
         handle(error)
       }
     })

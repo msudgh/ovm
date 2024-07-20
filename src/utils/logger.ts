@@ -1,8 +1,8 @@
-import {createLogger, format, transports} from 'winston'
+import { createLogger, format, transports } from 'winston'
 
 const getFormat = () => {
-  const jsonLogging = process.env.JSON_LOGGING === 'true'
-  const enableTimestamp = process.env.ENABLE_TIMESTAMP === 'true'
+  const jsonLogging = process.env.OVM_ENABLE_LOG_JSON === 'true'
+  const enableTimestamp = process.env.OVM_ENABLE_LOG_TIMESTAMP === 'true'
   return format.combine(
     format.colorize(),
     ...(enableTimestamp ? [format.timestamp()] : []),

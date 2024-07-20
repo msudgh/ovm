@@ -1,4 +1,4 @@
-import {homedir} from 'os'
+import { homedir } from 'os'
 import path from 'path'
 
 export const OVM_CONFIG_FILENAME = 'ovm.json'

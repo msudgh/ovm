@@ -1,13 +1,17 @@
-import {ExitPromptError} from '@inquirer/core'
-import {Command, Flags, handle} from '@oclif/core'
-import {Vault} from 'obsidian-utils'
-import {findVaultsByPatternMatching, findVaultsFromConfig} from '../services/vaults'
-import {logger} from '../utils/logger'
+import { ExitPromptError } from '@inquirer/core'
+import { Command, Flags, handle } from '@oclif/core'
+import { Vault } from 'obsidian-utils'
+import { DEFAULT_CONFIG_PATH } from '../constants'
+import { findVaultsByPatternMatching, findVaultsFromConfig } from '../services/vaults'
+import { logger } from '../utils/logger'
 
-export type FactoryFlags<T> = T & {
+export type CommonFlags = {
   debug: boolean
   timestamp: boolean
+  config: string
 }
+
+export type FactoryFlags<T> = T & CommonFlags
 
 export default class FactoryCommand extends Command {
   static readonly commonFlags = {
@@ -21,6 +25,12 @@ export default class FactoryCommand extends Command {
       default: false,
       description: 'Enable timestamp in logs',
     }),
+    config: Flags.file({
+      char: 'c',
+      description: `Path to the configuration file. (default: ${DEFAULT_CONFIG_PATH})`,
+      default: DEFAULT_CONFIG_PATH,
+      required: false,
+    }),
   }
 
   run(): Promise<unknown> {
@@ -28,12 +38,13 @@ export default class FactoryCommand extends Command {
   }
 
   public flagsInterceptor<T>(flags: FactoryFlags<T>): FactoryFlags<T> {
-    const {debug, timestamp} = flags
+    const { debug, timestamp } = flags
+
+    process.env.OVM_ENABLE_LOG_TIMESTAMP = timestamp ? 'true' : 'false'
 
     if (debug) {
       logger.level = 'debug'
-      logger.debug(`Command called`, {flags})
-      process.env.ENABLE_TIMESTAMP = timestamp ? 'true' : 'false'
+      logger.debug(`Command called`, { flags })
     }
 
     return flags
@@ -68,9 +79,9 @@ export default class FactoryCommand extends Command {
 
   public handleError(error: unknown) {
     if (error instanceof ExitPromptError) {
-      logger.debug('Exit prompt error:', {error})
+      logger.debug('Exit prompt error:', { error })
     } else if (error instanceof Error) {
-      logger.debug('An error occurred while installation:', {error})
+      logger.debug('An error occurred while installation:', { error })
       handle(error)
     }
   }

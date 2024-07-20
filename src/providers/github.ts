@@ -1,4 +1,4 @@
-import NodeFetchCache, {FileSystemCache} from 'node-fetch-cache'
+import NodeFetchCache, { FileSystemCache } from 'node-fetch-cache'
 
 // const interceptor = new ClientRequestInterceptor()
 const fetch = NodeFetchCache.create({
@@ -39,5 +39,5 @@ export const fetchPlugins = async (): Promise<PluginRegistry[]> => {
 
 export const findPluginInRegistry = async (name: string): Promise<PluginRegistry | undefined> => {
   const pluginsRegistry = await fetchPlugins()
-  return pluginsRegistry.find(({id}) => id === name)
+  return pluginsRegistry.find(({ id }) => id === name)
 }

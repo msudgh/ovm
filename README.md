@@ -1,18 +1,19 @@
-# ovm - Obsidian vaults manager
-
 ![NPM Version](https://img.shields.io/npm/v/ovm)
+![GitHub License](https://img.shields.io/github/license/msudgh/ovm)
 [![GitHub Actions Test Workflow Status](https://github.com/msudgh/ovm/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/msudgh/ovm/actions/workflows/test.yml)
+
+ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the management of vaults in Obsidian. This tool aims to overcome the limitations associated with performing bulk tasks on specific vaults and plugins. It enables users to install, uninstall, prune, and generate reports for a set of favorite plugins across multiple vaults, enhancing productivity and efficiency.
 
 **Table of Contents**
 
-- [ovm - Obsidian vaults manager](#ovm---obsidian-vaults-manager)
-  - [Usage](#usage)
-  - [Commands](#commands)
-    - [`ovm plugins install`](#ovm-plugins-install)
-    - [`ovm plugins prune`](#ovm-plugins-prune)
-    - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
-    - [`ovm reports stats`](#ovm-reports-stats)
-  - [License](#license)
+- [Usage](#usage)
+- [Commands](#commands)
+  - [`ovm config init`](#ovm-config-init)
+  - [`ovm plugins install`](#ovm-plugins-install)
+  - [`ovm plugins prune`](#ovm-plugins-prune)
+  - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
+  - [`ovm reports stats`](#ovm-reports-stats)
+- [License](#license)
 
 ## Usage
 
@@ -29,6 +30,13 @@ USAGE
 ```
 
 ## Commands
+
+### `ovm config init`
+
+Configure an ovm.json config file in user's home dir.
+
+- _Usage:_ `ovm help config init`
+- _See code:_ [src/commands/config/init.ts](src/commands/config/init.ts)
 
 ### `ovm plugins install`
 
