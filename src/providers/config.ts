@@ -1,10 +1,10 @@
-import {readFileSync, writeFileSync} from 'fs'
-import {GitHubPluginVersion} from 'obsidian-utils'
+import { readFileSync, writeFileSync } from 'fs'
+import { GitHubPluginVersion } from 'obsidian-utils'
 import z from 'zod'
-import {DEFAULT_CONFIG_PATH} from '../constants'
-import {logger} from '../utils/logger'
+import { DEFAULT_CONFIG_PATH } from '../constants'
+import { logger } from '../utils/logger'
 
-export type Plugin = {id: string; version: GitHubPluginVersion}
+export type Plugin = { id: string; version: GitHubPluginVersion }
 
 export type Config = {
   plugins: Plugin[]
@@ -14,26 +14,44 @@ export const ConfigSchema = z.object({
   plugins: z.array(z.custom<Plugin>()).default([]),
 })
 
-export const loadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<Config | Error> => {
-  return new Promise((resolve, reject) => {
+type SafeLoadConfigResultSuccess = {
+  success: true
+  data: Config
+  error: undefined
+}
+
+type SafeLoadConfigResultError = {
+  success: false
+  data: undefined
+  error: Error
+}
+
+type SafeLoadConfigResult =
+  | ({
+      success: boolean
+    } & SafeLoadConfigResultSuccess)
+  | SafeLoadConfigResultError
+
+export const safeLoadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<SafeLoadConfigResult> => {
+  return new Promise((resolve) => {
     try {
       const config = readFileSync(configPath)
       const parsed = JSON.parse(config.toString()) as Config
-      const {success, data, error} = ConfigSchema.safeParse(parsed)
+      const { success, data, error } = ConfigSchema.safeParse(parsed)
 
       if (!success) {
-        logger.debug('Invalid config file', {data, error})
+        logger.debug('Invalid config file', { data, error })
         throw new Error('Invalid config file')
       }
 
-      resolve(parsed)
+      resolve({ success, data, error: undefined })
     } catch (error) {
-      // Handle not found error
-      if (error instanceof Error && error.message.includes('ENOENT')) {
-        reject(new Error('Config file not found'))
+      const typedError = error as Error
+      if (typedError instanceof Error && typedError.message.includes('ENOENT')) {
+        resolve({ success: false, data: undefined, error: new Error('Config file not found') })
       }
 
-      reject(error)
+      resolve({ success: false, data: undefined, error: typedError })
     }
   })
 }
@@ -56,11 +74,12 @@ export const createDefaultConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<C
       const defaultConfig = ConfigSchema.parse({})
       writeConfig(defaultConfig)
 
-      logger.debug('Default config created', {configPath})
+      logger.debug('Default config created', { configPath })
 
       resolve(defaultConfig)
     } catch (error) {
-      reject(error)
+      const typedError = error as Error
+      reject(typedError)
     }
   })
 }

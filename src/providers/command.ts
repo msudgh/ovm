@@ -27,7 +27,7 @@ export default class FactoryCommand extends Command {
     }),
     config: Flags.file({
       char: 'c',
-      description: 'Path to the configuration file',
+      description: `Path to the configuration file. (default: ${DEFAULT_CONFIG_PATH})`,
       default: DEFAULT_CONFIG_PATH,
       required: false,
     }),
@@ -38,12 +38,13 @@ export default class FactoryCommand extends Command {
   }
 
   public flagsInterceptor<T>(flags: FactoryFlags<T>): FactoryFlags<T> {
-    const {debug, timestamp} = flags
+    const { debug, timestamp } = flags
+
+    process.env.OVM_ENABLE_LOG_TIMESTAMP = timestamp ? 'true' : 'false'
 
     if (debug) {
       logger.level = 'debug'
-      logger.debug(`Command called`, {flags})
-      process.env.ENABLE_TIMESTAMP = timestamp ? 'true' : 'false'
+      logger.debug(`Command called`, { flags })
     }
 
     return flags
@@ -78,9 +79,9 @@ export default class FactoryCommand extends Command {
 
   public handleError(error: unknown) {
     if (error instanceof ExitPromptError) {
-      logger.debug('Exit prompt error:', {error})
+      logger.debug('Exit prompt error:', { error })
     } else if (error instanceof Error) {
-      logger.debug('An error occurred while installation:', {error})
+      logger.debug('An error occurred while installation:', { error })
       handle(error)
     }
   }

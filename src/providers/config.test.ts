@@ -1,33 +1,27 @@
-import * as sinon from 'sinon'
-import {loadConfig} from './config'
+import { createDefaultConfig, safeLoadConfig } from './config'
 
-import {expect} from 'chai'
-import fs, {readFileSync} from 'fs'
+import { expect } from 'chai'
 import mock from 'mock-fs'
-import {OVM_CONFIG_FILENAME} from '../constants'
+import { OVM_CONFIG_FILENAME } from '../constants'
 
 describe('Config', () => {
-  it("should setup config in user's homedir by creating generating the file", async () => {
+  it("should load config from user's home dir", async () => {
     const userHome = '/home/user'
     const configPath = `${userHome}/${OVM_CONFIG_FILENAME}`
-    mock({
-      [userHome]: {},
-    })
-    const writeStub = sinon.stub(fs, 'writeFileSync')
-    const config = await loadConfig(configPath)
 
-    expect(writeStub.calledOnce).to.be.true
-    expect(writeStub.firstCall.args[0]).to.equal(configPath)
+    const sampleDefaultConfig = await createDefaultConfig()
 
     mock({
       [userHome]: {
-        [OVM_CONFIG_FILENAME]: JSON.stringify(config),
+        [OVM_CONFIG_FILENAME]: JSON.stringify(sampleDefaultConfig),
       },
     })
 
-    const createdFile = JSON.parse(readFileSync(configPath).toString())
-    expect(createdFile).to.deep.equal({plugins: []})
-    writeStub.restore()
+    const config = await safeLoadConfig(configPath)
+
+    expect(config.success).to.be.true
+    expect(config.data).to.deep.equal(config.data)
+    expect(config.error).to.be.undefined
     mock.restore()
   })
 
@@ -41,7 +35,8 @@ describe('Config', () => {
     })
 
     try {
-      await loadConfig(configPath)
+      const { error } = await safeLoadConfig(configPath)
+      throw error
     } catch (error) {
       expect(error).to.be.an('error')
     }

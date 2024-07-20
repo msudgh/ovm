@@ -17,7 +17,7 @@
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"format:check": "prettier -c \"src/**/*.ts\"",
-		"format:write": "prettier -w \"**/*.{ts}\"",
+		"format:write": "prettier -w \"src/**/*.ts\"",
 		"postpack": "shx rm -f oclif.manifest.json",
 		"posttest": "pnpm run lint",
 		"prepack": "oclif manifest && pnpm run build:release && pnpm run test",

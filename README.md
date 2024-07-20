@@ -10,7 +10,7 @@ This project is designed to improve the management of vaults in obsidian, to rem
 - [ovm - Obsidian vaults manager](#ovm---obsidian-vaults-manager)
   - [Usage](#usage)
   - [Commands](#commands)
-    - [`ovm plugins init`](#ovm-plugins-init)
+    - [`ovm config init`](#ovm-config-init)
     - [`ovm plugins install`](#ovm-plugins-install)
     - [`ovm plugins prune`](#ovm-plugins-prune)
     - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
@@ -33,11 +33,11 @@ USAGE
 
 ## Commands
 
-### `ovm plugins init`
+### `ovm config init`
 
 Configure an ovm.json config file in user's home dir.
 
-- _Usage:_ `ovm help config`
+- _Usage:_ `ovm help config init`
 - _See code:_ [src/commands/config/init.ts](src/commands/config/init.ts)
 
 ### `ovm plugins install`

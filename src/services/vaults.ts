@@ -1,15 +1,15 @@
-import {checkbox} from '@inquirer/prompts'
-import {glob} from 'glob'
-import {findVault, Vault} from 'obsidian-utils'
+import { checkbox } from '@inquirer/prompts'
+import { glob } from 'glob'
+import { findVault, Vault } from 'obsidian-utils'
 import path from 'path'
-import {logger} from '../utils/logger'
+import { logger } from '../utils/logger'
 
 export const findVaultsByPatternMatching = async (pathPattern: string) => {
   if (!pathPattern.endsWith('.obsidian')) {
     pathPattern = `${pathPattern}/**/.obsidian`
   }
 
-  const vaultsMatches = await glob(pathPattern, {absolute: true, dot: true, nocase: true})
+  const vaultsMatches = await glob(pathPattern, { absolute: true, dot: true, nocase: true })
   const detectedVaults = []
   const vaultsQueryPromises = vaultsMatches.map((vault) => findVault(vault))
 
@@ -41,7 +41,7 @@ export const vaultsSelector = async (vaults: Vault[]) => {
     required: true,
   })
 
-  logger.debug('selectedVaults', {selectedVaults})
+  logger.debug('selectedVaults', { selectedVaults })
 
   return selectedVaults
 }
