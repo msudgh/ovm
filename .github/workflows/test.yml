@@ -30,6 +30,7 @@ jobs:
       - run: pnpm run build
       - run: pnpm run test:coverage
       - name: SonarCloud Scan
+        if: matrix.os == 'ubuntu-latest'
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any

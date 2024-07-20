@@ -10,5 +10,13 @@
     "text",
     "html",
     "lcov"
+  ],
+  "exclude": [
+    "eslint.config.cjs",
+    "coverage/**",
+    "dist/**",
+    "node_modules/**",
+    "test/**",
+    "bin/**"
   ]
 }
