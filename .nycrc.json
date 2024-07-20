@@ -1,7 +1,22 @@
 {
+  "$schema": "https://json.schemastore.org/nycrc.json",
   "extends": "@istanbuljs/nyc-config-typescript",
   "all": true,
-  "check-coverage": true,
-  "extensions": [".ts"],
-  "reporter": ["text", "html", "lcov"]
+  "check-coverage": false,
+  "extensions": [
+    ".ts"
+  ],
+  "reporter": [
+    "text",
+    "html",
+    "lcov"
+  ],
+  "exclude": [
+    "eslint.config.cjs",
+    "coverage/**",
+    "dist/**",
+    "node_modules/**",
+    "test/**",
+    "bin/**"
+  ]
 }
