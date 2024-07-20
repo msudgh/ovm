@@ -2,12 +2,12 @@
   "name": "ovm",
   "description": "Obsidian Vaults Manager",
   "type": "commonjs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Masoud Ghorbani",
   "homepage": "https://github.com/msudgh/ovm",
-  "bugs": "https://github.com/w/ovm/issues",
-  "repository": "https://github.com/musdgh/ovm.git",
+  "bugs": "https://github.com/msudgh/ovm/issues",
+  "repository": "https://github.com/msudgh/ovm.git",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -25,6 +25,9 @@
     "coverage": "nyc --reporter=lcov npm run test"
   },
   "keywords": [
+    "obsidian",
+    "vaults",
+    "cli",
     "oclif"
   ],
   "bin": {
