@@ -2,7 +2,7 @@
 	"name": "ovm",
 	"description": "Obsidian Vaults Manager",
 	"type": "module",
-	"version": "0.1.0-b.3",
+	"version": "0.1.0-b.1",
 	"license": "MIT",
 	"author": "Masoud Ghorbani",
 	"homepage": "https://github.com/msudgh/ovm",
