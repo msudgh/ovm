@@ -63,9 +63,16 @@ export default class Prune extends FactoryCommand {
    * @param {CustomFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: FactoryFlags<PruneFlags>): Promise<void> {
+  private async action(
+    args: ArgInput,
+    flags: FactoryFlags<PruneFlags>,
+  ): Promise<void> {
     const { path } = flags
-    const { success: loadConfigSuccess, data: config, error: loadConfigError } = await safeLoadConfig()
+    const {
+      success: loadConfigSuccess,
+      data: config,
+      error: loadConfigError,
+    } = await safeLoadConfig()
 
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })
@@ -80,7 +87,9 @@ export default class Prune extends FactoryCommand {
       const childLogger = logger.child({ vault })
       const installedPlugins = await listInstalledPlugins(vault.path)
       const referencedPlugins = config.plugins.map(({ id }) => id)
-      const toBePruned = installedPlugins.filter(({ id }) => !referencedPlugins.includes(id))
+      const toBePruned = installedPlugins.filter(
+        ({ id }) => !referencedPlugins.includes(id),
+      )
 
       for (const plugin of toBePruned) {
         childLogger.debug(`Pruning plugin`, { plugin })

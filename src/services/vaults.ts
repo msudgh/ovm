@@ -9,7 +9,11 @@ export const findVaultsByPatternMatching = async (pathPattern: string) => {
     pathPattern = `${pathPattern}/**/.obsidian`
   }
 
-  const vaultsMatches = await glob(pathPattern, { absolute: true, dot: true, nocase: true })
+  const vaultsMatches = await glob(pathPattern, {
+    absolute: true,
+    dot: true,
+    nocase: true,
+  })
   const detectedVaults = []
   const vaultsQueryPromises = vaultsMatches.map((vault) => findVault(vault))
 
@@ -37,7 +41,8 @@ export const vaultsSelector = async (vaults: Vault[]) => {
   const selectedVaults = await checkbox({
     choices,
     message: 'Select the vaults:',
-    validate: (selected) => selected.length > 0 || 'At least one vault must be selected',
+    validate: (selected) =>
+      selected.length > 0 || 'At least one vault must be selected',
     required: true,
   })
 

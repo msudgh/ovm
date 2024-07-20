@@ -35,7 +35,8 @@ export const pluginsSelector = async (plugins: Plugin[]) => {
   const selectedPlugins = await checkbox({
     choices,
     message: 'Select the plugins:',
-    validate: (selected) => selected.length > 0 || 'At least one plugin must be selected',
+    validate: (selected) =>
+      selected.length > 0 || 'At least one plugin must be selected',
     required: true,
   })
 
@@ -44,7 +45,11 @@ export const pluginsSelector = async (plugins: Plugin[]) => {
   return selectedPlugins
 }
 
-export const modifyCommunityPlugins = async (plugin: Plugin, vaultPath: string, action: 'enable' | 'disable') => {
+export const modifyCommunityPlugins = async (
+  plugin: Plugin,
+  vaultPath: string,
+  action: 'enable' | 'disable',
+) => {
   const childLogger = logger.child({ plugin, vaultPath, action })
 
   childLogger.debug(`Modify community plugins json`)

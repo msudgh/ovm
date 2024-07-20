@@ -2,7 +2,10 @@ import { ExitPromptError } from '@inquirer/core'
 import { Command, Flags, handle } from '@oclif/core'
 import { Vault } from 'obsidian-utils'
 import { DEFAULT_CONFIG_PATH } from '../constants'
-import { findVaultsByPatternMatching, findVaultsFromConfig } from '../services/vaults'
+import {
+  findVaultsByPatternMatching,
+  findVaultsFromConfig,
+} from '../services/vaults'
 import { logger } from '../utils/logger'
 
 export type CommonFlags = {

@@ -1,6 +1,9 @@
 import { flush } from '@oclif/core'
 import { ArgInput } from '@oclif/core/lib/parser'
-import FactoryCommand, { CommonFlags, FactoryFlags } from '../../providers/command'
+import FactoryCommand, {
+  CommonFlags,
+  FactoryFlags,
+} from '../../providers/command'
 import { createDefaultConfig, safeLoadConfig } from '../../providers/config'
 import { logger } from '../../utils/logger'
 
@@ -39,7 +42,10 @@ export default class Init extends FactoryCommand {
    * @param {FactoryFlags<InitFlags>} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: FactoryFlags<CommonFlags>): Promise<void> {
+  private async action(
+    args: ArgInput,
+    flags: FactoryFlags<CommonFlags>,
+  ): Promise<void> {
     try {
       const { data: config, error } = await safeLoadConfig()
 

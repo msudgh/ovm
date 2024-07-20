@@ -6,7 +6,9 @@ const getFormat = () => {
   return format.combine(
     format.colorize(),
     ...(enableTimestamp ? [format.timestamp()] : []),
-    jsonLogging ? (format.json(), format.prettyPrint()) : (format.splat(), format.simple()),
+    jsonLogging
+      ? (format.json(), format.prettyPrint())
+      : (format.splat(), format.simple()),
   )
 }
 
