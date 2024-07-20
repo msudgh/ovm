@@ -1,18 +1,23 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "target": "ESNext",
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
-    "types": ["node", "mocha"],
+    "types": [
+      "node",
+      "mocha"
+    ],
     "noImplicitAny": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ]
 }

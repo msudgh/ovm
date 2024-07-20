@@ -1,10 +1,17 @@
 import { Flags, flush, handle } from '@oclif/core'
 import { ArgInput } from '@oclif/core/lib/parser'
 import { eachSeries } from 'async'
-import { installPluginFromGithub, isPluginInstalled, Vault } from 'obsidian-utils'
+import {
+  installPluginFromGithub,
+  isPluginInstalled,
+  Vault,
+} from 'obsidian-utils'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig } from '../../providers/config'
-import { findPluginInRegistry, handleExceedRateLimitError } from '../../providers/github'
+import {
+  findPluginInRegistry,
+  handleExceedRateLimitError,
+} from '../../providers/github'
 import { modifyCommunityPlugins } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
 import { logger } from '../../utils/logger'
@@ -68,9 +75,16 @@ export default class Install extends FactoryCommand {
    * @param {FactoryFlags<InstallFlags>} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
-  private async action(args: ArgInput, flags: FactoryFlags<InstallFlags>): Promise<void> {
+  private async action(
+    args: ArgInput,
+    flags: FactoryFlags<InstallFlags>,
+  ): Promise<void> {
     const { path, enable } = flags
-    const { success: loadConfigSuccess, data: config, error: loadConfigError } = await safeLoadConfig()
+    const {
+      success: loadConfigSuccess,
+      data: config,
+      error: loadConfigError,
+    } = await safeLoadConfig()
 
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })
@@ -103,7 +117,11 @@ export default class Install extends FactoryCommand {
         }
 
         try {
-          await installPluginFromGithub(pluginInRegistry.repo, stagePlugin.version, vault.path)
+          await installPluginFromGithub(
+            pluginInRegistry.repo,
+            stagePlugin.version,
+            vault.path,
+          )
           installedPlugins.push({
             repo: pluginInRegistry.repo,
             version: stagePlugin.version,

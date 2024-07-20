@@ -32,7 +32,9 @@ type SafeLoadConfigResult =
     } & SafeLoadConfigResultSuccess)
   | SafeLoadConfigResultError
 
-export const safeLoadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<SafeLoadConfigResult> => {
+export const safeLoadConfig = (
+  configPath = DEFAULT_CONFIG_PATH,
+): Promise<SafeLoadConfigResult> => {
   return new Promise((resolve) => {
     try {
       const config = readFileSync(configPath)
@@ -47,8 +49,15 @@ export const safeLoadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<SafeLo
       resolve({ success, data, error: undefined })
     } catch (error) {
       const typedError = error as Error
-      if (typedError instanceof Error && typedError.message.includes('ENOENT')) {
-        resolve({ success: false, data: undefined, error: new Error('Config file not found') })
+      if (
+        typedError instanceof Error &&
+        typedError.message.includes('ENOENT')
+      ) {
+        resolve({
+          success: false,
+          data: undefined,
+          error: new Error('Config file not found'),
+        })
       }
 
       resolve({ success: false, data: undefined, error: typedError })
@@ -56,7 +65,10 @@ export const safeLoadConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<SafeLo
   })
 }
 
-const writeConfig = (config: Config, configPath = DEFAULT_CONFIG_PATH): Promise<void | Error> => {
+const writeConfig = (
+  config: Config,
+  configPath = DEFAULT_CONFIG_PATH,
+): Promise<void | Error> => {
   return new Promise((resolve, reject) => {
     try {
       const content = JSON.stringify(config, null, 2)
@@ -68,7 +80,9 @@ const writeConfig = (config: Config, configPath = DEFAULT_CONFIG_PATH): Promise<
   })
 }
 
-export const createDefaultConfig = (configPath = DEFAULT_CONFIG_PATH): Promise<Config | Error> => {
+export const createDefaultConfig = (
+  configPath = DEFAULT_CONFIG_PATH,
+): Promise<Config | Error> => {
   return new Promise((resolve, reject) => {
     try {
       const defaultConfig = ConfigSchema.parse({})
