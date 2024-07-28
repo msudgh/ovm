@@ -60,7 +60,7 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
-    "@inquirer/core": "^9.0.4",
+    "@inquirer/core": "^9.0.6",
     "@inquirer/prompts": "^5.2.1",
     "@oclif/core": "^4.0.12",
     "@oclif/plugin-help": "^6.2.6",
