@@ -1,7 +1,19 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: 'monthly'
-    open-pull-requests-limit: 2
+      interval: "monthly"
+      time: "09:00"
+      day: "sunday"
+    open-pull-requests-limit: 1
+    reviewers:
+      - "msudgh"
+    versioning-strategy: increase
+    allow:
+      - dependency-type: "production"
+    groups:
+      security-update-for-dependencies:
+        applies-to: "security-updates"
+        dependency-type: "production"
+    target-branch: "develop"
