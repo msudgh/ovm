@@ -103,5 +103,10 @@
     "tsx": "^4.16.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^7.16.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "fast-xml-parser@<4.4.1": ">=4.4.1"
+    }
   }
 }
