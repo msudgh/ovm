@@ -43,7 +43,6 @@ export const safeLoadConfig = (
       const config = readFileSync(configPath)
       const parsed = JSON.parse(config.toString()) as Config
       const { success, data, error } = ConfigSchema.safeParse(parsed)
-      console.log('success', success)
 
       if (!success) {
         logger.debug('Invalid config file', { data, error })
@@ -69,14 +68,16 @@ export const safeLoadConfig = (
   })
 }
 
-const writeConfig = (
+export const writeConfig = (
   config: Config,
   configPath = DEFAULT_CONFIG_PATH,
 ): Promise<void | Error> => {
+  logger.debug('Writing config', { configPath })
   return new Promise((resolve, reject) => {
     try {
       const content = JSON.stringify(config, null, 2)
       writeFileSync(configPath, content)
+      logger.debug('Config written', { configPath })  
       resolve()
     } catch (error) {
       reject(error as Error)
