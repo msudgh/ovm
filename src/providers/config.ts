@@ -4,15 +4,18 @@ import z from 'zod'
 import { DEFAULT_CONFIG_PATH } from '../constants'
 import { logger } from '../utils/logger'
 
-export type Plugin = { id: string; version: GitHubPluginVersion }
+const PluginSchema = z.object({
+  id: z.string(),
+  version: z.custom<GitHubPluginVersion>().optional(),
+})
 
-export type Config = {
-  plugins: Plugin[]
-}
+export type Plugin = z.infer<typeof PluginSchema>
 
 export const ConfigSchema = z.object({
-  plugins: z.array(z.custom<Plugin>()).default([]),
+  plugins: z.array(PluginSchema).default([]),
 })
+
+export type Config = z.infer<typeof ConfigSchema>
 
 type SafeLoadConfigResultSuccess = {
   success: true
@@ -40,6 +43,7 @@ export const safeLoadConfig = (
       const config = readFileSync(configPath)
       const parsed = JSON.parse(config.toString()) as Config
       const { success, data, error } = ConfigSchema.safeParse(parsed)
+      console.log('success', success)
 
       if (!success) {
         logger.debug('Invalid config file', { data, error })
