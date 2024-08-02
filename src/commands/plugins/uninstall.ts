@@ -9,8 +9,6 @@ import { pluginsSelector, removePluginDir } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
 import { logger } from '../../utils/logger'
 
-const description = `Uninstall plugins from specified vaults.`
-
 interface UninstallFlags {
   path: string
 }
@@ -25,7 +23,7 @@ interface UninstallPluginVaultOpts {
  */
 export default class Uninstall extends FactoryCommand {
   static readonly aliases = ['pu', 'plugins:uninstall']
-  static override readonly description = description
+  static override readonly description = `Uninstall plugins from specified vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

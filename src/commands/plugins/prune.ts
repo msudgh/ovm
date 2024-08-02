@@ -8,8 +8,6 @@ import { listInstalledPlugins, removePluginDir } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
 import { logger } from '../../utils/logger'
 
-const description = `Prune plugins from specified vaults.`
-
 interface PruneFlags {
   path: string
 }
@@ -24,7 +22,7 @@ interface PrunePluginVaultOpts {
  */
 export default class Prune extends FactoryCommand {
   static readonly aliases = ['pp', 'plugins:prune']
-  static override readonly description = description
+  static override readonly description = `Prune plugins from specified vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
