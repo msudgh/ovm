@@ -7,14 +7,12 @@ import FactoryCommand, {
 import { createDefaultConfig, safeLoadConfig } from '../../providers/config'
 import { logger } from '../../utils/logger'
 
-const description = `Configure an ovm.json config file in user's home dir.`
-
 /**
  * Init command configure an ovm.json config file in user's home dir.
  */
 export default class Init extends FactoryCommand {
   static readonly aliases = ['ci', 'config:init']
-  static override readonly description = description
+  static override readonly description = `Configure an ovm.json config file in user's home dir.`
   static override readonly examples = ['<%= config.bin %> <%= command.id %>']
   static override readonly flags = {
     ...this.commonFlags,

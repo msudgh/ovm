@@ -4,15 +4,18 @@ import z from 'zod'
 import { DEFAULT_CONFIG_PATH } from '../constants'
 import { logger } from '../utils/logger'
 
-export type Plugin = { id: string; version: GitHubPluginVersion }
+const PluginSchema = z.object({
+  id: z.string(),
+  version: z.custom<GitHubPluginVersion>().optional(),
+})
 
-export type Config = {
-  plugins: Plugin[]
-}
+export type Plugin = z.infer<typeof PluginSchema>
 
 export const ConfigSchema = z.object({
-  plugins: z.array(z.custom<Plugin>()).default([]),
+  plugins: z.array(PluginSchema).default([]),
 })
+
+export type Config = z.infer<typeof ConfigSchema>
 
 type SafeLoadConfigResultSuccess = {
   success: true
@@ -65,14 +68,16 @@ export const safeLoadConfig = (
   })
 }
 
-const writeConfig = (
+export const writeConfig = (
   config: Config,
   configPath = DEFAULT_CONFIG_PATH,
 ): Promise<void | Error> => {
+  logger.debug('Writing config', { configPath })
   return new Promise((resolve, reject) => {
     try {
       const content = JSON.stringify(config, null, 2)
       writeFileSync(configPath, content)
+      logger.debug('Config written', { configPath })  
       resolve()
     } catch (error) {
       reject(error as Error)
