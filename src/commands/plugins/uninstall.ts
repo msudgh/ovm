@@ -1,13 +1,15 @@
-import { Flags, flush, handle } from '@oclif/core'
-import { ArgInput } from '@oclif/core/lib/parser'
+import { Args, Flags, flush, handle } from '@oclif/core'
 import { eachSeries } from 'async'
 import { isPluginInstalled, Vault } from 'obsidian-utils'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
-import { Config, safeLoadConfig } from '../../providers/config'
-import { handleExceedRateLimitError } from '../../providers/github'
+import { Config, Plugin, safeLoadConfig } from '../../providers/config'
 import { pluginsSelector, removePluginDir } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
 import { logger } from '../../utils/logger'
+
+interface UninstallArgs {
+  pluginId?: string
+}
 
 interface UninstallFlags {
   path: string
@@ -23,11 +25,12 @@ interface UninstallPluginVaultOpts {
  */
 export default class Uninstall extends FactoryCommand {
   static readonly aliases = ['pu', 'plugins:uninstall']
-  static override readonly description = `Uninstall plugins from specified vaults.`
+  static override readonly description = `Uninstall plugin/s from specified vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
+    '<%= config.bin %> <%= command.id %> id',
   ]
   static override readonly flags = {
     path: Flags.string({
@@ -37,6 +40,12 @@ export default class Uninstall extends FactoryCommand {
       default: '',
     }),
     ...this.commonFlags,
+  }
+  static override readonly args = {
+    pluginId: Args.string({
+      description: 'Specific Plugin ID to install',
+      required: false,
+    }),
   }
 
   /**
@@ -58,12 +67,12 @@ export default class Uninstall extends FactoryCommand {
   /**
    * Main action method for the command.
    * Loads vaults, selects vaults, and uninstall specified plugins.
-   * @param {ArgInput} args - The arguments passed to the command.
+   * @param {UninstallArgs} args - The arguments passed to the command.
    * @param {FactoryFlags} flags - The flags passed to the command.
    * @returns {Promise<void>}
    */
   private async action(
-    args: ArgInput,
+    args: UninstallArgs,
     flags: FactoryFlags<UninstallFlags>,
   ): Promise<void> {
     const { path } = flags
@@ -80,15 +89,30 @@ export default class Uninstall extends FactoryCommand {
 
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const vaultsWithConfig = selectedVaults.map((vault) => ({ vault, config }))
-    const uninstallVaultIterator = async (opts: UninstallPluginVaultOpts) => {
-      const { vault, config } = opts
+
+    // Check if pluginId is provided and uninstall only that plugin
+    const { pluginId } = args
+    if (pluginId) {
+      await this.uninstallPluginInVaults(selectedVaults, pluginId)
+    } else {
+      await this.uninstallPluginsInVaults(selectedVaults, config.plugins)
+    }
+  }
+
+  private async uninstallPluginsInVaults(
+    vaults: Vault[],
+    plugins: Plugin[],
+    specific = false,
+  ) {
+    const uninstallVaultIterator = async (vault: Vault) => {
       logger.debug(`Uninstall plugins for vault`, { vault })
 
       const uninstalledPlugins = []
       const failedPlugins = []
 
-      const selectedPlugins = await pluginsSelector(config.plugins)
+      const selectedPlugins = specific
+        ? await pluginsSelector([plugins[0]])
+        : await pluginsSelector(plugins)
 
       for (const stagePlugin of selectedPlugins) {
         const childLogger = logger.child({ stagePlugin, vault })
@@ -103,7 +127,6 @@ export default class Uninstall extends FactoryCommand {
           uninstalledPlugins.push(stagePlugin)
         } catch (error) {
           failedPlugins.push(stagePlugin)
-          handleExceedRateLimitError(error)
           childLogger.error(`Failed to uninstall plugin`, { error })
         }
       }
@@ -113,11 +136,15 @@ export default class Uninstall extends FactoryCommand {
       return { uninstalledPlugins, failedPlugins }
     }
 
-    eachSeries(vaultsWithConfig, uninstallVaultIterator, (error) => {
+    eachSeries(vaults, uninstallVaultIterator, (error) => {
       if (error) {
         logger.debug('Error installing plugins', { error })
         handle(error)
       }
     })
+  }
+
+  private async uninstallPluginInVaults(vaults: Vault[], id: string) {
+    await this.uninstallPluginsInVaults(vaults, [{ id }], true)
   }
 }

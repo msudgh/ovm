@@ -41,7 +41,6 @@ export default class Install extends FactoryCommand {
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
     '<%= config.bin %> <%= command.id %> id',
-    '<%= config.bin %> <%= command.id %> id@version',
   ]
   static override readonly flags = {
     path: Flags.string({
