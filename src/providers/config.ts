@@ -11,8 +11,18 @@ const PluginSchema = z.object({
 
 export type Plugin = z.infer<typeof PluginSchema>
 
+interface Hotkey {
+  modifiers: string[];
+  key: string;
+}
+
+interface HotkeysConfig {
+  [command: string]: Hotkey[];
+}
+
 export const ConfigSchema = z.object({
   plugins: z.array(PluginSchema).default([]),
+  hotkeys: z.custom<HotkeysConfig>().default({}),
 })
 
 export type Config = z.infer<typeof ConfigSchema>

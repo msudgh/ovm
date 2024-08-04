@@ -1,6 +1,5 @@
 import NodeFetchCache, { FileSystemCache } from 'node-fetch-cache'
 
-// const interceptor = new ClientRequestInterceptor()
 const fetch = NodeFetchCache.create({
   cache: new FileSystemCache({
     cacheDirectory: './cache',

@@ -1,4 +1,4 @@
-import { createDefaultConfig, safeLoadConfig } from './config'
+import { ConfigSchema, safeLoadConfig } from './config'
 
 import { expect } from 'chai'
 import mock from 'mock-fs'
@@ -9,11 +9,11 @@ describe('Config', () => {
     const userHome = '/home/user'
     const configPath = `${userHome}/${OVM_CONFIG_FILENAME}`
 
-    const sampleDefaultConfig = await createDefaultConfig()
+    const defaultConfig = ConfigSchema.parse({})
 
     mock({
       [userHome]: {
-        [OVM_CONFIG_FILENAME]: JSON.stringify(sampleDefaultConfig),
+        [OVM_CONFIG_FILENAME]: JSON.stringify(defaultConfig),
       },
     })
 
@@ -22,6 +22,9 @@ describe('Config', () => {
     expect(config.success).to.be.true
     expect(config.data).to.deep.equal(config.data)
     expect(config.error).to.be.undefined
+    expect(config.data).to.have.property('plugins')
+    expect(config.data).to.have.property('hotkeys')
+    expect(config.data).to.deep.equal(defaultConfig)
     mock.restore()
   })
 
