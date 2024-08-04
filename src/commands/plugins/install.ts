@@ -6,7 +6,7 @@ import {
   Vault,
 } from 'obsidian-utils'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
-import { Config, Plugin, safeLoadConfig, writeConfig } from '../../providers/config'
+import { Config, safeLoadConfig, writeConfig } from '../../providers/config'
 import {
   findPluginInRegistry,
   handleExceedRateLimitError,
@@ -95,7 +95,7 @@ export default class Install extends FactoryCommand {
       success: loadConfigSuccess,
       data: config,
       error: loadConfigError,
-    } = await safeLoadConfig()
+    } = await safeLoadConfig(flags.config)
 
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })
@@ -108,16 +108,16 @@ export default class Install extends FactoryCommand {
     // Check if pluginId is provided and install only that plugin
     const { pluginId } = args
     if (pluginId) {
-      await this.installPluginInVaults(selectedVaults, pluginId, enable)
+      await this.installPluginInVaults(selectedVaults, config, flags, pluginId)
     } else {
-      await this.installPluginsInVaults(selectedVaults, config.plugins, enable)
+      await this.installPluginsInVaults(selectedVaults, config, flags, enable)
     }
   }
 
   private async installPluginsInVaults(
     vaults: Vault[],
-    plugins: Plugin[],
-    enable: boolean,
+    config: Config,
+    flags: FactoryFlags<InstallFlags>,
     specific = false,
   ) {
     const installVaultIterator = async (vault: Vault) => {
@@ -125,7 +125,7 @@ export default class Install extends FactoryCommand {
       const installedPlugins = []
       const failedPlugins = []
 
-      for (const stagePlugin of plugins) {
+      for (const stagePlugin of config.plugins) {
         const childLogger = logger.child({ stagePlugin, vault })
 
         const pluginInRegistry = await findPluginInRegistry(stagePlugin.id)
@@ -138,7 +138,7 @@ export default class Install extends FactoryCommand {
           continue
         }
 
-       stagePlugin.version = stagePlugin.version ?? 'latest';
+        stagePlugin.version = stagePlugin.version ?? 'latest'
 
         try {
           await installPluginFromGithub(
@@ -151,15 +151,16 @@ export default class Install extends FactoryCommand {
             version: stagePlugin.version,
           })
 
-          if (enable) {
+          if (flags.enable) {
             // Enable the plugin
             await modifyCommunityPlugins(stagePlugin, vault.path, 'enable')
           }
 
           if (specific) {
             // Add the plugin to the config
-            const newPlugins = new Set([...plugins])
-            await writeConfig({ plugins: [...newPlugins] })
+            const newPlugins = new Set([...config.plugins])
+            const updatedConfig = { ...config, plugins: [...newPlugins] }
+            await writeConfig(updatedConfig, flags.config)
           }
 
           childLogger.debug(`Installed plugin`)
@@ -190,12 +191,22 @@ export default class Install extends FactoryCommand {
     })
   }
 
-  private async installPluginInVaults(vaults: Vault[], id: string, enable: boolean) {
-    const pluginInRegistry = await findPluginInRegistry(id)
+  private async installPluginInVaults(
+    vaults: Vault[],
+    config: Config,
+    flags: FactoryFlags<InstallFlags>,
+    pluginId: string,
+  ) {
+    const pluginInRegistry = await findPluginInRegistry(pluginId)
     if (!pluginInRegistry) {
-      throw new PluginNotFoundInRegistryError(id)
+      throw new PluginNotFoundInRegistryError(pluginId)
     }
 
-    await this.installPluginsInVaults(vaults, [{ id }], enable, true)
+    await this.installPluginsInVaults(
+      vaults,
+      { ...config, plugins: [{ id: pluginId }] },
+      flags,
+      true,
+    )
   }
 }

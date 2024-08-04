@@ -47,7 +47,7 @@ Install plugins in specified vaults.
 
 ### `ovm plugins prune`
 
-Prune plugins from specified vaults.
+Prune plugin/s from specified vaults.
 
 - _Usage:_ `ovm help plugins prune`
 - _See code:_ [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)
