@@ -12,12 +12,12 @@ const PluginSchema = z.object({
 export type Plugin = z.infer<typeof PluginSchema>
 
 interface Hotkey {
-  modifiers: string[];
-  key: string;
+  modifiers: string[]
+  key: string
 }
 
 interface HotkeysConfig {
-  [command: string]: Hotkey[];
+  [command: string]: Hotkey[]
 }
 
 export const ConfigSchema = z.object({
@@ -46,7 +46,7 @@ type SafeLoadConfigResult =
   | SafeLoadConfigResultError
 
 export const safeLoadConfig = (
-  configPath = DEFAULT_CONFIG_PATH,
+  configPath: string,
 ): Promise<SafeLoadConfigResult> => {
   return new Promise((resolve) => {
     try {
@@ -55,8 +55,9 @@ export const safeLoadConfig = (
       const { success, data, error } = ConfigSchema.safeParse(parsed)
 
       if (!success) {
-        logger.debug('Invalid config file', { data, error })
-        throw new Error('Invalid config file')
+        throw new Error(
+          `Invalid config file\nIssues: ${JSON.stringify(error.issues)}`,
+        )
       }
 
       resolve({ success, data, error: undefined })
@@ -87,7 +88,7 @@ export const writeConfig = (
     try {
       const content = JSON.stringify(config, null, 2)
       writeFileSync(configPath, content)
-      logger.debug('Config written', { configPath })  
+      logger.debug('Config written', { configPath })
       resolve()
     } catch (error) {
       reject(error as Error)

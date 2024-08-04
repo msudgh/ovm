@@ -12,7 +12,7 @@ import { logger } from '../../utils/logger'
  */
 export default class Init extends FactoryCommand {
   static readonly aliases = ['ci', 'config:init']
-  static override readonly description = `Configure an ovm.json config file in user's home dir.`
+  static override readonly description = `Configure ovm config file.`
   static override readonly examples = ['<%= config.bin %> <%= command.id %>']
   static override readonly flags = {
     ...this.commonFlags,
@@ -45,7 +45,7 @@ export default class Init extends FactoryCommand {
     flags: FactoryFlags<CommonFlags>,
   ): Promise<void> {
     try {
-      const { data: config, error } = await safeLoadConfig()
+      const { data: config, error } = await safeLoadConfig(flags.config)
 
       if (config) {
         logger.error('File already exists!', { config: flags.config })

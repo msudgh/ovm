@@ -46,6 +46,9 @@
     ],
     "topicSeparator": " ",
     "topics": {
+      "config": {
+        "description": "Init and edit ovm config file"
+      },
       "plugins": {
         "description": "Manage plugins of the vaults"
       },

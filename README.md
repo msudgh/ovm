@@ -9,6 +9,7 @@ ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the ma
 - [Usage](#usage)
 - [Commands](#commands)
   - [`ovm config init`](#ovm-config-init)
+  - [`ovm config edit`](#ovm-config-edit)
   - [`ovm plugins install`](#ovm-plugins-install)
   - [`ovm plugins prune`](#ovm-plugins-prune)
   - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
@@ -33,10 +34,17 @@ USAGE
 
 ### `ovm config init`
 
-Configure an ovm.json config file in user's home dir.
+Configure ovm config file.
 
 - _Usage:_ `ovm help config init`
 - _See code:_ [src/commands/config/init.ts](src/commands/config/init.ts)
+- 
+### `ovm config edit`
+
+Edit ovm config file.
+
+- _Usage:_ `ovm help config edit`
+- _See code:_ [src/commands/config/edit.ts](src/commands/config/edit.ts)
 
 ### `ovm plugins install`
 
