@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { GitHubPluginVersion } from 'obsidian-utils'
 import z from 'zod'
-import { DEFAULT_CONFIG_PATH } from '../constants'
 import { logger } from '../utils/logger'
 
 const PluginSchema = z.object({
@@ -35,9 +34,7 @@ type SafeLoadConfigResult =
     } & SafeLoadConfigResultSuccess)
   | SafeLoadConfigResultError
 
-export const safeLoadConfig = (
-  configPath = DEFAULT_CONFIG_PATH,
-): Promise<SafeLoadConfigResult> => {
+export const safeLoadConfig = (configPath: string): Promise<SafeLoadConfigResult> => {
   return new Promise((resolve) => {
     try {
       const config = readFileSync(configPath)
@@ -70,14 +67,14 @@ export const safeLoadConfig = (
 
 export const writeConfig = (
   config: Config,
-  configPath = DEFAULT_CONFIG_PATH,
+  configPath: string,
 ): Promise<void | Error> => {
   logger.debug('Writing config', { configPath })
   return new Promise((resolve, reject) => {
     try {
       const content = JSON.stringify(config, null, 2)
       writeFileSync(configPath, content)
-      logger.debug('Config written', { configPath })  
+      logger.debug('Config written', { configPath })
       resolve()
     } catch (error) {
       reject(error as Error)
@@ -86,12 +83,12 @@ export const writeConfig = (
 }
 
 export const createDefaultConfig = (
-  configPath = DEFAULT_CONFIG_PATH,
+  configPath: string,
 ): Promise<Config | Error> => {
   return new Promise((resolve, reject) => {
     try {
       const defaultConfig = ConfigSchema.parse({})
-      writeConfig(defaultConfig)
+      writeConfig(defaultConfig, configPath)
 
       logger.debug('Default config created', { configPath })
 
