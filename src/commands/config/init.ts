@@ -45,7 +45,7 @@ export default class Init extends FactoryCommand {
     flags: FactoryFlags<CommonFlags>,
   ): Promise<void> {
     try {
-      const { data: config, error } = await safeLoadConfig()
+      const { data: config, error } = await safeLoadConfig(flags.config)
 
       if (config) {
         logger.error('File already exists!', { config: flags.config })

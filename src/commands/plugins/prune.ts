@@ -22,7 +22,7 @@ interface PrunePluginVaultOpts {
  */
 export default class Prune extends FactoryCommand {
   static readonly aliases = ['pp', 'plugins:prune']
-  static override readonly description = `Prune plugins from specified vaults.`
+  static override readonly description = `Prune plugin/s from specified vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
@@ -70,7 +70,7 @@ export default class Prune extends FactoryCommand {
       success: loadConfigSuccess,
       data: config,
       error: loadConfigError,
-    } = await safeLoadConfig()
+    } = await safeLoadConfig(flags.config)
 
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })

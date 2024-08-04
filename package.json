@@ -2,7 +2,7 @@
   "name": "ovm",
   "description": "Obsidian Vaults Manager",
   "type": "commonjs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
   "author": "Masoud Ghorbani",
   "homepage": "https://github.com/msudgh/ovm",
@@ -41,8 +41,7 @@
     "dirname": "ovm",
     "commands": "./dist/commands",
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-not-found"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": " ",
     "topics": {
@@ -64,7 +63,6 @@
     "@inquirer/prompts": "^5.2.1",
     "@oclif/core": "^4.0.12",
     "@oclif/plugin-help": "^6.2.6",
-    "@oclif/plugin-not-found": "^3.2.12",
     "async": "^3.2.5",
     "glob": "^11.0.0",
     "inquirer": "^10.0.4",

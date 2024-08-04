@@ -23,9 +23,6 @@ importers:
       '@oclif/plugin-help':
         specifier: ^6.2.6
         version: 6.2.6
-      '@oclif/plugin-not-found':
-        specifier: ^3.2.12
-        version: 3.2.12
       async:
         specifier: ^3.2.5
         version: 3.2.5

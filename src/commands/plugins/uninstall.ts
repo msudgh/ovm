@@ -80,7 +80,7 @@ export default class Uninstall extends FactoryCommand {
       success: loadConfigSuccess,
       data: config,
       error: loadConfigError,
-    } = await safeLoadConfig()
+    } = await safeLoadConfig(flags.config)
 
     if (!loadConfigSuccess) {
       logger.error('Failed to load config', { error: loadConfigError })
