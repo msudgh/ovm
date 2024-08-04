@@ -3,14 +3,8 @@
   "extends": "@istanbuljs/nyc-config-typescript",
   "all": true,
   "check-coverage": false,
-  "extensions": [
-    ".ts"
-  ],
-  "reporter": [
-    "text",
-    "html",
-    "lcov"
-  ],
+  "extensions": [".ts"],
+  "reporter": ["text", "html", "lcov"],
   "exclude": [
     "eslint.config.cjs",
     "coverage/**",
