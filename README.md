@@ -17,7 +17,7 @@ ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the ma
 
 ## Usage
 
-```sh-session
+```bash
 $ npm install -g ovm
 $ ovm version
 ovm/0.1.0 darwin-x64 node-v20.11.0 # Output may vary
@@ -63,8 +63,28 @@ Uninstall plugins from specified vaults.
 
 Stats of vaults and installed plugins.
 
-- _Usage:_ `ovm help plugins stats`
+- _Usage:_ `ovm help reports stats`
 - _See code:_ [src/commands/reports/stats.ts](src/commands/reports/stats.ts)
+
+Example Output
+
+```bash
+$ ovm reports stats
+? Select the vaults: Career, Financial, Goals
+┌──────────────┬────────┐
+│ (index)      │ Values │
+├──────────────┼────────┤
+│ totalVaults  │ 3      │
+│ totalPlugins │ 3      │
+└──────────────┴────────┘
+┌──────────────────────────────────────────────────┬─────────────┬─────────────┬─────────┐
+│ (index)                                          │ 0           │ 1           │ 2       │
+├──────────────────────────────────────────────────┼─────────────┼─────────────┼─────────┤
+│ colored-tags@5.0.0 (118.78 kB)                   │ 'Career'    │ 'Financial' │ 'Goals' │
+│ copilot@2.5.2 (4.02 MB)                          │ 'Career'    │             │         │
+│ dataview@0.5.67 (2.38 MB)                        │ 'Career'    │ 'Financial' │         │
+└──────────────────────────────────────────────────┴─────────────┴─────────────┴─────────┘
+```
 
 ## License
 

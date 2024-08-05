@@ -64,6 +64,8 @@
     "@oclif/core": "^4.0.12",
     "@oclif/plugin-help": "^6.2.6",
     "async": "^3.2.5",
+    "fast-folder-size": "^2.2.0",
+    "filesize": "^10.1.4",
     "glob": "^11.0.0",
     "inquirer": "^10.0.4",
     "node-fetch-cache": "^4.1.2",
