@@ -6,14 +6,28 @@ ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the ma
 
 **Table of Contents**
 
+- [Features](#features)
+- [Requirements](#requirements)
 - [Usage](#usage)
+- [Config file](#config-file)
 - [Commands](#commands)
-  - [`ovm config init`](#ovm-config-init)
-  - [`ovm plugins install`](#ovm-plugins-install)
-  - [`ovm plugins prune`](#ovm-plugins-prune)
-  - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
-  - [`ovm reports stats`](#ovm-reports-stats)
+  - [`ovm config init` / `ovm ci`](#ovm-config-init--ovm-ci)
+  - [`ovm plugins install` / `ovm pi`](#ovm-plugins-install--ovm-pi)
+  - [`ovm plugins prune` / `ovm pp`](#ovm-plugins-prune--ovm-pp)
+  - [`ovm plugins uninstall` / `ovm pu`](#ovm-plugins-uninstall--ovm-pu)
+  - [`ovm reports stats` / `ovm rs`](#ovm-reports-stats--ovm-rs)
 - [License](#license)
+
+## Features
+
+- **Manage Obsidian plugins**: Install/Uninstall/Prune plugins in multiple vaults at one go.
+- **Generate reports**: Generate stats of vaults and installed plugins with Table/JSON format.
+- **Interactive CLI**: User-friendly interface to select vaults and plugins for each command.
+- **Cross-platform**: Windows, macOS, and Linux.
+
+## Requirements
+
+- Node.js 18.x or higher
 
 ## Usage
 
@@ -29,44 +43,137 @@ USAGE
 ...
 ```
 
+## Config file
+
+The config file is created in the user's home directory and is named `ovm.json` by [`ovm ci`](#ovm-config-init--ovm-ci). It contains an array of plugins that are to be installed across single/multiple vault.
+
+```json
+{
+  "plugins": []
+}
+```
+
+Example config file for following [Commands](#commands) section is as follows:
+
+```json
+{
+  "plugins": [
+    {
+      "id": "colored-tags",
+      "version": "latest"
+    },
+    {
+      "id": "copilot",
+      "version": "latest"
+    },
+    {
+      "id": "dataview",
+      "version": "latest"
+    }
+  ]
+}
+```
+
 ## Commands
 
-### `ovm config init`
+> The content used in the examples below is for illustrative purposes only. e.g. In the output sections, the vaults are stored in `~/Documents/` directory. The actual output may vary.
+
+### `ovm config init` / `ovm ci`
 
 Configure an ovm.json config file in user's home dir.
 
 - _Usage:_ `ovm help config init`
 - _See code:_ [src/commands/config/init.ts](src/commands/config/init.ts)
 
-### `ovm plugins install`
+Output
 
-Install plugins in specified vaults.
+```bash
+$ ovm config init
+info: Config file created {"path":"~/ovm.json"}
+
+$ cat ~/ovm.json
+{
+  "plugins": []
+}
+```
+
+### `ovm plugins install` / `ovm pi`
+
+Install plugin/s in specified vaults.
 
 - _Usage:_ `ovm help plugins install`
 - _See code:_ [src/commands/plugins/install.ts](src/commands/plugins/install.ts)
 
-### `ovm plugins prune`
+Output
 
-Prune plugin/s from specified vaults.
+```bash
+$ ovm plugins install
+? Select the vaults: Career, Financial, Goals
+info: Installed plugin {"plugin":{"id":"colored-tags","version":"latest"},"vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+info: Installed plugin {"plugin":{"id":"copilot","version":"latest"},"vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+info: Installed plugin {"plugin":{"id":"dataview","version":"latest"},"vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+info: Installed 3 plugins {"vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+info: Installed plugin {"plugin":{"id":"colored-tags","version":"latest"},"vault":{"name":"Financial","path":"~/Documents/obsidian/Financial"}}
+info: Installed plugin {"plugin":{"id":"copilot","version":"latest"},"vault":{"name":"Financial","path":"~/Documents/obsidian/Financial"}}
+info: Installed plugin {"plugin":{"id":"dataview","version":"latest"},"vault":{"name":"Financial","path":"~/Documents/obsidian/Financial"}}
+info: Installed 3 plugins {"vault":{"name":"Financial","path":"~/Documents/obsidian/Financial"}}
+info: Installed plugin {"plugin":{"id":"colored-tags","version":"latest"},"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
+info: Installed plugin {"plugin":{"id":"copilot","version":"latest"},"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
+info: Installed plugin {"plugin":{"id":"dataview","version":"latest"},"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
+info: Installed 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
+```
+
+### `ovm plugins prune` / `ovm pp`
+
+Prune existing plugin/s from vaults which are unspecified in the config file.
 
 - _Usage:_ `ovm help plugins prune`
 - _See code:_ [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)
 
-### `ovm plugins uninstall`
+Output
+
+```bash
+$ ovm plugins prune
+? Select the vaults: Test
+info: Removed plugin {"pluginId":"obsidian-tasks-plugin","vaultPath":"~/Documents/obsidian/Test"}
+info: Pruned 1 plugins {"vault":{"name":"Test","path":"~/Documents/obsidian/Test"}}
+```
+
+### `ovm plugins uninstall` / `ovm pu`
 
 Uninstall plugins from specified vaults.
 
 - _Usage:_ `ovm help plugins uninstall`
 - _See code:_ [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)
 
-### `ovm reports stats`
+Output
+
+```bash
+$ ovm plugins uninstall
+? Select the vaults: Career, Financial, Goals
+? Select the plugins: colored-tags, copilot, dataview
+info: Removed plugin {"pluginId":"colored-tags","vaultPath":"~/Documents/obsidian/Career"}
+info: Removed plugin {"pluginId":"copilot","vaultPath":"~/Documents/obsidian/Career"}
+info: Removed plugin {"pluginId":"dataview","vaultPath":"~/Documents/obsidian/Career"}
+info: Uninstalled 3 plugins {"vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+info: Removed plugin {"pluginId":"colored-tags","vaultPath":"~/Documents/obsidian/Financial"}
+info: Removed plugin {"pluginId":"copilot","vaultPath":"~/Documents/obsidian/Financial"}
+info: Removed plugin {"pluginId":"dataview","vaultPath":"~/Documents/obsidian/Financial"}
+info: Uninstalled 3 plugins {"vault":{"name":"Financial","path":"~/Documents/obsidian/Financial"}}
+info: Removed plugin {"pluginId":"colored-tags","vaultPath":"~/Documents/obsidian/Goals"}
+info: Removed plugin {"pluginId":"copilot","vaultPath":"~/Documents/obsidian/Goals"}
+info: Removed plugin {"pluginId":"dataview","vaultPath":"~/Documents/obsidian/Goals"}
+info: Uninstalled 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
+```
+
+### `ovm reports stats` / `ovm rs`
 
 Stats of vaults and installed plugins.
 
 - _Usage:_ `ovm help reports stats`
 - _See code:_ [src/commands/reports/stats.ts](src/commands/reports/stats.ts)
 
-Example Output
+Output: `Table (default)` / `JSON`
 
 ```bash
 $ ovm reports stats

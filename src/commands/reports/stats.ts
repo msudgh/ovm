@@ -105,8 +105,13 @@ export default class Stats extends FactoryCommand {
         if (!pluginDirExists) {
           continue
         }
-        const manifestFile = await readFile(pluginDir + '/manifest.json', 'utf8')
-        const manifestVersion = (JSON.parse(manifestFile) as { version: string }).version
+        const manifestFile = await readFile(
+          pluginDir + '/manifest.json',
+          'utf8',
+        )
+        const manifestVersion = (
+          JSON.parse(manifestFile) as { version: string }
+        ).version
         const pluginDirSize = await promisify(fastFolderSize)(pluginDir)
         const pluginNameWithSize = pluginDirSize
           ? `${stagePlugin.id}@${manifestVersion} (${filesize(pluginDirSize)})`
@@ -132,11 +137,14 @@ export default class Stats extends FactoryCommand {
         }
 
         const sortedInstalledPlugins = Object.entries(installedPlugins)
-        .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-        .reduce((acc, [key, value]) => {
-          acc[key] = value;
-          return acc;
-        }, {} as Record<string, string[]>);
+          .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+          .reduce(
+            (acc, [key, value]) => {
+              acc[key] = value
+              return acc
+            },
+            {} as Record<string, string[]>,
+          )
 
         if (output === 'table') {
           console.table(totalStats)
