@@ -10,8 +10,13 @@ jobs:
   unit-tests:
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'windows-latest']
-        node_version: [lts/*]
+        os:
+          - 'ubuntu-latest'
+          - 'windows-latest'
+          - 'macos-latest'
+        node_version:
+          - '>=18.0.0'
+          - 'lts/*'
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:

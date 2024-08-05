@@ -5,6 +5,7 @@ import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, Plugin, safeLoadConfig } from '../../providers/config'
 import { pluginsSelector, removePluginDir } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
+import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { logger } from '../../utils/logger'
 
 interface UninstallArgs {
@@ -25,7 +26,7 @@ interface UninstallPluginVaultOpts {
  */
 export default class Uninstall extends FactoryCommand {
   static readonly aliases = ['pu', 'plugins:uninstall']
-  static override readonly description = `Uninstall plugin/s from specified vaults.`
+  static override readonly description = `Uninstall plugin/s from vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
@@ -35,8 +36,7 @@ export default class Uninstall extends FactoryCommand {
   static override readonly flags = {
     path: Flags.string({
       char: 'p',
-      description:
-        'Path or Glob pattern of vaults to uninstall plugins. Default: reads from Obsidian config per environment.',
+      description: VAULTS_PATH_FLAG_DESCRIPTION,
       default: '',
     }),
     ...this.commonFlags,

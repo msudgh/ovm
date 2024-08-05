@@ -6,6 +6,7 @@ import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig } from '../../providers/config'
 import { listInstalledPlugins, removePluginDir } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
+import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { logger } from '../../utils/logger'
 
 interface PruneFlags {
@@ -31,8 +32,7 @@ export default class Prune extends FactoryCommand {
   static override readonly flags = {
     path: Flags.string({
       char: 'p',
-      description:
-        'Path or Glob pattern of vaults to prune plugins. Default: reads from Obsidian config per environment.',
+      description: VAULTS_PATH_FLAG_DESCRIPTION,
       default: '',
     }),
     ...this.commonFlags,

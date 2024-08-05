@@ -2,7 +2,7 @@ import { ConfigSchema, safeLoadConfig } from './config'
 
 import { expect } from 'chai'
 import mock from 'mock-fs'
-import { OVM_CONFIG_FILENAME } from '../constants'
+import { OVM_CONFIG_FILENAME } from '../utils/constants'
 
 describe('Config', () => {
   it("should load config from user's home dir", async () => {
