@@ -16,6 +16,7 @@ import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig } from '../../providers/config'
 import { InstalledPlugins } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
+import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { logger } from '../../utils/logger'
 interface StatsFlags {
   path: string
@@ -33,8 +34,7 @@ export default class Stats extends FactoryCommand {
   static override readonly flags = {
     path: Flags.string({
       char: 'p',
-      description:
-        'Path or Glob pattern of vaults to get stats from. Default: reads from Obsidian per vault config per environment.',
+      description: VAULTS_PATH_FLAG_DESCRIPTION,
       default: '',
     }),
     output: Flags.string({

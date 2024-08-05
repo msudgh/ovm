@@ -13,6 +13,7 @@ import {
 } from '../../providers/github'
 import { modifyCommunityPlugins } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
+import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { PluginNotFoundInRegistryError } from '../../utils/errors'
 import { logger } from '../../utils/logger'
 
@@ -45,8 +46,7 @@ export default class Install extends FactoryCommand {
   static override readonly flags = {
     path: Flags.string({
       char: 'p',
-      description:
-        'Path or Glob pattern of vaults to install plugins. (default: detects vaults from Obsidian configuration)',
+      description: VAULTS_PATH_FLAG_DESCRIPTION,
       default: '',
     }),
     enable: Flags.boolean({

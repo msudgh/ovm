@@ -1,4 +1,6 @@
 export { run } from '@oclif/core'
+export * from './commands/config/init'
 export * from './commands/plugins/install'
 export * from './commands/plugins/prune'
 export * from './commands/plugins/uninstall'
+export * from './commands/reports/stats'

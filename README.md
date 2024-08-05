@@ -21,6 +21,7 @@ ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the ma
 ## Features
 
 - **Manage Obsidian plugins**: Install/Uninstall/Prune plugins in multiple vaults at one go.
+- **Perform actions on Obsidian or custom vaults**: By default, Obsidian vaults are supported and detected. The vaults related commands support `-p` flag to define a custom vault/s from a path or [`Glob`](<https://en.wikipedia.org/wiki/Glob_(programming)>) pattern. e.g. `~/Documents/obsidian/*`.
 - **Generate reports**: Generate stats of vaults and installed plugins with Table/JSON format.
 - **Interactive CLI**: User-friendly interface to select vaults and plugins for each command.
 - **Cross-platform**: Windows, macOS, and Linux.
@@ -41,6 +42,14 @@ $ ovm --help [COMMAND]
 USAGE
   $ ovm COMMAND
 ...
+```
+
+**Common flags**
+
+```bash
+  -c, --config=<value>  [default: ~/ovm.json] Path to the config file.
+  -d, --debug           Enable debugging mode.
+  -t, --timestamp       Enable timestamp in logs.
 ```
 
 ## Config file
@@ -141,7 +150,7 @@ info: Pruned 1 plugins {"vault":{"name":"Test","path":"~/Documents/obsidian/Test
 
 ### `ovm plugins uninstall` / `ovm pu`
 
-Uninstall plugins from specified vaults.
+Uninstall plugin/s from vaults.
 
 - _Usage:_ `ovm help plugins uninstall`
 - _See code:_ [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)
