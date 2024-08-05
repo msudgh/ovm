@@ -1,5 +1,5 @@
-![NPM Version](https://img.shields.io/npm/v/ovm)
-![GitHub License](https://img.shields.io/github/license/msudgh/ovm)
+[![NPM Version](https://img.shields.io/npm/v/ovm)](http://npmjs.com/package/ovm)
+[![GitHub License](https://img.shields.io/github/license/msudgh/ovm)](LICENSE)
 [![GitHub Actions Test Workflow Status](https://github.com/msudgh/ovm/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/msudgh/ovm/actions/workflows/test.yml)
 
 ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the management of vaults in Obsidian. This tool aims to overcome the limitations associated with performing bulk tasks on specific vaults and plugins. It enables users to install, uninstall, prune, and generate reports for a set of favorite plugins across multiple vaults, enhancing productivity and efficiency.
