@@ -34,7 +34,9 @@ type SafeLoadConfigResult =
     } & SafeLoadConfigResultSuccess)
   | SafeLoadConfigResultError
 
-export const safeLoadConfig = (configPath: string): Promise<SafeLoadConfigResult> => {
+export const safeLoadConfig = (
+  configPath: string,
+): Promise<SafeLoadConfigResult> => {
   return new Promise((resolve) => {
     try {
       const config = readFileSync(configPath)

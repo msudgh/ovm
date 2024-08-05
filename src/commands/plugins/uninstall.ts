@@ -95,30 +95,23 @@ export default class Uninstall extends FactoryCommand {
     if (pluginId) {
       await this.uninstallPluginInVaults(selectedVaults, pluginId)
     } else {
-      await this.uninstallPluginsInVaults(selectedVaults, config.plugins)
+      const selectedPlugins = await pluginsSelector(config.plugins)
+      await this.uninstallPluginsInVaults(selectedVaults, selectedPlugins)
     }
   }
 
-  private async uninstallPluginsInVaults(
-    vaults: Vault[],
-    plugins: Plugin[],
-    specific = false,
-  ) {
+  private async uninstallPluginsInVaults(vaults: Vault[], plugins: Plugin[]) {
     const uninstallVaultIterator = async (vault: Vault) => {
       logger.debug(`Uninstall plugins for vault`, { vault })
 
       const uninstalledPlugins = []
       const failedPlugins = []
 
-      const selectedPlugins = specific
-        ? await pluginsSelector([plugins[0]])
-        : await pluginsSelector(plugins)
-
-      for (const stagePlugin of selectedPlugins) {
-        const childLogger = logger.child({ stagePlugin, vault })
+      for (const stagePlugin of plugins) {
+        const childLogger = logger.child({ plugin: stagePlugin, vault })
 
         if (!(await isPluginInstalled(stagePlugin.id, vault.path))) {
-          childLogger.debug(`Plugin not installed`)
+          childLogger.warn(`Plugin not installed`)
           continue
         }
 
@@ -131,7 +124,10 @@ export default class Uninstall extends FactoryCommand {
         }
       }
 
-      logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, { vault })
+      uninstalledPlugins.length &&
+        logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, {
+          vault,
+        })
 
       return { uninstalledPlugins, failedPlugins }
     }
@@ -145,6 +141,6 @@ export default class Uninstall extends FactoryCommand {
   }
 
   private async uninstallPluginInVaults(vaults: Vault[], id: string) {
-    await this.uninstallPluginsInVaults(vaults, [{ id }], true)
+    await this.uninstallPluginsInVaults(vaults, [{ id }])
   }
 }

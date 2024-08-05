@@ -1,13 +1,22 @@
 import { Flags, flush, handle } from '@oclif/core'
 import { ArgInput } from '@oclif/core/lib/parser'
 import { eachSeries, ErrorCallback } from 'async'
-import { isPluginInstalled, Vault } from 'obsidian-utils'
+import fastFolderSize from 'fast-folder-size'
+import { filesize } from 'filesize'
+import { existsSync } from 'fs'
+import { readFile } from 'fs/promises'
+import {
+  isPluginInstalled,
+  Vault,
+  vaultPathToPluginsPath,
+} from 'obsidian-utils'
+import { join } from 'path'
+import { promisify } from 'util'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig } from '../../providers/config'
 import { InstalledPlugins } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
 import { logger } from '../../utils/logger'
-
 interface StatsFlags {
   path: string
   output: string
@@ -88,10 +97,28 @@ export default class Stats extends FactoryCommand {
       const { vault, config } = opts
       logger.debug(`Checking stats for vault`, { vault })
 
+      const pluginsDir = vaultPathToPluginsPath(vault.path)
       for (const stagePlugin of config.plugins) {
+        const pluginDir = join(pluginsDir, stagePlugin.id)
+        const pluginDirExists = existsSync(pluginDir)
+
+        if (!pluginDirExists) {
+          continue
+        }
+        const manifestFile = await readFile(
+          pluginDir + '/manifest.json',
+          'utf8',
+        )
+        const manifestVersion = (
+          JSON.parse(manifestFile) as { version: string }
+        ).version
+        const pluginDirSize = await promisify(fastFolderSize)(pluginDir)
+        const pluginNameWithSize = pluginDirSize
+          ? `${stagePlugin.id}@${manifestVersion} (${filesize(pluginDirSize)})`
+          : stagePlugin.id
         if (await isPluginInstalled(stagePlugin.id, vault.path)) {
-          installedPlugins[stagePlugin.id] = [
-            ...(installedPlugins[stagePlugin.id] || []),
+          installedPlugins[pluginNameWithSize] = [
+            ...(installedPlugins[pluginNameWithSize] || []),
             vault.name,
           ]
         }
@@ -109,12 +136,22 @@ export default class Stats extends FactoryCommand {
           totalPlugins: config.plugins.length,
         }
 
+        const sortedInstalledPlugins = Object.entries(installedPlugins)
+          .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+          .reduce(
+            (acc, [key, value]) => {
+              acc[key] = value
+              return acc
+            },
+            {} as Record<string, string[]>,
+          )
+
         if (output === 'table') {
           console.table(totalStats)
-          console.table(installedPlugins)
+          console.table(sortedInstalledPlugins)
         } else if (output === 'json') {
           console.log(JSON.stringify(totalStats, null, 2))
-          console.log(JSON.stringify(installedPlugins, null, 2))
+          console.log(JSON.stringify(sortedInstalledPlugins, null, 2))
         }
       }
     }

@@ -61,7 +61,7 @@ export default class Init extends FactoryCommand {
       if (typedError && typedError.message === 'Config file not found') {
         try {
           await createDefaultConfig(flags.config)
-          logger.info('Config file created', { config: flags.config })
+          logger.info('Config file created', { path: flags.config })
         } catch (error) {
           this.handleError(error)
         }
