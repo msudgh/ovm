@@ -126,7 +126,7 @@ export default class Install extends FactoryCommand {
       const failedPlugins = []
 
       for (const stagePlugin of config.plugins) {
-        const childLogger = logger.child({ stagePlugin, vault })
+        const childLogger = logger.child({ plugin: stagePlugin, vault })
 
         const pluginInRegistry = await findPluginInRegistry(stagePlugin.id)
         if (!pluginInRegistry) {
@@ -163,7 +163,7 @@ export default class Install extends FactoryCommand {
             await writeConfig(updatedConfig, flags.config)
           }
 
-          childLogger.debug(`Installed plugin`)
+          childLogger.info(`Installed plugin`)
         } catch (error) {
           failedPlugins.push({
             repo: pluginInRegistry.repo,
@@ -174,11 +174,10 @@ export default class Install extends FactoryCommand {
         }
       }
 
-      if (installedPlugins.length > 0) {
+      installedPlugins.length &&
         logger.info(`Installed ${installedPlugins.length} plugins`, {
           vault,
         })
-      }
 
       return { installedPlugins, failedPlugins }
     }
