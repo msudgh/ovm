@@ -25,7 +25,7 @@ interface StatsFlags {
 
 export default class Stats extends FactoryCommand {
   static readonly aliases = ['rs', 'reports:stats']
-  static override readonly description = `Stats of vaults and installed plugins.`
+  static override readonly description = `Statistics of vaults and installed plugins.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

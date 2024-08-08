@@ -21,8 +21,8 @@ ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the ma
 ## Features
 
 - **Manage Obsidian plugins**: Install/Uninstall/Prune plugins in multiple vaults at one go.
-- **Perform actions on Obsidian or custom vaults**: By default, Obsidian vaults are supported and detected. The vaults related commands support `-p` flag to define a custom vault/s from a path or [`Glob`](<https://en.wikipedia.org/wiki/Glob_(programming)>) pattern. e.g. `~/Documents/obsidian/*`.
-- **Generate reports**: Generate stats of vaults and installed plugins with Table/JSON format.
+- **Perform actions on Obsidian or custom vaults**: By default, Obsidian vaults are supported and detected. The vault-related commands support `-p` flag to define a custom vault/s from a path or [`Glob`](<https://en.wikipedia.org/wiki/Glob_(programming)>) pattern. e.g. `~/Documents/obsidian/*`.
+- **Generate reports**: Generate statistics of vaults and installed plugins with Table/JSON output format.
 - **Interactive CLI**: User-friendly interface to select vaults and plugins for each command.
 - **Cross-platform**: Windows, macOS, and Linux.
 
@@ -54,7 +54,7 @@ USAGE
 
 ## Config file
 
-The config file is created in the user's home directory and is named `ovm.json` by [`ovm ci`](#ovm-config-init--ovm-ci). It contains an array of plugins that are to be installed across single/multiple vault.
+The config file is created in the user's home directory by [`ovm ci`](#ovm-config-init--ovm-ci) and is named `ovm.json`. It contains an array of plugins that are to be installed across single/multiple vault.
 
 ```json
 {
@@ -89,7 +89,7 @@ Example config file for following [Commands](#commands) section is as follows:
 
 ### `ovm config init` / `ovm ci`
 
-Configure an ovm.json config file in user's home dir.
+Configure an ovm.json config file in user's home directory.
 
 - _Usage:_ `ovm help config init`
 - _See code:_ [src/commands/config/init.ts](src/commands/config/init.ts)
@@ -108,7 +108,7 @@ $ cat ~/ovm.json
 
 ### `ovm plugins install` / `ovm pi`
 
-Install plugin/s in specified vaults.
+Install plugin(s) in specified vaults.
 
 - _Usage:_ `ovm help plugins install`
 - _See code:_ [src/commands/plugins/install.ts](src/commands/plugins/install.ts)
@@ -134,7 +134,7 @@ info: Installed 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/
 
 ### `ovm plugins prune` / `ovm pp`
 
-Prune existing plugin/s from vaults which are unspecified in the config file.
+Prune existing plugin(s) from vaults that are unspecified in the config file.
 
 - _Usage:_ `ovm help plugins prune`
 - _See code:_ [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)
@@ -150,7 +150,7 @@ info: Pruned 1 plugins {"vault":{"name":"Test","path":"~/Documents/obsidian/Test
 
 ### `ovm plugins uninstall` / `ovm pu`
 
-Uninstall plugin/s from vaults.
+Uninstall plugin(s) from vaults.
 
 - _Usage:_ `ovm help plugins uninstall`
 - _See code:_ [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)
@@ -177,7 +177,7 @@ info: Uninstalled 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidia
 
 ### `ovm reports stats` / `ovm rs`
 
-Stats of vaults and installed plugins.
+Statistics of vaults and installed plugins.
 
 - _Usage:_ `ovm help reports stats`
 - _See code:_ [src/commands/reports/stats.ts](src/commands/reports/stats.ts)

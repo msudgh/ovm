@@ -26,7 +26,7 @@ interface UninstallPluginVaultOpts {
  */
 export default class Uninstall extends FactoryCommand {
   static readonly aliases = ['pu', 'plugins:uninstall']
-  static override readonly description = `Uninstall plugin/s from vaults.`
+  static override readonly description = `Uninstall plugin(s) from vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

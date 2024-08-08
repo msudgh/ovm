@@ -1,15 +1,15 @@
 import { Args, Flags, flush, handle } from '@oclif/core'
 import { eachSeries } from 'async'
 import {
-  installPluginFromGithub,
-  isPluginInstalled,
-  Vault,
+    installPluginFromGithub,
+    isPluginInstalled,
+    Vault,
 } from 'obsidian-utils'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig, writeConfig } from '../../providers/config'
 import {
-  findPluginInRegistry,
-  handleExceedRateLimitError,
+    findPluginInRegistry,
+    handleExceedRateLimitError,
 } from '../../providers/github'
 import { modifyCommunityPlugins } from '../../services/plugins'
 import { vaultsSelector } from '../../services/vaults'
@@ -36,7 +36,7 @@ interface InstallPluginVaultOpts {
  */
 export default class Install extends FactoryCommand {
   static readonly aliases = ['pi', 'plugins:install']
-  static override readonly description = `Install plugin/s in specified vaults.`
+  static override readonly description = `Install plugin(s) in specified vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
