@@ -220,7 +220,7 @@ Run a shell command on selected vaults (using Node.js child_process).
 Output: `Table (default)` / `JSON`
 
 ```bash
-$ ovm run -s "tar -cf '{0}.tar' '{0}'" -o=json
+$ ovm vaults run -s "tar -cf '{0}.tar' '{0}'" -o=json
 ? Select the vaults: Career, Financial, Goals
 info: Run command {"command":"tar -cf '~/Documents/obsidian/Career.tar' '~/Documents/obsidian/Career'","vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
 
