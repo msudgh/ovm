@@ -90,6 +90,7 @@ Example config file for following [Commands](#commands) section is as follows:
 > The content used in the examples below is for illustrative purposes only. e.g. In the output sections, the vaults are stored in `~/Documents/` directory. The actual output may vary.
 
 ### `ovm config init`
+
 Aliases: `ovm ci`
 
 Configure an ovm.json config file in user's home directory.
@@ -110,6 +111,7 @@ $ cat ~/ovm.json
 ```
 
 ### `ovm plugins install`
+
 Aliases: `ovm pi`
 
 Install plugin(s) in specified vaults.
@@ -137,6 +139,7 @@ info: Installed 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/
 ```
 
 ### `ovm plugins prune`
+
 Aliases: `ovm pp`
 
 Prune existing plugin(s) from vaults that are unspecified in the config file.
@@ -154,6 +157,7 @@ info: Pruned 1 plugins {"vault":{"name":"Test","path":"~/Documents/obsidian/Test
 ```
 
 ### `ovm plugins uninstall`
+
 Aliases: `ovm pu`
 
 Uninstall plugin(s) from vaults.
@@ -182,6 +186,7 @@ info: Uninstalled 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidia
 ```
 
 ### `ovm reports stats`
+
 Aliases: `ovm rs`
 
 Statistics of vaults and installed plugins.
@@ -210,6 +215,7 @@ $ ovm reports stats
 ```
 
 ### `ovm vaults run`
+
 Aliases: `ovm vr` / `ovm r` / `ovm run`
 
 Run a shell command on selected vaults (using Node.js child_process).
@@ -261,6 +267,7 @@ info: Run operation finished! {"custom_commands_log_path":"/var/folders/_v/j4w6k
 A custom command can be executed on vault(s) by using reserved placeholders as string value within the shell command. The placeholders are replaced with the actual values during the execution.
 
 List of placeholders:
+
 - `{0}`: Vault path
 - `{1}`: Vault name
 

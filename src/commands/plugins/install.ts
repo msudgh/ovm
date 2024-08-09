@@ -161,10 +161,11 @@ export default class Install extends FactoryCommand {
         }
       }
 
-      installedPlugins.length &&
+      if (installedPlugins.length) {
         logger.info(`Installed ${installedPlugins.length} plugins`, {
           vault,
         })
+      }
 
       return { installedPlugins, failedPlugins }
     }

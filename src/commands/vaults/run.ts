@@ -3,6 +3,7 @@ import { each, eachSeries, ErrorCallback } from 'async'
 import { exec, ExecException } from 'child_process'
 import { formatDuration, intervalToDuration } from 'date-fns'
 import { Vault } from 'obsidian-utils'
+import { CommandsExecutedOnVaults } from '../../commands'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { safeLoadConfig } from '../../providers/config'
 import { vaultsSelector } from '../../providers/vaults'
@@ -128,12 +129,12 @@ export default class Run extends FactoryCommand {
 
     const vaults = await this.loadVaults(path)
     const selectedVaults = await vaultsSelector(vaults)
-    const vaultsWithCommand = selectedVaults.map((vault: any) => ({
+    const vaultsWithCommand = selectedVaults.map((vault: Vault) => ({
       vault,
       command: this.commandInterpolation(vault, command),
     }))
 
-    const taskExecutedOnVaults: Record<string, any> = {}
+    const taskExecutedOnVaults: CommandsExecutedOnVaults = {}
 
     const commandVaultIterator = async (opts: {
       vault: Vault
@@ -142,31 +143,44 @@ export default class Run extends FactoryCommand {
       const { vault, command } = opts
       logger.debug(`Execute command`, { vault, command })
 
-      const startDate = new Date()
-      const { error, result } = await this.asyncExecCustomCommand(
-        command,
-        flags.runFromVaultDirectoryAsWorkDir,
-        vault,
-      )
-      const endDate = new Date()
-      const durationLessThanSecond = endDate.getTime() - startDate.getTime()
-      const durationMoreThanSecond = intervalToDuration({
-        start: startDate,
-        end: endDate,
-      })
+      try {
+        const startDate = new Date()
+        const result = await this.asyncExecCustomCommand(
+          command,
+          flags.runFromVaultDirectoryAsWorkDir,
+          vault,
+        )
+        const endDate = new Date()
+        const durationLessThanSecond = endDate.getTime() - startDate.getTime()
+        const durationMoreThanSecond = intervalToDuration({
+          start: startDate,
+          end: endDate,
+        })
 
-      const formattedDuration =
-        formatDuration(durationMoreThanSecond, {
-          format: ['hours', 'minutes', 'seconds'],
-        }) || `${durationLessThanSecond} ms`
+        const formattedDuration =
+          formatDuration(durationMoreThanSecond, {
+            format: ['hours', 'minutes', 'seconds'],
+          }) || `${durationLessThanSecond} ms`
 
-      taskExecutedOnVaults[vault.name] = {
-        success: null,
-        duration: formattedDuration,
-        error: null,
-      }
+        taskExecutedOnVaults[vault.name] = {
+          success: null,
+          duration: formattedDuration,
+          error: null,
+        }
 
-      if (error) {
+        if (result) {
+          taskExecutedOnVaults[vault.name]['success'] = true
+          customCommandLogger.info('Executed successfully', {
+            result,
+            vault,
+            command,
+          })
+          if (!flags.silent) {
+            logger.info(`Run command`, { vault, command })
+            console.log(result)
+          }
+        }
+      } catch (error) {
         taskExecutedOnVaults[vault.name]['error'] = JSON.stringify(error)
         customCommandLogger.error('Execution failed', {
           error: JSON.stringify(error),
@@ -174,22 +188,11 @@ export default class Run extends FactoryCommand {
           command,
         })
       }
-
-      if (result) {
-        taskExecutedOnVaults[vault.name]['success'] = true
-        customCommandLogger.info('Executed successfully', {
-          result,
-          vault,
-          command,
-        })
-        if (!flags.silent) {
-          logger.info(`Run command`, { vault, command })
-          console.log(result)
-        }
-      }
     }
 
-    const commandVaultErrorCallback: ErrorCallback<Error> = (error: any) => {
+    const commandVaultErrorCallback: ErrorCallback<Error> = (
+      error: Error | null | undefined,
+    ) => {
       if (error) {
         logger.debug('UnhandledException', {
           error: JSON.stringify(error),
@@ -200,13 +203,10 @@ export default class Run extends FactoryCommand {
       } else {
         const sortedTaskExecutedOnVaults = Object.entries(taskExecutedOnVaults)
           .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-          .reduce(
-            (acc, [key, value]) => {
-              acc[key] = value
-              return acc
-            },
-            {} as Record<string, boolean>,
-          )
+          .reduce((acc, [key, value]) => {
+            acc[key] = value
+            return acc
+          }, {} as CommandsExecutedOnVaults)
 
         logger.info('Run operation finished!', {
           custom_commands_log_path: CUSTOM_COMMAND_LOGGER_FILE,
@@ -238,17 +238,16 @@ export default class Run extends FactoryCommand {
     command: string,
     runFromVaultDirectoryAsWorkDir: boolean,
     vault: Vault,
-  ): Promise<
-    Pick<ExecuteCustomCommandResult, 'error'> & {
-      result: string
-    }
-  > {
+  ): Promise<Pick<ExecuteCustomCommandResult, 'error'> | string> {
     return new Promise((resolve, reject) => {
       exec(
         command,
         { cwd: runFromVaultDirectoryAsWorkDir ? vault.path : __dirname },
-        (error: any, stdout: any, stderr: any) => {
-          resolve({ result: `${stderr}\n${stdout}`, error })
+        (error, stdout, stderr) => {
+          if (error) {
+            return reject(error)
+          }
+          resolve(`${stderr}\n${stdout}`)
         },
       )
     })

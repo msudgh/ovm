@@ -19,8 +19,8 @@ describe('Config', () => {
 
     const config = await safeLoadConfig(configPath)
 
-    expect(config.success).to.be.true
-    expect(config.error).to.be.undefined
+    expect(config.success).to.be.true.equal(true)
+    expect(config.error).to.be.undefined.equal(undefined)
     expect(config.data).to.deep.equal(sampleDefaultConfig)
     mock.restore()
   })
