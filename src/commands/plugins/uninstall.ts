@@ -1,31 +1,19 @@
 import { Args, Flags, flush, handle } from '@oclif/core'
 import { eachSeries } from 'async'
 import { isPluginInstalled, Vault } from 'obsidian-utils'
+import { UninstallArgs, UninstallFlags } from '../../commands'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
-import { Config, Plugin, safeLoadConfig } from '../../providers/config'
-import { pluginsSelector, removePluginDir } from '../../services/plugins'
-import { vaultsSelector } from '../../services/vaults'
+import { Plugin, safeLoadConfig } from '../../providers/config'
+import { pluginsSelector, removePluginDir } from '../../providers/plugins'
+import { vaultsSelector } from '../../providers/vaults'
 import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { logger } from '../../utils/logger'
-
-interface UninstallArgs {
-  pluginId?: string
-}
-
-interface UninstallFlags {
-  path: string
-}
-
-interface UninstallPluginVaultOpts {
-  vault: Vault
-  config: Config
-}
 
 /**
  * Uninstall command removes specified plugins from vaults.
  */
 export default class Uninstall extends FactoryCommand {
-  static readonly aliases = ['pu', 'plugins:uninstall']
+  static readonly aliases = ['pu', 'plugins uninstall']
   static override readonly description = `Uninstall plugin(s) from vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
