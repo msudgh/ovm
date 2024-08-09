@@ -14,8 +14,8 @@ import { join } from 'path'
 import { promisify } from 'util'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig } from '../../providers/config'
-import { InstalledPlugins } from '../../services/plugins'
-import { vaultsSelector } from '../../services/vaults'
+import { InstalledPlugins } from '../../providers/plugins'
+import { vaultsSelector } from '../../providers/vaults'
 import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { logger } from '../../utils/logger'
 interface StatsFlags {
@@ -24,8 +24,8 @@ interface StatsFlags {
 }
 
 export default class Stats extends FactoryCommand {
-  static readonly aliases = ['rs', 'reports:stats']
-  static override readonly description = `Stats of vaults and installed plugins.`
+  static readonly aliases = ['rs', 'reports stats']
+  static override readonly description = `Statistics of vaults and installed plugins.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

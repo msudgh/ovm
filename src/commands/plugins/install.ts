@@ -5,38 +5,25 @@ import {
   isPluginInstalled,
   Vault,
 } from 'obsidian-utils'
+import { InstallArgs, InstallFlags } from '../../commands'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
 import { Config, safeLoadConfig, writeConfig } from '../../providers/config'
 import {
   findPluginInRegistry,
   handleExceedRateLimitError,
 } from '../../providers/github'
-import { modifyCommunityPlugins } from '../../services/plugins'
-import { vaultsSelector } from '../../services/vaults'
+import { modifyCommunityPlugins } from '../../providers/plugins'
+import { vaultsSelector } from '../../providers/vaults'
 import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { PluginNotFoundInRegistryError } from '../../utils/errors'
 import { logger } from '../../utils/logger'
-
-interface InstallFlags {
-  path: string
-  enable: boolean
-}
-
-interface InstallArgs {
-  pluginId?: string
-}
-
-interface InstallPluginVaultOpts {
-  vault: Vault
-  config: Config
-}
 
 /**
  * Install command installs specified plugins in vaults.
  */
 export default class Install extends FactoryCommand {
-  static readonly aliases = ['pi', 'plugins:install']
-  static override readonly description = `Install plugin/s in specified vaults.`
+  static readonly aliases = ['pi', 'plugins install']
+  static override readonly description = `Install plugin(s) in specified vaults.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

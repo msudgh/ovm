@@ -1,29 +1,20 @@
 import { Flags, flush, handle } from '@oclif/core'
 import { ArgInput } from '@oclif/core/lib/parser'
 import { eachSeries } from 'async'
-import { Vault } from 'obsidian-utils'
+import { PruneFlags, PrunePluginVaultOpts } from '../../commands'
 import FactoryCommand, { FactoryFlags } from '../../providers/command'
-import { Config, safeLoadConfig } from '../../providers/config'
-import { listInstalledPlugins, removePluginDir } from '../../services/plugins'
-import { vaultsSelector } from '../../services/vaults'
+import { safeLoadConfig } from '../../providers/config'
+import { listInstalledPlugins, removePluginDir } from '../../providers/plugins'
+import { vaultsSelector } from '../../providers/vaults'
 import { VAULTS_PATH_FLAG_DESCRIPTION } from '../../utils/constants'
 import { logger } from '../../utils/logger'
-
-interface PruneFlags {
-  path: string
-}
-
-interface PrunePluginVaultOpts {
-  vault: Vault
-  config: Config
-}
 
 /**
  * Prune command list and remove plugins that aren't referred in config file.
  */
 export default class Prune extends FactoryCommand {
-  static readonly aliases = ['pp', 'plugins:prune']
-  static override readonly description = `Prune existing plugin/s from vaults which are unspecified in the config file.`
+  static readonly aliases = ['pp', 'plugins prune']
+  static override readonly description = `Prune existing plugin(s) from vaults that are unspecified in the config file.`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

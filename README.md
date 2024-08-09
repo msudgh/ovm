@@ -11,18 +11,20 @@ ovm (Obsidian Vaults Manager) is a CLI application designed to streamline the ma
 - [Usage](#usage)
 - [Config file](#config-file)
 - [Commands](#commands)
-  - [`ovm config init` / `ovm ci`](#ovm-config-init--ovm-ci)
-  - [`ovm plugins install` / `ovm pi`](#ovm-plugins-install--ovm-pi)
-  - [`ovm plugins prune` / `ovm pp`](#ovm-plugins-prune--ovm-pp)
-  - [`ovm plugins uninstall` / `ovm pu`](#ovm-plugins-uninstall--ovm-pu)
-  - [`ovm reports stats` / `ovm rs`](#ovm-reports-stats--ovm-rs)
+  - [`ovm config init`](#ovm-config-init)
+  - [`ovm plugins install`](#ovm-plugins-install)
+  - [`ovm plugins prune`](#ovm-plugins-prune)
+  - [`ovm plugins uninstall`](#ovm-plugins-uninstall)
+  - [`ovm reports stats`](#ovm-reports-stats)
+  - [`ovm vaults run`](#ovm-vaults-run)
+    - [Reserved placeholders](#reserved-placeholders)
 - [License](#license)
 
 ## Features
 
 - **Manage Obsidian plugins**: Install/Uninstall/Prune plugins in multiple vaults at one go.
-- **Perform actions on Obsidian or custom vaults**: By default, Obsidian vaults are supported and detected. The vaults related commands support `-p` flag to define a custom vault/s from a path or [`Glob`](<https://en.wikipedia.org/wiki/Glob_(programming)>) pattern. e.g. `~/Documents/obsidian/*`.
-- **Generate reports**: Generate stats of vaults and installed plugins with Table/JSON format.
+- **Perform actions on Obsidian or custom vaults**: By default, Obsidian vaults are supported and detected. The vault-related commands support `-p` flag to define a custom vault/s from a path or [`Glob`](<https://en.wikipedia.org/wiki/Glob_(programming)>) pattern. e.g. `~/Documents/obsidian/*`.
+- **Generate reports**: Generate statistics of vaults and installed plugins with Table/JSON output format.
 - **Interactive CLI**: User-friendly interface to select vaults and plugins for each command.
 - **Cross-platform**: Windows, macOS, and Linux.
 
@@ -54,7 +56,7 @@ USAGE
 
 ## Config file
 
-The config file is created in the user's home directory and is named `ovm.json` by [`ovm ci`](#ovm-config-init--ovm-ci). It contains an array of plugins that are to be installed across single/multiple vault.
+The config file is created in the user's home directory by [`ovm ci`](#ovm-config-init--ovm-ci) and is named `ovm.json`. It contains an array of plugins that are to be installed across single/multiple vault.
 
 ```json
 {
@@ -87,9 +89,10 @@ Example config file for following [Commands](#commands) section is as follows:
 
 > The content used in the examples below is for illustrative purposes only. e.g. In the output sections, the vaults are stored in `~/Documents/` directory. The actual output may vary.
 
-### `ovm config init` / `ovm ci`
+### `ovm config init`
+Aliases: `ovm ci`
 
-Configure an ovm.json config file in user's home dir.
+Configure an ovm.json config file in user's home directory.
 
 - _Usage:_ `ovm help config init`
 - _See code:_ [src/commands/config/init.ts](src/commands/config/init.ts)
@@ -106,9 +109,10 @@ $ cat ~/ovm.json
 }
 ```
 
-### `ovm plugins install` / `ovm pi`
+### `ovm plugins install`
+Aliases: `ovm pi`
 
-Install plugin/s in specified vaults.
+Install plugin(s) in specified vaults.
 
 - _Usage:_ `ovm help plugins install`
 - _See code:_ [src/commands/plugins/install.ts](src/commands/plugins/install.ts)
@@ -132,9 +136,10 @@ info: Installed plugin {"plugin":{"id":"dataview","version":"latest"},"vault":{"
 info: Installed 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
 ```
 
-### `ovm plugins prune` / `ovm pp`
+### `ovm plugins prune`
+Aliases: `ovm pp`
 
-Prune existing plugin/s from vaults which are unspecified in the config file.
+Prune existing plugin(s) from vaults that are unspecified in the config file.
 
 - _Usage:_ `ovm help plugins prune`
 - _See code:_ [src/commands/plugins/prune.ts](src/commands/plugins/prune.ts)
@@ -148,9 +153,10 @@ info: Removed plugin {"pluginId":"obsidian-tasks-plugin","vaultPath":"~/Document
 info: Pruned 1 plugins {"vault":{"name":"Test","path":"~/Documents/obsidian/Test"}}
 ```
 
-### `ovm plugins uninstall` / `ovm pu`
+### `ovm plugins uninstall`
+Aliases: `ovm pu`
 
-Uninstall plugin/s from vaults.
+Uninstall plugin(s) from vaults.
 
 - _Usage:_ `ovm help plugins uninstall`
 - _See code:_ [src/commands/plugins/uninstall.ts](src/commands/plugins/uninstall.ts)
@@ -175,9 +181,10 @@ info: Removed plugin {"pluginId":"dataview","vaultPath":"~/Documents/obsidian/Go
 info: Uninstalled 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
 ```
 
-### `ovm reports stats` / `ovm rs`
+### `ovm reports stats`
+Aliases: `ovm rs`
 
-Stats of vaults and installed plugins.
+Statistics of vaults and installed plugins.
 
 - _Usage:_ `ovm help reports stats`
 - _See code:_ [src/commands/reports/stats.ts](src/commands/reports/stats.ts)
@@ -201,6 +208,76 @@ $ ovm reports stats
 │ dataview@0.5.67 (2.38 MB)                        │ 'Career'    │ 'Financial' │         │
 └──────────────────────────────────────────────────┴─────────────┴─────────────┴─────────┘
 ```
+
+### `ovm vaults run`
+Aliases: `ovm vr` / `ovm r` / `ovm run`
+
+Run a shell command on selected vaults (using Node.js child_process).
+
+- _Usage:_ `ovm help vaults run`
+- _See code:_ [src/commands/vaults/run.ts](src/commands/vaults/run.ts)
+
+Output: `Table (default)` / `JSON`
+
+```bash
+$ ovm vaults run -s "tar -cf '{0}.tar' '{0}'" -o=json
+? Select the vaults: Career, Financial, Goals
+info: Run command {"command":"tar -cf '~/Documents/obsidian/Career.tar' '~/Documents/obsidian/Career'","vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+
+info: Run operation finished! {"custom_commands_log_path":"/var/folders/_v/j4w6kv1s27b6xjfzvl5k6lqm0000gn/T/ovm-custom-command.json"}
+{
+  "Career": {
+    "success": true,
+    "duration": "2 seconds",
+    "error": null
+  },
+  "Financial": {
+    "success": true,
+    "duration": "1 second",
+    "error": null
+  },
+  "Goals": {
+    "success": true,
+    "duration": "1 second",
+    "error": null
+  }
+}
+
+$ ovm r "echo 'Path: {0}'"
+info: Run command {"command":"echo 'Path: ~/Documents/obsidian/Career'","vault":{"name":"Career","path":"~/Documents/obsidian/Career"}}
+
+Path: ~/Documents/obsidian/Career
+
+info: Run operation finished! {"custom_commands_log_path":"/var/folders/_v/j4w6kv1s27b6xjfzvl5k6lqm0000gn/T/ovm-custom-command.json"}
+┌─────────┬─────────┬──────────┬───────┐
+│ (index) │ success │ duration │ error │
+├─────────┼─────────┼──────────┼───────┤
+│ Career  │ true    │ '10 ms'  │ null  │
+└─────────┴─────────┴──────────┴───────┘
+```
+
+#### Reserved placeholders
+
+A custom command can be executed on vault(s) by using reserved placeholders as string value within the shell command. The placeholders are replaced with the actual values during the execution.
+
+List of placeholders:
+- `{0}`: Vault path
+- `{1}`: Vault name
+
+Examples:
+
+- Echo vault(s) path
+  - `ovm run "echo 'Path: {0}'"`
+- Echo vault(s) path and name
+  - `ovm run "echo 'Path: {0}, Name: {1}'"`
+- Echo vault(s) name and silent the command's result
+  - `ovm run -s "echo 'Path: {0}'"`
+- Create an archive of vault(s) by `tar` command
+  - `ovm run "tar -cf '{0}.tar' '{0}'"`
+- Encrypt vault(s) directory by `gpg` command [algo: `AES256`, passphrase `password`]
+  - `ovm run "tar -cf '{0}.tar' '{0}' && gpg --batch --symmetric --cipher-algo AES256 --passphrase 'password' '{0}.tar'"`
+- Decrypt the archive of vault(s) by `gpg` command [passphrase: `password`]
+  - `ovm run "gpg -q --batch --decrypt --passphrase 'password' -o '{0}.tar' '{0}.tar.gpg'"`
 
 ## License
 

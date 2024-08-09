@@ -11,7 +11,7 @@ import { logger } from '../../utils/logger'
  * Init command configure an ovm.json config file in user's home dir.
  */
 export default class Init extends FactoryCommand {
-  static readonly aliases = ['ci', 'config:init']
+  static readonly aliases = ['ci', 'config init']
   static override readonly description = `Configure an ovm.json config file in user's home dir.`
   static override readonly examples = ['<%= config.bin %> <%= command.id %>']
   static override readonly flags = {

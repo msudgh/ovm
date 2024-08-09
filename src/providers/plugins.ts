@@ -1,8 +1,8 @@
 import { checkbox } from '@inquirer/prompts'
 import { readdir, readFile, rm, writeFile } from 'fs/promises'
 import { vaultPathToPluginsPath } from 'obsidian-utils'
-import { Plugin } from '../providers/config'
 import { logger } from '../utils/logger'
+import { Plugin } from './config'
 
 export type InstalledPlugins = Record<string, Array<string>>
 
