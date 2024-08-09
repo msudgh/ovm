@@ -36,3 +36,12 @@ export interface UninstallPluginVaultOpts {
   vault: Vault
   config: Config
 }
+
+export type CommandsExecutedOnVaults = Record<
+  string,
+  {
+    success: null | boolean
+    duration: string
+    error: null | Error | string
+  }
+>

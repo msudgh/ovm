@@ -112,10 +112,11 @@ export default class Uninstall extends FactoryCommand {
         }
       }
 
-      uninstalledPlugins.length &&
+      if (uninstalledPlugins.length) {
         logger.info(`Uninstalled ${uninstalledPlugins.length} plugins`, {
           vault,
         })
+      }
 
       return { uninstalledPlugins, failedPlugins }
     }
