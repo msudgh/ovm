@@ -50,3 +50,6 @@ export const vaultsSelector = async (vaults: Vault[]) => {
 
   return selectedVaults
 }
+
+export const getVaultPath = (vault: Vault) => vault.path
+export const getVaultName = (vault: Vault) => vault.name
