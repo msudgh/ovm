@@ -32,7 +32,6 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
-      - run: pnpm run build
       - run: pnpm run test:coverage
       - name: SonarCloud Scan
         if: matrix.os == 'ubuntu-latest'

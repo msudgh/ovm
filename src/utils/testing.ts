@@ -1,6 +1,6 @@
 import { exec, ExecException } from 'child_process'
 import { rm } from 'fs/promises'
-import { tmpdir } from 'os'
+import { platform, tmpdir } from 'os'
 import path from 'path'
 import { OVM_CONFIG_FILENAME } from './constants'
 
@@ -13,8 +13,22 @@ export const runCommand = async (
   command: string,
   dev = false,
 ): Promise<CommandResult | (ExecException | null)> => {
-  const formattedCommand = `./bin/${dev ? 'dev' : 'run'}.js ${command}`
   return new Promise((resolve, reject) => {
+    const detectedPlatform = platform()
+    const runnerExt = detectedPlatform === 'win32' ? 'cmd' : 'js'
+    const runnerType = dev ? 'dev' : 'run'
+    const runnerFilePath = `${runnerType}.${runnerExt}`
+    const formattedCommand =
+      detectedPlatform === 'win32'
+        ? path.win32.normalize(
+            path.join(
+              __dirname,
+              '..',
+              '..',
+              `bin/${runnerFilePath} ${command}`,
+            ),
+          )
+        : `./bin/${runnerFilePath} ${command}`
     exec(formattedCommand, (error, stdout, stderr) => {
       if (error) {
         reject(error)
@@ -28,7 +42,10 @@ export const getTmpConfigFilePath = () => {
   return path.join(tmpdir(), OVM_CONFIG_FILENAME)
 }
 
-
 export const destroyConfigMockFile = async (path: string) => {
-  await rm(path, { force: true })
+  if (platform() === 'win32') {
+    return await rm(path.normalize(path), { force: true })
+  }
+
+  return await rm(path, { force: true })
 }

@@ -2,6 +2,8 @@ import { expect } from 'chai'
 import { existsSync } from 'fs'
 import { destroyConfigMockFile, getTmpConfigFilePath, runCommand } from '../../utils/testing'
 
+process.env.CI = 'true'
+
 describe('Command: config init', () => {
   beforeEach(async () => {
     const tmpConfigFilePath = getTmpConfigFilePath()
