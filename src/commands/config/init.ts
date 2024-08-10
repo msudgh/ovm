@@ -48,8 +48,7 @@ export default class Init extends FactoryCommand {
       const { data: config, error } = await safeLoadConfig(flags.config)
 
       if (config) {
-        logger.error('File already exists!', { config: flags.config })
-        process.exit(1)
+        throw new Error('File already exists!')
       }
 
       if (error) {
