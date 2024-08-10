@@ -78,7 +78,10 @@ export default class FactoryCommand extends Command {
   }
 
   public handleError(error: unknown) {
-    if (error instanceof ExitPromptError) {
+    // Avoid handling errors by logger for CI environment
+    if (process.env.CI) {
+      throw error
+    } else if (error instanceof ExitPromptError) {
       logger.debug('Exit prompt error:', { error })
     } else if (error instanceof Error) {
       logger.debug('An error occurred while installation:', { error })
