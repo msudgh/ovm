@@ -220,6 +220,8 @@ Aliases: `ovm vr` / `ovm r` / `ovm run`
 
 Run a shell command on selected vaults (using Node.js child_process).
 
+**Disclaimer: Any input containing shell metacharacters may be used to trigger arbitrary command execution, using of this command is at risk of command's caller.**
+
 - _Usage:_ `ovm help vaults run`
 - _See code:_ [src/commands/vaults/run.ts](src/commands/vaults/run.ts)
 
