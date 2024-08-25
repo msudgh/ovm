@@ -2,7 +2,7 @@
   "name": "ovm",
   "description": "Obsidian Vaults Manager",
   "type": "commonjs",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "license": "MIT",
   "author": "Masoud Ghorbani",
   "homepage": "https://github.com/msudgh/ovm",
@@ -11,8 +11,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "shx rm -rf dist && tsc -p tsconfig.json",
-    "build:watch": "shx rm -rf dist && tsc -p tsconfig.json -w",
+    "build": "shx rm -rf dist && tsc -p tsconfig.release.json",
+    "build:watch": "shx rm -rf dist && tsc -p tsconfig.release.json -w",
     "build:release": "shx rm -rf dist && tsc -p tsconfig.release.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -21,7 +21,7 @@
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
     "prepack": "oclif manifest && pnpm run build:release && pnpm run test:unit",
-    "test:unit": "mocha",
+    "test:unit": "pnpm run build && mocha",
     "test:coverage": "nyc npm run test:unit"
   },
   "keywords": [
