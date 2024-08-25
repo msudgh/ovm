@@ -5,7 +5,6 @@ import FactoryCommand, {
   FactoryFlags,
 } from '../../providers/command'
 import { createDefaultConfig, safeLoadConfig } from '../../providers/config'
-import { logger } from '../../utils/logger'
 
 /**
  * Init command configure an ovm.json config file in user's home dir.
@@ -60,7 +59,6 @@ export default class Init extends FactoryCommand {
       if (typedError && typedError.message === 'Config file not found') {
         try {
           await createDefaultConfig(flags.config)
-          logger.info('Config file created', { path: flags.config })
         } catch (error) {
           this.handleError(error)
         }

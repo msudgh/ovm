@@ -39,13 +39,13 @@ export const runCommand = async (
 }
 
 export const getTmpConfigFilePath = () => {
+  if (platform() === 'win32') {
+    return path.win32.join(tmpdir(), OVM_CONFIG_FILENAME)
+  }
+
   return path.join(tmpdir(), OVM_CONFIG_FILENAME)
 }
 
 export const destroyConfigMockFile = async (path: string) => {
-  if (platform() === 'win32') {
-    return await rm(path.normalize(path), { force: true })
-  }
-
   return await rm(path, { force: true })
 }

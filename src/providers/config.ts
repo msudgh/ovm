@@ -69,14 +69,15 @@ export const safeLoadConfig = (
 
 export const writeConfig = (
   config: Config,
-  configPath: string,
+  path: string,
 ): Promise<void | Error> => {
-  logger.debug('Writing config', { configPath })
+  logger.debug('Writing config', { path })
   return new Promise((resolve, reject) => {
     try {
       const content = JSON.stringify(config, null, 2)
-      writeFileSync(configPath, content)
-      logger.debug('Config written', { configPath })
+
+      writeFileSync(path, content)
+      logger.debug('Config written', { path })
       resolve()
     } catch (error) {
       reject(error as Error)
@@ -85,14 +86,15 @@ export const writeConfig = (
 }
 
 export const createDefaultConfig = (
-  configPath: string,
+  path: string,
 ): Promise<Config | Error> => {
   return new Promise((resolve, reject) => {
     try {
       const defaultConfig = ConfigSchema.parse({})
-      writeConfig(defaultConfig, configPath)
 
-      logger.debug('Default config created', { configPath })
+      writeConfig(defaultConfig, path)
+
+      logger.info('Config file created', { path })
 
       resolve(defaultConfig)
     } catch (error) {

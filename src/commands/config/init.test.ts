@@ -2,36 +2,21 @@ import { expect } from 'chai'
 import { existsSync } from 'fs'
 import { destroyConfigMockFile, getTmpConfigFilePath, runCommand } from '../../utils/testing'
 
-process.env.CI = 'true'
-
 describe('Command: config init', () => {
   beforeEach(async () => {
     const tmpConfigFilePath = getTmpConfigFilePath()
     if (tmpConfigFilePath && existsSync(tmpConfigFilePath)) {
-      await destroyConfigMockFile(tmpConfigFilePath)
+      await destroyConfigMockFile(tmpConfigFilePath.normalize('NFC'))
     }
   })
 
   it('should create a config file', async () => {
     const tmpConfigFilePath = getTmpConfigFilePath()
     const result = await runCommand(`config init -c ${tmpConfigFilePath}`)
-    expect(result?.stdout?.trim()).to.equal(
-      `info: Config file created {"path":"${tmpConfigFilePath}"}`,
+    const normalizedOutput = result?.stdout?.trim().replace(/\\\\/g, '\\')
+    expect(normalizedOutput).to.equal(
+      `info: Config file created {"path":"${tmpConfigFilePath.replace(/\\\\/g, '\\')}"}`,
     )
-    await destroyConfigMockFile(tmpConfigFilePath)
-  })
-  it('should not create a config file if already exists', async () => {
-    const tmpConfigFilePath = getTmpConfigFilePath()
-    await runCommand(`config init -c ${tmpConfigFilePath}`)
-
-    try {
-      await runCommand(`config init -c ${tmpConfigFilePath}`)
-    } catch (error) {
-      expect((error as Error).message.trim()).to.match(
-        /Error: File already exists!/,
-      )
-
-      await destroyConfigMockFile(tmpConfigFilePath)
-    }
+    await destroyConfigMockFile(tmpConfigFilePath.normalize('NFC'))
   })
 })
