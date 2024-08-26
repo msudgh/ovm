@@ -56,7 +56,7 @@ USAGE
 
 ## Config file
 
-The config file is created in the user's home directory by [`ovm ci`](#ovm-config-init--ovm-ci) and is named `ovm.json`. It contains an array of plugins that are to be installed across single/multiple vault.
+The config file is created in the user's home directory by [`ovm ci`](#ovm-config-init) and is named `ovm.json`. It contains an array of plugins that are to be installed across single/multiple vault.
 
 ```json
 {
