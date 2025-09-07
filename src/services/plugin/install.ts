@@ -1,15 +1,17 @@
 import { each } from 'async'
 import { installPluginFromGithub, isPluginInstalled } from 'obsidian-utils'
 import {
-  findPluginInRegistry,
-  getPluginVersion,
-  handleExceedRateLimitError,
-} from '../providers/github'
-import {
   deduplicatePlugins,
   modifyCommunityPlugins,
-} from '../providers/plugins'
-import { getSelectedVaults, mapVaultsIteratorItem } from '../providers/vaults'
+} from '../../providers/plugins'
+import {
+  findPluginInRegistry,
+  handleExceedRateLimitError,
+} from '../../providers/registry'
+import {
+  getSelectedVaults,
+  mapVaultsIteratorItem,
+} from '../../providers/vaults'
 import {
   FactoryFlagsWithVaults,
   InstallArgs,
@@ -17,12 +19,14 @@ import {
   InstallCommandIterator,
   InstallFlags,
   StagedPlugins,
-} from '../types/commands'
-import { handlerCommandError } from '../utils/command'
+  StagedPluginsWithError,
+} from '../../types/commands'
+import { handlerCommandError } from '../../utils/command'
 
-import { PluginNotFoundInRegistryError } from '../utils/errors'
-import { logger } from '../utils/logger'
-import { loadConfig, writeConfig } from './config'
+import { PluginNotFoundInRegistryError } from '../../utils/errors'
+import { logger } from '../../utils/logger'
+import { getPluginVersion } from '../../utils/plugin'
+import { loadConfig, writeConfig } from '../config'
 
 const installVaultIterator: InstallCommandIterator = async (item) => {
   const { vault, config, flags, args } = item
@@ -31,7 +35,7 @@ const installVaultIterator: InstallCommandIterator = async (item) => {
     ? [{ id: args.pluginId }]
     : config.plugins
   const installedPlugins: StagedPlugins = []
-  const failedPlugins: StagedPlugins = []
+  const failedPlugins: StagedPluginsWithError = []
   const reinstallPlugins: StagedPlugins = []
   const result = { installedPlugins, failedPlugins, reinstallPlugins }
 
@@ -87,6 +91,7 @@ const installVaultIterator: InstallCommandIterator = async (item) => {
       const failedPlugin = {
         ...stagePlugin,
         version,
+        error: error as Error,
       }
 
       result.failedPlugins.push(failedPlugin)
@@ -137,7 +142,4 @@ const action = async (
   return each(items, iterator, installCommandCallback)
 }
 
-export default {
-  action,
-  installVaultIterator,
-}
+export { action, installVaultIterator }

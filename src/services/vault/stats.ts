@@ -7,7 +7,10 @@ import { readFile } from 'fs/promises'
 import { isPluginInstalled, vaultPathToPluginsPath } from 'obsidian-utils'
 import { join } from 'path'
 import { promisify } from 'util'
-import { getSelectedVaults, mapVaultsIteratorItem } from '../providers/vaults'
+import {
+  getSelectedVaults,
+  mapVaultsIteratorItem,
+} from '../../providers/vaults'
 import {
   FactoryFlagsWithVaults,
   InstalledPlugins,
@@ -16,10 +19,10 @@ import {
   StatsCommandCallbackResult,
   StatsCommandIterator,
   StatsFlags,
-} from '../types/commands'
-import { handlerCommandError } from '../utils/command'
-import { logger } from '../utils/logger'
-import { loadConfig } from './config'
+} from '../../types/commands'
+import { handlerCommandError } from '../../utils/command'
+import { logger } from '../../utils/logger'
+import { loadConfig } from '../config'
 
 const installedPlugins: InstalledPlugins = {}
 
@@ -124,7 +127,4 @@ const action = async (
   return each(items, iterator, statsVaultCallback)
 }
 
-export default {
-  action,
-  statsVaultIterator,
-}
+export { action, statsVaultIterator }

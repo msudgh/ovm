@@ -1,16 +1,9 @@
 import { Command, Flags } from '@oclif/core'
-import { exec } from 'child_process'
-import { Vault } from 'obsidian-utils'
-import { homedir } from 'os'
-import path from 'path'
 import { handlerCommandError } from '../utils/command'
 import {
-  OVM_CONFIG_FILENAME,
-  RESERVED_VARIABLES,
+  DEFAULT_CONFIG_PATH,
   VAULTS_PATH_FLAG_DESCRIPTION,
 } from '../utils/constants'
-
-const DEFAULT_CONFIG_PATH = path.join(homedir(), OVM_CONFIG_FILENAME)
 
 const commonFlags = {
   debug: Flags.boolean({
@@ -64,43 +57,4 @@ class FactoryCommandWithVaults extends Command {
   }
 }
 
-const commandInterpolation = (vault: Vault, command: string): string => {
-  const variableRegex = /\{(\d*?)}/g
-  const replacer = (match: string, variable: string) => {
-    const variableFunction = RESERVED_VARIABLES[variable]
-
-    if (variableFunction) {
-      return variableFunction(vault)
-    } else {
-      return match
-    }
-  }
-  const interpolatedCommand = command.replace(variableRegex, replacer)
-
-  return interpolatedCommand
-}
-
-const asyncExecCustomCommand = async (
-  vault: Vault,
-  command: string,
-  cwd: string,
-): Promise<string> =>
-  new Promise((resolve, reject) => {
-    exec(
-      commandInterpolation(vault, command),
-      { cwd },
-      (error, stdout, stderr) => {
-        if (error) {
-          reject(error)
-        }
-        resolve(`${stderr}\n${stdout}`)
-      },
-    )
-  })
-
-export {
-  asyncExecCustomCommand,
-  commandInterpolation,
-  FactoryCommand,
-  FactoryCommandWithVaults,
-}
+export { FactoryCommand, FactoryCommandWithVaults }

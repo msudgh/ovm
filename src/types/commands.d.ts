@@ -1,7 +1,7 @@
 import { AsyncIterator } from 'async'
 import { ExecException } from 'child_process'
 import { Vault } from 'obsidian-utils'
-import { Config, Plugin } from '../services/config'
+import { Config, Plugin } from '../services/config/index.types'
 
 export type CustomError = Error | ExecException
 
@@ -40,7 +40,17 @@ export interface PrunedPlugin {
   id: string
 }
 
-export type StagedPlugins = Array<Pick<Plugin, 'id' | 'repo' | 'version'>>
+export type FailedPlugin = Plugin & {
+  error: Error
+}
+
+type PluginBaseKeys = 'id' | 'repo' | 'version'
+
+export type StagedPlugins = Array<Pick<Plugin, PluginBaseKeys>>
+
+export type StagedPluginsWithError = Array<
+  Pick<FailedPlugin, PluginBaseKeys | 'error'>
+>
 
 export type InstalledPlugins = Record<string, Array<string>>
 
@@ -148,7 +158,7 @@ export type InitCommandCallback = (
 
 export interface InstallCommandIteratorResult {
   installedPlugins: StagedPlugins
-  failedPlugins: StagedPlugins
+  failedPlugins: StagedPluginsWithError
   reinstallPlugins: StagedPlugins
 }
 
@@ -245,3 +255,75 @@ export type RunCommandCallbackResult = CommandCallbackBaseResult &
 export type RunCommandCallback = (
   _err?: Error | null,
 ) => RunCommandCallbackResult
+
+// Config sync
+export interface SyncFlags {
+  overwrite: boolean
+  backup: boolean
+  onlyInstalled: boolean
+  type: string
+  mergeStrategy: string
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface SyncArgs {
+  // No specific args for sync command - using empty object type
+}
+
+export interface SyncCommandIteratorResult {
+  synced: number
+  skipped: number
+}
+
+export type SyncCommandVaultIteratorItem = CommandVaultIteratorItem & {
+  flags: FactoryFlagsWithVaults<SyncFlags>
+  args?: SyncArgs
+}
+
+export type SyncCommandIterator = (
+  _item: SyncCommandVaultIteratorItem,
+) => Promise<SyncCommandIteratorResult>
+
+// Plugin sync
+export interface PluginSyncFlags {
+  overwrite: boolean
+  backup: boolean
+  onlyInstalled: boolean
+  pluginId?: string
+  mergeStrategy: string
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PluginSyncArgs {
+  // No specific args for plugin sync command - using empty object type
+}
+
+export type PluginSyncCommandVaultIteratorItem = CommandVaultIteratorItem & {
+  flags: FactoryFlagsWithVaults<PluginSyncFlags>
+  args?: PluginSyncArgs
+}
+
+export type PluginSyncCommandIterator = (
+  _item: PluginSyncCommandVaultIteratorItem,
+) => Promise<SyncCommandIteratorResult>
+
+// Vault sync (for core configs)
+export interface VaultSyncFlags {
+  overwrite: boolean
+  backup: boolean
+  mergeStrategy: string
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface VaultSyncArgs {
+  // No specific args for vault sync command - using empty object type
+}
+
+export type VaultSyncCommandVaultIteratorItem = CommandVaultIteratorItem & {
+  flags: FactoryFlagsWithVaults<VaultSyncFlags>
+  args?: VaultSyncArgs
+}
+
+export type VaultSyncCommandIterator = (
+  _item: VaultSyncCommandVaultIteratorItem,
+) => Promise<SyncCommandIteratorResult>

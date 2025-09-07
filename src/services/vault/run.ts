@@ -1,7 +1,9 @@
 import { each } from 'async'
 import { formatDuration, intervalToDuration } from 'date-fns'
-import { asyncExecCustomCommand } from '../providers/command'
-import { getSelectedVaults, mapVaultsIteratorItem } from '../providers/vaults'
+import {
+  getSelectedVaults,
+  mapVaultsIteratorItem,
+} from '../../providers/vaults'
 import {
   CommandsExecutedOnVaults,
   CustomError,
@@ -11,15 +13,18 @@ import {
   RunCommandCallbackResult,
   RunCommandIterator,
   RunFlags,
-} from '../types/commands'
-import { handlerCommandError } from '../utils/command'
+} from '../../types/commands'
+import {
+  asyncExecCustomCommand,
+  handlerCommandError,
+} from '../../utils/command'
 import {
   CUSTOM_COMMAND_LOGGER_FILE,
   customCommandLogger,
   logger,
   silentCheck,
-} from '../utils/logger'
-import { loadConfig } from './config'
+} from '../../utils/logger'
+import { loadConfig } from '../config'
 
 const taskExecutedOnVaults: CommandsExecutedOnVaults = {}
 
@@ -163,7 +168,4 @@ const action = async (
   return each(items, iterator, commandVaultCallback)
 }
 
-export default {
-  action,
-  runCommandVaultIterator,
-}
+export { action, runCommandVaultIterator }

@@ -1,17 +1,55 @@
-import { expect } from 'chai'
-import { plugin1, plugin2 } from '../utils/fixtures/plugins'
-import { ConfigSchema } from './config'
-import statsService from './stats'
-
+import { describe, expect, it, vi } from 'vitest'
+import { plugin1, plugin2 } from '../../utils/fixtures/plugins'
 import {
   destroyVault,
   getTestCommonWithVaultPathFlags,
   setupVault,
-} from '../utils/testing'
-import installService from './install'
+} from '../../utils/testing'
+import { ConfigSchema } from '../config'
+import { statsVaultIterator } from './stats'
 
-const { installVaultIterator } = installService
-const { statsVaultIterator } = statsService
+vi.mock('obsidian-utils', async () => {
+  const actual = await vi.importActual('obsidian-utils')
+  return {
+    ...actual,
+    installPluginFromGithub: vi.fn().mockResolvedValue(undefined),
+    isPluginInstalled: vi.fn().mockImplementation((pluginId: string) => {
+      // For stats tests, return true only for plugin1 by default
+      // Individual tests can override this behavior
+      return Promise.resolve(pluginId === 'obsidian-linter')
+    }),
+  }
+})
+
+vi.mock('fs', async () => {
+  const actual = await vi.importActual('fs')
+  return {
+    ...actual,
+    existsSync: vi.fn().mockReturnValue(true), // Mock that plugin directories exist
+  }
+})
+
+vi.mock('fs/promises', async () => {
+  const actual = (await vi.importActual(
+    'fs/promises',
+  )) as typeof import('fs/promises')
+  return {
+    ...actual,
+    readFile: vi.fn().mockImplementation((path) => {
+      // Mock manifest.json content
+      if (path.includes('manifest.json')) {
+        return Promise.resolve('{"version": "1.0.0"}')
+      }
+      return actual.readFile(path)
+    }),
+  }
+})
+
+vi.mock('fast-folder-size', () => ({
+  default: vi.fn().mockImplementation((path, callback) => {
+    callback(null, 1024) // Mock 1KB folder size
+  }),
+}))
 
 describe('Command: stats', () => {
   it('should display stats for vaults and 0 plugins', async () => {
@@ -35,30 +73,7 @@ describe('Command: stats', () => {
     const { vault, config } = await setupVault(
       ConfigSchema.parse({ plugins: [] }),
     )
-    const testCommonWithVaultPathFlags = getTestCommonWithVaultPathFlags(
-      config.path,
-      vault.path,
-    )
-
-    const installResult = await installVaultIterator({
-      vault,
-      config: {
-        ...config,
-        plugins: [plugin1],
-      },
-      flags: {
-        ...testCommonWithVaultPathFlags,
-        enable: true,
-      },
-      args: {
-        pluginId: plugin1.id,
-      },
-    })
-
-    expect(installResult.installedPlugins[0].id).to.be.equal(plugin1.id)
-
     const installedPlugins = {}
-
     const result = await statsVaultIterator({
       vault,
       config: ConfigSchema.parse({ plugins: [plugin1] }),
@@ -83,22 +98,8 @@ describe('Command: stats', () => {
       vault.path,
     )
 
-    const installResult = await installVaultIterator({
-      vault,
-      config: {
-        ...config,
-        plugins: [plugin1],
-      },
-      flags: {
-        ...testCommonWithVaultPathFlags,
-        enable: true,
-      },
-      args: {
-        pluginId: plugin1.id,
-      },
-    })
-
-    expect(installResult.installedPlugins[0].id).to.be.equal(plugin1.id)
+    // Skip the install step since we're mocking isPluginInstalled to return true
+    // This test is about stats counting, not about installation
 
     const result = await statsVaultIterator({
       vault,

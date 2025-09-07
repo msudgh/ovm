@@ -1,10 +1,18 @@
+import fse from 'fs-extra'
 import { readFile, writeFile } from 'fs/promises'
 import { GitHubPluginVersion } from 'obsidian-utils'
+import { dirname } from 'path'
 import z from 'zod'
-import { logger } from '../utils/logger'
-import { stringToJSONSchema } from '../utils/transformer'
+import { logger } from '../../utils/logger'
+import { stringToJSONSchema } from '../../utils/transformer'
+import {
+  Config,
+  ConfigSyncMergeStrategy,
+  ConfigSyncType,
+  SafeLoadConfigResult,
+} from './index.types'
 
-const PluginSchema = z.object({
+export const PluginSchema = z.object({
   id: z.string(),
   version: z.custom<GitHubPluginVersion>().optional(),
   repo: z.string().optional(),
@@ -12,34 +20,53 @@ const PluginSchema = z.object({
   author: z.string().optional(),
   description: z.string().optional(),
 })
-
-export type Plugin = z.infer<typeof PluginSchema>
+export const configSyncType = ['plugin', 'core', 'custom', 'all'] as const
+export const configSyncMergeStrategy = ['replace', 'merge', 'smart'] as const
+export const ConfigSyncEntrySchema = z.object({
+  source: z
+    .string()
+    .describe(
+      'Source file path (relative to ovm config directory or absolute)',
+    ),
+  target: z
+    .string()
+    .describe("Target file path (relative to vault's .obsidian directory)"),
+  type: z
+    .custom<ConfigSyncType>()
+    .describe('Type of configuration for special handling'),
+  pluginId: z.string().optional().describe('For plugin configs, the plugin ID'),
+  mergeStrategy: z
+    .custom<ConfigSyncMergeStrategy>()
+    .optional()
+    .describe('Merge strategy for this config'),
+  vaults: z
+    .array(z.string())
+    .optional()
+    .describe('Only apply to specific vaults (if empty, apply to all)'),
+  onlyIfInstalled: z
+    .boolean()
+    .optional()
+    .describe('For plugin configs, only sync if plugin is installed'),
+  include: z
+    .array(z.string())
+    .optional()
+    .describe('Specific keys to include when merging'),
+  exclude: z
+    .array(z.string())
+    .optional()
+    .describe('Specific keys to exclude when merging'),
+})
 
 export const ConfigSchema = z
   .object({
     plugins: z.array(PluginSchema).default([]),
+    configSync: z
+      .object({
+        files: z.array(ConfigSyncEntrySchema).default([]),
+      })
+      .optional(),
   })
   .strict()
-
-export type Config = z.infer<typeof ConfigSchema>
-
-type SafeLoadConfigResultSuccess = {
-  success: true
-  data: Config
-  error: undefined
-}
-
-type SafeLoadConfigResultError = {
-  success: false
-  data: undefined
-  error: Error
-}
-
-type SafeLoadConfigResult =
-  | ({
-      success: boolean
-    } & SafeLoadConfigResultSuccess)
-  | SafeLoadConfigResultError
 
 export const safeLoadConfig = async (
   configPath: string,
@@ -95,6 +122,10 @@ export const writeConfig = async (
   path: string,
 ): Promise<void> => {
   logger.debug('Writing config', { path })
+
+  // Ensure the directory exists before writing the file
+  const configDir = dirname(path)
+  await fse.ensureDir(configDir)
 
   const content = JSON.stringify(config, null, 2)
 

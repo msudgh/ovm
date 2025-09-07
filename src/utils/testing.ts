@@ -1,10 +1,10 @@
-import { existsSync } from 'fs'
+import { Dirent, existsSync } from 'fs'
 import fse from 'fs-extra'
 import fsp from 'fs/promises'
 import { platform, tmpdir } from 'os'
 import path from 'path'
-import { pathToFileURL } from 'url'
-import { Config, ConfigSchema, createDefaultConfig } from '../services/config'
+import { ConfigSchema, createDefaultConfig } from '../services/config/index'
+import { Config } from '../services/config/index.types'
 import { OVM_CONFIG_FILENAME } from './constants'
 import { CUSTOM_COMMAND_LOGGER_FILE } from './logger'
 
@@ -25,13 +25,26 @@ export const destroyConfigMockFile = (path: string) => {
 }
 
 export const setupVault = async (overrideConfig?: Config) => {
-  const vaultName = `ovm-test-vault-${Date.now()}`
+  const vaultName = `ovm-test-vault-${Date.now()}-${Math.floor(Math.random() * 1000)}`
   const vaultPath = path.join(tmpdir(), vaultName)
   const configFilePath = path.join(vaultPath, OVM_CONFIG_FILENAME)
 
   const normalizedPath = path.normalize(vaultPath)
+
+  // Ensure the vault directory exists first
+  if (!existsSync(normalizedPath)) {
+    fse.mkdirpSync(normalizedPath)
+  }
+
+  // Ensure the config file directory exists (same as vault path in this case)
+  const configDir = path.dirname(configFilePath)
+  if (!existsSync(configDir)) {
+    fse.mkdirpSync(configDir)
+  }
+
+  // Then create the .obsidian directory
   const obsidianDir = path.resolve(normalizedPath, '.obsidian')
-  if (normalizedPath && !existsSync(normalizedPath)) {
+  if (!existsSync(obsidianDir)) {
     fse.mkdirpSync(obsidianDir)
   }
 
@@ -40,11 +53,8 @@ export const setupVault = async (overrideConfig?: Config) => {
     'community-plugins.json',
   )
 
-  if (!fse.pathExistsSync(normalizedVaultCommunityPluginsPath)) {
-    fse.writeFileSync(
-      pathToFileURL(normalizedVaultCommunityPluginsPath),
-      JSON.stringify([]),
-    )
+  if (!existsSync(normalizedVaultCommunityPluginsPath)) {
+    fse.writeFileSync(normalizedVaultCommunityPluginsPath, JSON.stringify([]))
   }
 
   const config = await createDefaultConfig(
@@ -88,3 +98,19 @@ export const destroyVault = (vaultPath: string) => {
     fse.rmSync(customLogsPath, { force: true })
   }
 }
+
+export const createMockDirent = (
+  name: string,
+  isDirectory: boolean,
+): Dirent => ({
+  name,
+  isDirectory: () => isDirectory,
+  isFile: () => !isDirectory,
+  isBlockDevice: () => false,
+  isCharacterDevice: () => false,
+  isSymbolicLink: () => false,
+  isFIFO: () => false,
+  isSocket: () => false,
+  parentPath: '',
+  path: '',
+})

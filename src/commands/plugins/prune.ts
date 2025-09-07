@@ -1,10 +1,8 @@
 import { flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import pruneService from '../../services/prune'
+import { FactoryCommandWithVaults } from '../../providers/factory'
+import { action } from '../../services/plugin/prune'
 import { FactoryFlagsWithVaults, PruneFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-
-const { action } = pruneService
 
 /**
  * Prune command list and remove plugins that aren't referred in config file.

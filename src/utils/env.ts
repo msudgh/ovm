@@ -1,3 +1,3 @@
 export const isTestEnv = () => {
-  return typeof global.it === 'function' || process.env.CI === 'true'
+  return process.env.NODE_ENV === 'test' || process.env.CI === 'true'
 }

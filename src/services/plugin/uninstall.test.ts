@@ -1,28 +1,34 @@
-import { expect } from 'chai'
-import proxyquire from 'proxyquire'
-import sinon from 'sinon'
-
-import { UninstallCommandIterator } from '../types/commands'
-import { plugin1, plugin2 } from '../utils/fixtures/plugins'
+import * as obsidianUtils from 'obsidian-utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import * as pluginsProvider from '../../providers/plugins'
+import { UninstallCommandIterator } from '../../types/commands'
+import { plugin1, plugin2 } from '../../utils/fixtures/plugins'
 import {
   destroyVault,
   getTestCommonWithVaultPathFlags,
   setupVault,
-} from '../utils/testing'
-import { ConfigSchema } from './config'
-import installService from './install'
-import uninstallService from './uninstall'
+} from '../../utils/testing'
+import { ConfigSchema } from '../config'
+import { uninstallVaultIterator } from './uninstall'
 
-const { installVaultIterator } = installService
-const { uninstallVaultIterator } = uninstallService
-
-const sandbox = sinon.createSandbox()
+vi.mock('obsidian-utils', async () => {
+  const actual = await vi.importActual('obsidian-utils')
+  return {
+    ...actual,
+    installPluginFromGithub: vi.fn().mockResolvedValue(undefined),
+    isPluginInstalled: vi.fn().mockResolvedValue(true), // Return true to simulate plugins are installed
+  }
+})
 
 const [{ id: plugin1Id }, { id: plugin2Id }] = [plugin1, plugin2]
 
 describe('Command: uninstall', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   afterEach(() => {
-    sandbox.restore()
+    vi.restoreAllMocks()
   })
 
   it('should perform uninstallation successfully', async () => {
@@ -36,18 +42,13 @@ describe('Command: uninstall', () => {
 
     const plugins = [{ id: plugin1Id }]
 
-    const installResult = await installVaultIterator({
-      vault,
-      config,
-      flags: {
-        ...testCommonWithVaultPathFlags,
-        enable: true,
-      },
-    })
+    // Mock removePluginDir to succeed
+    const removePluginDirSpy = vi
+      .spyOn(pluginsProvider, 'removePluginDir')
+      .mockResolvedValue()
 
-    expect(installResult.installedPlugins[0].id).to.be.equal(
-      config?.plugins[0].id,
-    )
+    // For uninstall tests, we want isPluginInstalled to return true initially
+    vi.mocked(obsidianUtils.isPluginInstalled).mockResolvedValue(true)
 
     const result = await (uninstallVaultIterator as UninstallCommandIterator)({
       vault,
@@ -64,6 +65,7 @@ describe('Command: uninstall', () => {
       .true
     expect(result.failedPlugins.length).to.equal(0)
 
+    removePluginDirSpy.mockRestore()
     destroyVault(vault.path)
   })
 
@@ -95,21 +97,7 @@ describe('Command: uninstall', () => {
       vault.path,
     )
 
-    const installResult = await installVaultIterator({
-      vault,
-      config,
-      flags: {
-        ...testCommonWithVaultPathFlags,
-        enable: true,
-      },
-    })
-
-    expect(installResult.installedPlugins[0].id).to.be.equal(
-      config?.plugins[0].id,
-    )
-    expect(installResult.installedPlugins[1].id).to.be.equal(
-      config?.plugins[1].id,
-    )
+    vi.mocked(obsidianUtils.isPluginInstalled).mockResolvedValue(true)
 
     const result = await (uninstallVaultIterator as UninstallCommandIterator)({
       vault,
@@ -137,31 +125,14 @@ describe('Command: uninstall', () => {
       vault.path,
     )
 
-    // Only install plugin1 and leave plugin2 uninstalled to test the failure
-    const installResult = await installVaultIterator({
-      vault,
-      config,
-      flags: {
-        ...testCommonWithVaultPathFlags,
-        enable: true,
-      },
-      args: {
-        pluginId: plugin1Id,
-      },
-    })
+    // Mock that plugins are installed
+    vi.mocked(obsidianUtils.isPluginInstalled).mockResolvedValue(true)
 
-    expect(installResult.installedPlugins[0].id).to.be.equal(
-      config?.plugins[0].id,
-    )
+    const removePluginDirSpy = vi
+      .spyOn(pluginsProvider, 'removePluginDir')
+      .mockRejectedValue(new Error('Error'))
 
-    const removePluginDirStub = sandbox.stub().rejects(new Error('Error'))
-    const {
-      default: { uninstallVaultIterator },
-    } = proxyquire.noCallThru()('./uninstall', {
-      '../providers/plugins': { removePluginDir: removePluginDirStub },
-    })
-
-    const result = await (uninstallVaultIterator as UninstallCommandIterator)({
+    const result = await uninstallVaultIterator({
       vault,
       config,
       flags: {
@@ -169,7 +140,7 @@ describe('Command: uninstall', () => {
       },
     })
 
-    expect(removePluginDirStub.called).to.be.true
+    expect(removePluginDirSpy.mock.calls.length).to.be.greaterThan(0)
     expect(result.uninstalledPlugins.length).to.equal(0)
     expect(result.failedPlugins.length).to.equal(2)
     expect(result.failedPlugins.some((plugin) => plugin.id === plugin1Id)).to.be
@@ -177,6 +148,7 @@ describe('Command: uninstall', () => {
     expect(result.failedPlugins.some((plugin) => plugin.id === plugin2Id)).to.be
       .true
 
+    removePluginDirSpy.mockRestore()
     destroyVault(vault.path)
   })
 })

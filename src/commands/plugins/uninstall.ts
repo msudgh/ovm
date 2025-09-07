@@ -1,10 +1,8 @@
 import { Args, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import uninstallService from '../../services/uninstall'
+import { FactoryCommandWithVaults } from '../../providers/factory'
+import { action } from '../../services/plugin/uninstall'
 import { FactoryFlagsWithVaults, UninstallFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-
-const { action } = uninstallService
 
 /**
  * Uninstall command removes specified plugins from vaults.

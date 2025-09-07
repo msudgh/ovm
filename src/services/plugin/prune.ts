@@ -4,8 +4,11 @@ import {
   listInstalledPlugins,
   modifyCommunityPlugins,
   removePluginDir,
-} from '../providers/plugins'
-import { getSelectedVaults, mapVaultsIteratorItem } from '../providers/vaults'
+} from '../../providers/plugins'
+import {
+  getSelectedVaults,
+  mapVaultsIteratorItem,
+} from '../../providers/vaults'
 import {
   FactoryFlagsWithVaults,
   PruneArgs,
@@ -14,10 +17,10 @@ import {
   PruneCommandIterator,
   PruneCommandIteratorResult,
   PruneFlags,
-} from '../types/commands'
-import { handlerCommandError } from '../utils/command'
-import { logger } from '../utils/logger'
-import { loadConfig } from './config'
+} from '../../types/commands'
+import { handlerCommandError } from '../../utils/command'
+import { logger } from '../../utils/logger'
+import { loadConfig } from '../config'
 
 const pruneVaultIterator: PruneCommandIterator = async (item) => {
   const { vault, config } = item
@@ -82,7 +85,4 @@ const action = async (
   return each(items, iterator, pruneCommandCallback)
 }
 
-export default {
-  action,
-  pruneVaultIterator,
-}
+export { action, pruneVaultIterator }

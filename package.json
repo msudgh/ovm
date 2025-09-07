@@ -5,24 +5,24 @@
   "version": "0.6.8",
   "license": "GPL-3.0-only",
   "author": "Masoud Ghorbani",
-  "homepage": "https://github.com/msudgh/ovm",
-  "bugs": "https://github.com/msudgh/ovm/issues",
-  "repository": "https://github.com/msudgh/ovm.git",
+  "homepage": "https://github.com/masoudgs/ovm",
+  "bugs": "https://github.com/masoudgs/ovm/issues",
+  "repository": "https://github.com/masoudgs/ovm.git",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.release.json",
-    "build:watch": "rm -rf dist && tsc -p tsconfig.json -w",
+    "build:watch": "rm -rf dist && tsc -p tsconfig.release.json -w",
     "build:release": "rm -rf dist && tsc -p tsconfig.release.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier -c \"**/*.{ts,json,md}\"",
     "format:write": "prettier -w \"**/*.{ts,json,md}\"",
     "postpack": "rm -f oclif.manifest.json",
-    "posttest": "pnpm run lint",
-    "prepack": "oclif manifest && pnpm run build:release && pnpm run test:unit",
-    "test:unit": "npm run build && mocha",
-    "test:coverage": "c8 npm run test:unit",
+    "prepack": "oclif manifest && pnpm run build:release && pnpm run test",
+    "test": "pnpm vitest",
+    "test:coverage": "pnpm run test --coverage",
     "prepare": "husky"
   },
   "keywords": [
@@ -63,7 +63,6 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
-    "inquirer": "12.4.1",
     "@inquirer/core": "10.1.6",
     "@inquirer/prompts": "7.3.1",
     "@oclif/core": "4.2.6",
@@ -73,6 +72,7 @@
     "fast-folder-size": "2.4.0",
     "filesize": "10.1.6",
     "glob": "11.0.1",
+    "inquirer": "12.4.1",
     "node-fetch-cache": "5.0.2",
     "obsidian-utils": "0.10.2",
     "winston": "3.17.0",
@@ -84,32 +84,29 @@
     "@total-typescript/ts-reset": "0.6.1",
     "@types/async": "3.2.24",
     "@types/cacache": "17.0.2",
-    "@types/chai": "5.0.1",
     "@types/fs-extra": "11.0.4",
     "@types/inquirer": "9.0.7",
-    "@types/mocha": "10.0.10",
     "@types/mock-fs": "4.13.4",
     "@types/node": "22.13.1",
     "@types/proxyquire": "1.3.31",
-    "@types/sinon": "17.0.3",
-    "c8": "10.1.3",
-    "chai": "5.1.2",
+    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/ui": "3.2.4",
     "eslint": "9.20.0",
     "eslint-config-prettier": "10.0.1",
     "fs-extra": "11.3.0",
     "globals": "15.14.0",
     "husky": "9.1.7",
     "lint-staged": "15.4.3",
-    "mocha": "11.1.0",
     "obsidian": "1.7.2",
     "oclif": "4.17.25",
     "prettier": "3.4.2",
     "proxyquire": "2.1.3",
-    "sinon": "19.0.2",
     "source-map-support": "0.5.21",
+    "tap-junit": "^5.0.4",
     "ts-node": "10.9.2",
     "typescript": "5.5.4",
-    "typescript-eslint": "8.23.0"
+    "typescript-eslint": "8.23.0",
+    "vitest": "^3.2.4"
   },
   "pnpm": {
     "overrides": {
@@ -120,7 +117,10 @@
       "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.6",
       "glob@<9.0.0": ">=11.0.1",
       "rimraf@<5.0.0": ">=6.0.1"
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "lint-staged": {
     "*.{ts,tsx,json,js}": [
@@ -131,5 +131,5 @@
       "pnpm run format:write"
     ]
   },
-  "packageManager": "pnpm@9.8.0+sha1.33f415ae4331f9b29a92dd9bbef959b916d65535"
+  "packageManager": "pnpm@10.14.0"
 }

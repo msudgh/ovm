@@ -2,7 +2,7 @@ import { checkbox } from '@inquirer/prompts'
 import { glob } from 'glob'
 import { findVault, Vault } from 'obsidian-utils'
 import { basename, dirname } from 'path'
-import { Config } from '../services/config'
+import { Config } from '../services/config/index.types'
 import { isTestEnv } from '../utils/env'
 import { logger } from '../utils/logger'
 
@@ -16,7 +16,7 @@ export const findVaultsByPatternMatching = async (pathPattern: string) => {
     dot: true,
     nocase: true,
   })
-  const detectedVaults = []
+  const detectedVaults: Vault[] = []
   const vaultsQueryPromises = vaultsMatches.map((vault) => findVault(vault))
 
   for await (const [vault] of vaultsQueryPromises) {

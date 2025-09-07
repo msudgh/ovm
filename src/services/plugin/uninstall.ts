@@ -1,8 +1,10 @@
 import { each } from 'async'
 import { isPluginInstalled } from 'obsidian-utils'
-import { deduplicatePlugins, removePluginDir } from '../providers/plugins'
-import { getSelectedVaults, mapVaultsIteratorItem } from '../providers/vaults'
-import { loadConfig, Plugin, writeConfig } from '../services/config'
+import { deduplicatePlugins, removePluginDir } from '../../providers/plugins'
+import {
+  getSelectedVaults,
+  mapVaultsIteratorItem,
+} from '../../providers/vaults'
 import {
   FactoryFlagsWithVaults,
   UninstallArgs,
@@ -10,9 +12,11 @@ import {
   UninstallCommandCallbackResult,
   UninstallCommandIterator,
   UninstallFlags,
-} from '../types/commands'
-import { handlerCommandError } from '../utils/command'
-import { logger } from '../utils/logger'
+} from '../../types/commands'
+import { handlerCommandError } from '../../utils/command'
+import { logger } from '../../utils/logger'
+import { loadConfig, writeConfig } from '../config'
+import { Plugin } from '../config/index.types'
 
 const uninstallVaultIterator: UninstallCommandIterator = async (item) => {
   const { vault, config, flags, args } = item
@@ -97,7 +101,4 @@ const action = async (
   return each(items, iterator, uninstallCommandCallback)
 }
 
-export default {
-  action,
-  uninstallVaultIterator,
-}
+export { action, uninstallVaultIterator }

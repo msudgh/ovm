@@ -1,10 +1,8 @@
 import { Args, Flags, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import runService from '../../services/run'
+import { FactoryCommandWithVaults } from '../../providers/factory'
+import { action } from '../../services/vault/run'
 import { FactoryFlagsWithVaults, RunFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-
-const { action } = runService
 
 export default class Run extends FactoryCommandWithVaults {
   static readonly aliases = ['r', 'run', 'vr', 'vaults run']

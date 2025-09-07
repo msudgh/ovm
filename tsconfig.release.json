@@ -1,18 +1,6 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "module": "commonjs",
-    "moduleResolution": "Node",
-    "target": "ESNext",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "types": ["node", "mocha"],
-    "noImplicitAny": true,
-    "skipLibCheck": false,
-    "sourceMap": true,
-    "forceConsistentCasingInFileNames": true,
     "removeComments": true
   },
   "include": ["src/**/*.ts"],

@@ -1,10 +1,8 @@
 import { Flags, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import statsService from '../../services/stats'
+import { FactoryCommandWithVaults } from '../../providers/factory'
+import { action } from '../../services/vault/stats'
 import { FactoryFlagsWithVaults, StatsFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-
-const { action } = statsService
 
 export default class Stats extends FactoryCommandWithVaults {
   static readonly aliases = ['rs', 'reports stats']
