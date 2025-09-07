@@ -2,7 +2,7 @@
   "name": "ovm",
   "description": "Obsidian Vaults Manager",
   "type": "commonjs",
-  "version": "0.6.8",
+  "version": "0.7.0",
   "license": "GPL-3.0-only",
   "author": "Masoud Ghorbani",
   "homepage": "https://github.com/masoudgs/ovm",
