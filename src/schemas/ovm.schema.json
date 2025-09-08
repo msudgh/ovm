@@ -1,0 +1,100 @@
+{
+  "$ref": "#/definitions/ConfigSchema",
+  "definitions": {
+    "ConfigSchema": {
+      "type": "object",
+      "properties": {
+        "plugins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "version": {},
+              "repo": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "author": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": ["id"],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "configSync": {
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "description": "Source file path (relative to ovm config directory or absolute)"
+                  },
+                  "target": {
+                    "type": "string",
+                    "description": "Target file path (relative to vault's .obsidian directory)"
+                  },
+                  "type": {
+                    "description": "Type of configuration for special handling"
+                  },
+                  "pluginId": {
+                    "type": "string",
+                    "description": "For plugin configs, the plugin ID"
+                  },
+                  "mergeStrategy": {
+                    "description": "Merge strategy for this config"
+                  },
+                  "vaults": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Only apply to specific vaults (if empty, apply to all)"
+                  },
+                  "onlyIfInstalled": {
+                    "type": "boolean",
+                    "description": "For plugin configs, only sync if plugin is installed"
+                  },
+                  "include": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Specific keys to include when merging"
+                  },
+                  "exclude": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Specific keys to exclude when merging"
+                  }
+                },
+                "required": ["source", "target"],
+                "additionalProperties": false
+              },
+              "default": []
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "OVM Config"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

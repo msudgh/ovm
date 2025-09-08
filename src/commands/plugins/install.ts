@@ -42,7 +42,7 @@ export default class Install extends FactoryCommandWithVaults {
   public async run(): Promise<void> {
     try {
       const { args, flags } = await this.parse(Install)
-      return action(
+      await action(
         args,
         flagsInterceptor<FactoryFlagsWithVaults<InstallFlags>>(flags),
       )
