@@ -4,6 +4,7 @@ import { GitHubPluginVersion } from 'obsidian-utils'
 import { dirname } from 'path'
 import z from 'zod'
 import { logger } from '../../utils/logger'
+import { untildify } from '../../utils/shell'
 import { stringToJSONSchema } from '../../utils/transformer'
 import {
   Config,
@@ -67,23 +68,22 @@ export const ConfigSchema = z
       .optional(),
   })
   .strict()
+  .describe('OVM Config')
 
 export const safeLoadConfig = async (
   configPath: string,
 ): Promise<SafeLoadConfigResult> => {
   try {
-    const config = await readFile(configPath)
+    const config = await readFile(untildify(configPath))
     const { success, data, error } = stringToJSONSchema
       .pipe(ConfigSchema)
       .safeParse(config.toString())
 
     if (!success) {
-      logger.debug('Schema validation failed', { error })
-
       return {
         success,
         data,
-        error: new Error('Invalid config file'),
+        error: new Error('Invalid config file', { cause: error.message }),
       }
     }
 
@@ -110,7 +110,12 @@ export const loadConfig = async (configPath: string) => {
   } = await safeLoadConfig(configPath)
 
   if (!loadConfigSuccess) {
-    logger.error('Failed to load config', { error: loadConfigError })
+    logger.error(loadConfigError.message, {
+      cause:
+        typeof loadConfigError.cause === 'string'
+          ? JSON.parse(loadConfigError.cause)
+          : loadConfigError.cause,
+    })
     process.exit(1)
   }
 

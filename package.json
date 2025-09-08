@@ -23,7 +23,8 @@
     "prepack": "oclif manifest && pnpm run build:release && pnpm run test",
     "test": "pnpm vitest",
     "test:coverage": "pnpm run test --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate:schema": "ts-node src/scripts/json-schema-export.ts"
   },
   "keywords": [
     "obsidian",
@@ -106,7 +107,8 @@
     "ts-node": "10.9.2",
     "typescript": "5.5.4",
     "typescript-eslint": "8.23.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod-to-json-schema": "^3.24.6"
   },
   "pnpm": {
     "overrides": {
