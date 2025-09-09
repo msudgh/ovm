@@ -60,6 +60,7 @@ export const ConfigSyncEntrySchema = z.object({
 
 export const ConfigSchema = z
   .object({
+    $schema: z.string().optional().describe('JSON Schema for the config'),
     plugins: z.array(PluginSchema).default([]),
     configSync: z
       .object({

@@ -1,5 +1,5 @@
 import { each } from 'async'
-import { dirname, resolve } from 'path'
+import path, { dirname, resolve } from 'path'
 import { syncFileToVault } from '../../providers/configSync'
 import {
   getSelectedVaults,
@@ -13,6 +13,7 @@ import {
 } from '../../types/commands'
 import { handlerCommandError } from '../../utils/command'
 import { logger } from '../../utils/logger'
+import { untildify } from '../../utils/shell'
 import { loadConfig } from '../config'
 import { ConfigSyncMergeStrategy } from '../config/index.types'
 
@@ -38,11 +39,19 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
   )
 
   // Get config base path for resolving relative source paths
-  const configDir = dirname(resolve(flags.config || './ovm.json'))
+  const configDir = dirname(resolve(untildify(flags.config) || './ovm.json'))
+
+  if (!vaultEntries.length) {
+    logger.info(`No config files to sync for vault ${vault.name}`)
+    return { synced, skipped }
+  }
 
   for (const entry of vaultEntries) {
     try {
-      const sourcePath = resolve(configDir, entry.source)
+      const isAbsolute = path.isAbsolute(entry.source)
+      const sourcePath = isAbsolute
+        ? entry.source
+        : resolve(configDir, entry.source)
       const result = await syncFileToVault({
         source: sourcePath,
         target: entry.target,
