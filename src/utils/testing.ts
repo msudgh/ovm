@@ -114,3 +114,84 @@ export const createMockDirent = (
   parentPath: '',
   path: '',
 })
+
+export const replaceVersionInfo = (input: string): string => {
+  return input.replace(
+    /ovm\/[\d.]+\s+\w+-\w+\s+node-v[\d.]+/,
+    'ovm/X.X.X platform-arch node-vX.X.X',
+  )
+}
+
+export const normalizeHelpOutput = (input: string): string => {
+  const normalized = replaceVersionInfo(input)
+
+  // Split into lines for more precise processing
+  const lines = normalized.split('\n')
+  const result = []
+  let pendingLine = ''
+
+  for (const line of lines) {
+    // Skip empty lines
+    if (line.trim() === '') {
+      // If we have a pending line, push it and clear
+      if (pendingLine) {
+        result.push(pendingLine)
+        pendingLine = ''
+      }
+      result.push('')
+      continue
+    }
+
+    // Handle section headers (all caps words)
+    if (line.match(/^[A-Z]+$/)) {
+      // If we have a pending line, push it and clear
+      if (pendingLine) {
+        result.push(pendingLine)
+        pendingLine = ''
+      }
+      result.push(line)
+      continue
+    }
+
+    // Handle lines that start with spaces (commands, topics, descriptions)
+    if (line.match(/^\s+/)) {
+      const match = line.match(/^(\s*)/)
+      const leadingSpaces = match ? match[1].length : 0
+      const content = line.trim()
+
+      if (content) {
+        // Normalize spacing within the content
+        const normalizedContent = content.replace(/\s+/g, ' ')
+
+        // If this is a continuation line (more than 4 spaces), append to pending line
+        if (leadingSpaces > 4 && pendingLine) {
+          pendingLine += ` ${normalizedContent}`
+        } else {
+          // If we have a pending line, push it first
+          if (pendingLine) {
+            result.push(pendingLine)
+          }
+          // Start a new line with 2 spaces
+          pendingLine = `  ${normalizedContent}`
+        }
+      }
+      continue
+    }
+
+    // For all other lines (like headers, usage, etc.)
+    // If we have a pending line, push it and clear
+    if (pendingLine) {
+      result.push(pendingLine)
+      pendingLine = ''
+    }
+    const normalizedLine = line.replace(/\s+/g, ' ').trim()
+    result.push(normalizedLine)
+  }
+
+  // Don't forget to push any remaining pending line
+  if (pendingLine) {
+    result.push(pendingLine)
+  }
+
+  return result.join('\n')
+}

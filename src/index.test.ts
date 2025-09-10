@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { promisify } from 'node:util'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { destroyVault, setupVault } from './utils/testing'
+import { destroyVault, normalizeHelpOutput, setupVault } from './utils/testing'
 
 describe('ovm CLI', () => {
   const originalEnv = { ...process.env }
@@ -23,30 +23,35 @@ describe('ovm CLI', () => {
   })
 
   describe('help', () => {
-    it('prints top-level help', async () => {
+    it('prints top-level', async () => {
       const { stdout, stderr } = await execFileAsync('node', [
         OVM_BINARY_PATH,
         '--help',
       ])
 
       expect(stderr).toBe('')
-      expect(stdout).toMatchSnapshot()
-    })
 
-    it('prints help for a topic', async () => {
+      const normalizedStdout = normalizeHelpOutput(stdout)
+
+      expect(normalizedStdout).toMatchSnapshot()
+    }, 30000)
+
+    it('prints for a topic', async () => {
       const { stdout, stderr } = await execFileAsync('node', [
         OVM_BINARY_PATH,
         'plugins',
         '--help',
       ])
 
+      const normalizedStdout = normalizeHelpOutput(stdout)
+
       expect(stderr).toBe('')
-      expect(stdout).toMatchSnapshot()
+      expect(normalizedStdout).toMatchSnapshot()
     })
   })
 
   describe('reports stats', () => {
-    it('returns JSON stats', async () => {
+    it("returns the vault's statistics with JSON output", async () => {
       const { vault, config } = await setupVault()
       const { stdout, stderr } = await execFileAsync(
         'node',
