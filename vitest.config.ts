@@ -22,6 +22,7 @@ export default defineConfig({
         'src/providers/factory.ts',
         'src/utils/testing.ts',
         'src/utils/fixtures/**',
+        'src/scripts/**',
       ],
     },
     reporters: [

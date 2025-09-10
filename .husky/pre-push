@@ -1,2 +1,2 @@
 pnpm run build
-pnpm run test:coverage
+pnpm run test:coverage --silent
