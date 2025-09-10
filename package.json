@@ -63,6 +63,12 @@
     "/dist",
     "/oclif.manifest.json"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js"
+    }
+  },
   "dependencies": {
     "@inquirer/core": "10.1.6",
     "@inquirer/prompts": "7.3.1",

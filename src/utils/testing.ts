@@ -28,7 +28,6 @@ export const setupVault = async (overrideConfig?: Config) => {
   const vaultName = `ovm-test-vault-${Date.now()}-${Math.floor(Math.random() * 1000)}`
   const vaultPath = path.join(tmpdir(), vaultName)
   const configFilePath = path.join(vaultPath, OVM_CONFIG_FILENAME)
-
   const normalizedPath = path.normalize(vaultPath)
 
   // Ensure the vault directory exists first
