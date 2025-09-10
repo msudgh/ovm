@@ -50,8 +50,8 @@ const syncPluginVaultIterator: PluginSyncCommandIterator = async (item) => {
           flags.mergeStrategy) as ConfigSyncMergeStrategy,
         include: entry.include,
         exclude: entry.exclude,
-        overwrite: flags.overwrite,
-        backup: flags.backup,
+        overwrite: entry.overwrite ?? flags.overwrite,
+        backup: entry.backup ?? flags.backup,
         onlyIfInstalled: entry.onlyIfInstalled ?? flags.onlyInstalled,
       })
 
