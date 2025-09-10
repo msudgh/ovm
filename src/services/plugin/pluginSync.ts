@@ -1,5 +1,4 @@
 import { each } from 'async'
-import { dirname, resolve } from 'path'
 import { syncPluginConfigToVault } from '../../providers/configSync'
 import {
   getSelectedVaults,
@@ -12,39 +11,23 @@ import {
   PluginSyncFlags,
 } from '../../types/commands'
 import { handlerCommandError } from '../../utils/command'
+import { getFilteredSyncEntries } from '../../utils/config'
 import { logger } from '../../utils/logger'
+import { getSourceBaseDir, resolveSourcePath } from '../../utils/path'
 import { loadConfig } from '../config'
-import { ConfigSyncEntry, ConfigSyncMergeStrategy } from '../config/index.types'
+import { ConfigSyncMergeStrategy } from '../config/index.types'
 
 const syncPluginVaultIterator: PluginSyncCommandIterator = async (item) => {
   const { vault, config, flags } = item
   let synced = 0
   let skipped = 0
 
-  const entries = config.configSync?.files || []
-  if (entries.length === 0) {
-    return { synced, skipped }
-  }
-
-  // Filter only plugin type entries
-  const pluginEntries = entries.filter(
-    (entry: ConfigSyncEntry) => entry.type === 'plugin',
-  )
-
-  // Filter by specific plugin if provided
-  const filteredEntries = flags.pluginId
-    ? pluginEntries.filter((entry) => entry.pluginId === flags.pluginId)
-    : pluginEntries
-
-  // Filter by vault
-  const vaultName = vault.name
-  const vaultEntries = filteredEntries.filter(
-    (entry: ConfigSyncEntry) =>
-      !entry.vaults || entry.vaults.includes(vaultName),
-  )
-
-  // Get config base path for resolving relative source paths
-  const configDir = dirname(resolve(flags.config || './ovm.json'))
+  const vaultEntries = getFilteredSyncEntries({
+    config,
+    vault,
+    types: ['plugin'],
+    pluginId: flags.pluginId,
+  })
 
   for (const entry of vaultEntries) {
     if (!entry.pluginId) {
@@ -54,7 +37,10 @@ const syncPluginVaultIterator: PluginSyncCommandIterator = async (item) => {
     }
 
     try {
-      const sourcePath = resolve(configDir, entry.source)
+      const sourcePath = resolveSourcePath(
+        entry.source,
+        getSourceBaseDir(config, flags),
+      )
       const result = await syncPluginConfigToVault({
         source: sourcePath,
         target: entry.target || 'data.json', // Default to data.json for plugins
@@ -94,9 +80,8 @@ const action = async (
   const config = await loadConfig(flags.config)
   const selectedVaults = await getSelectedVaults(flags.path)
 
-  logger.debug('Syncing plugin configs on selected vaults...', {
+  logger.debug('Syncing plugins on selected vaults...', {
     vaults: selectedVaults.length,
-    pluginId: flags.pluginId || 'all plugins',
   })
 
   const items = mapVaultsIteratorItem<

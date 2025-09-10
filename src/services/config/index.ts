@@ -64,6 +64,12 @@ export const ConfigSchema = z
     plugins: z.array(PluginSchema).default([]),
     configSync: z
       .object({
+        baseDir: z
+          .string()
+          .optional()
+          .describe(
+            'Base directory for config files (relative to ovm config directory or absolute)',
+          ),
         files: z.array(ConfigSyncEntrySchema).default([]),
       })
       .optional(),

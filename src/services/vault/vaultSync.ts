@@ -1,6 +1,5 @@
 import { each } from 'async'
-import path, { dirname, resolve } from 'path'
-import { syncFileToVault } from '../../providers/configSync'
+import { SyncConfigOptions, syncFileToVault } from '../../providers/configSync'
 import {
   getSelectedVaults,
   mapVaultsIteratorItem,
@@ -12,8 +11,9 @@ import {
   VaultSyncFlags,
 } from '../../types/commands'
 import { handlerCommandError } from '../../utils/command'
+import { getFilteredSyncEntries } from '../../utils/config'
 import { logger } from '../../utils/logger'
-import { untildify } from '../../utils/shell'
+import { getSourceBaseDir, resolveSourcePath } from '../../utils/path'
 import { loadConfig } from '../config'
 import { ConfigSyncMergeStrategy } from '../config/index.types'
 
@@ -22,37 +22,19 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
   let synced = 0
   let skipped = 0
 
-  const entries = config.configSync?.files || []
-  if (entries.length === 0) {
-    return { synced, skipped }
-  }
-
-  // Filter only core and custom type entries (not plugin)
-  const coreEntries = entries.filter(
-    (entry) => entry.type === 'core' || entry.type === 'custom',
-  )
-
-  // Filter by vault
-  const vaultName = vault.name
-  const vaultEntries = coreEntries.filter(
-    (entry) => !entry.vaults || entry.vaults.includes(vaultName),
-  )
-
-  // Get config base path for resolving relative source paths
-  const configDir = dirname(resolve(untildify(flags.config) || './ovm.json'))
-
-  if (!vaultEntries.length) {
-    logger.info(`No config files to sync for vault ${vault.name}`)
-    return { synced, skipped }
-  }
+  const vaultEntries = getFilteredSyncEntries({
+    config,
+    vault,
+    types: ['core', 'custom'],
+  })
 
   for (const entry of vaultEntries) {
     try {
-      const isAbsolute = path.isAbsolute(entry.source)
-      const sourcePath = isAbsolute
-        ? entry.source
-        : resolve(configDir, entry.source)
-      const result = await syncFileToVault({
+      const sourcePath = resolveSourcePath(
+        entry.source,
+        getSourceBaseDir(config, flags),
+      )
+      const options: SyncConfigOptions = {
         source: sourcePath,
         target: entry.target,
         type: entry.type,
@@ -65,7 +47,8 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
         backup: flags.backup,
         // Core configs don't need onlyIfInstalled check
         onlyIfInstalled: false,
-      })
+      }
+      const result = await syncFileToVault(options)
 
       if (result) {
         synced++
@@ -92,7 +75,7 @@ const action = async (
   const config = await loadConfig(flags.config)
   const selectedVaults = await getSelectedVaults(flags.path)
 
-  logger.debug('Syncing core vault configs on selected vaults...', {
+  logger.debug('Syncing vault core configs on selected vaults...', {
     vaults: selectedVaults.length,
   })
 
