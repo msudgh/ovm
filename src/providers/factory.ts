@@ -1,24 +1,21 @@
 import { Command, Flags } from '@oclif/core'
 import { handlerCommandError } from '../utils/command'
-import {
-  DEFAULT_CONFIG_PATH,
-  VAULTS_PATH_FLAG_DESCRIPTION,
-} from '../utils/constants'
+import { DEFAULT_CONFIG_PATH, DESCRIPTIONS } from '../utils/constants'
 
 const commonFlags = {
   debug: Flags.boolean({
     char: 'd',
     default: false,
-    description: 'Enable debugging mode.',
+    description: DESCRIPTIONS.debug,
   }),
   timestamp: Flags.boolean({
     char: 't',
     default: false,
-    description: 'Enable timestamp in logs.',
+    description: DESCRIPTIONS.timestamp,
   }),
   config: Flags.file({
     char: 'c',
-    description: `Path to the config file.`,
+    description: DESCRIPTIONS.config,
     default: DEFAULT_CONFIG_PATH,
     required: false,
   }),
@@ -41,7 +38,7 @@ class FactoryCommandWithVaults extends Command {
     ...FactoryCommand.commonFlags,
     path: Flags.string({
       char: 'p',
-      description: VAULTS_PATH_FLAG_DESCRIPTION,
+      description: DESCRIPTIONS.path,
       default: '',
     }),
   }

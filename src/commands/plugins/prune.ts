@@ -9,7 +9,7 @@ import { flagsInterceptor } from '../../utils/command'
  */
 export default class Prune extends FactoryCommandWithVaults {
   static readonly aliases = ['pp', 'plugins prune']
-  static override readonly description = `Prune existing plugin(s) from vaults that are unspecified in the config file.`
+  static override readonly description = `Prune existing plugin(s) from vaults that are unspecified in the config file`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',

@@ -7,10 +7,10 @@ USAGE
   $ ovm plugins COMMAND
 
 COMMANDS
-  plugins install Install plugin(s) in specified vaults.
-  plugins prune Prune existing plugin(s) from vaults that are unspecified in the config file.
-  plugins sync Sync plugin configuration files (data.json) defined in ovm.json (configSync).
-  plugins uninstall Uninstall plugin(s) from vaults.
+  plugins install Install plugin(s) in specified vaults
+  plugins prune Prune existing plugin(s) from vaults that are unspecified in the config file
+  plugins sync Sync plugin configuration files (data.json)
+  plugins uninstall Uninstall plugin(s) from vaults
 
 "
 `;
@@ -25,24 +25,24 @@ USAGE
   $ ovm [COMMAND]
 
 TOPICS
-  config Configure an ovm.json config file in user's home dir.
+  config Configure an ovm.json config file in user's home dir
   plugins Manage plugins of the vaults
   reports Reports on vaults
   vaults Perform tasks on vaults
 
 COMMANDS
-  ci Configure an ovm.json config file in user's home dir.
+  ci Configure an ovm.json config file in user's home dir
   help Display help for ovm.
-  pi Install plugin(s) in specified vaults.
-  pp Prune existing plugin(s) from vaults that are unspecified in the config file.
-  ps Sync plugin configuration files (data.json) defined in ovm.json (configSync).
-  pu Uninstall plugin(s) from vaults.
+  pi Install plugin(s) in specified vaults
+  pp Prune existing plugin(s) from vaults that are unspecified in the config file
+  ps Sync plugin configuration files (data.json)
+  pu Uninstall plugin(s) from vaults
   r Run a shell command on selected vaults (using Node.js child_process).
-  rs Statistics of vaults and installed plugins.
+  rs Statistics of vaults and installed plugins
   run Run a shell command on selected vaults (using Node.js child_process).
   version
   vr Run a shell command on selected vaults (using Node.js child_process).
-  vs Sync core and custom vault configuration files defined in ovm.json (configSync).
+  vs Sync core and custom vault configuration files
 
 "
 `;
