@@ -60,9 +60,16 @@ export const ConfigSyncEntrySchema = z.object({
 
 export const ConfigSchema = z
   .object({
+    $schema: z.string().optional().describe('JSON Schema for the config'),
     plugins: z.array(PluginSchema).default([]),
     configSync: z
       .object({
+        baseDir: z
+          .string()
+          .optional()
+          .describe(
+            'Base directory for config files (relative to ovm config directory or absolute)',
+          ),
         files: z.array(ConfigSyncEntrySchema).default([]),
       })
       .optional(),
