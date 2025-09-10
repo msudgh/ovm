@@ -1,4 +1,5 @@
 import { mkdirSync, writeFileSync } from 'fs'
+import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ConfigSchema } from '.'
@@ -154,5 +155,58 @@ describe('Integration Tests', () => {
     // Cleanup
     destroyVault(workVault.path)
     destroyVault(personalVault.path)
+  })
+
+  it('should handle baseDir for core file sync', async () => {
+    const tempBaseDir = join(tmpdir(), `ovm-test-basedir-${Date.now()}`)
+
+    mkdirSync(tempBaseDir, { recursive: true })
+
+    const coreConfigFile = 'core-settings.json'
+    const coreConfigContent = { theme: 'dark' }
+
+    writeFileSync(
+      join(tempBaseDir, coreConfigFile),
+      JSON.stringify(coreConfigContent),
+    )
+
+    const { vault, config: vaultConfig } = await setupVault()
+    vault.name = 'TestVault'
+
+    const config = ConfigSchema.parse({
+      plugins: [],
+      configSync: {
+        baseDir: tempBaseDir,
+        files: [
+          {
+            source: coreConfigFile,
+            target: 'app.json',
+            type: 'core',
+            vaults: [vault.name],
+          },
+        ],
+      },
+    })
+
+    const flags = {
+      ...getTestCommonWithVaultPathFlags(vaultConfig.path, vault.path),
+      overwrite: true,
+      backup: false,
+      onlyInstalled: false,
+      mergeStrategy: 'replace',
+    }
+
+    await syncVaultCoreIterator({ vault, config, flags })
+
+    expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith(
+      expect.objectContaining({
+        source: join(tempBaseDir, coreConfigFile),
+        vaultPath: vault.path,
+        target: 'app.json',
+      }),
+    )
+
+    destroyVault(vault.path)
+    destroyVault(tempBaseDir)
   })
 })

@@ -34,6 +34,10 @@
         "configSync": {
           "type": "object",
           "properties": {
+            "baseDir": {
+              "type": "string",
+              "description": "Base directory for config files (relative to ovm config directory or absolute)"
+            },
             "files": {
               "type": "array",
               "items": {

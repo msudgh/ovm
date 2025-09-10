@@ -293,5 +293,16 @@ describe('Config', () => {
       const fullResult = ConfigSchema.safeParse(fullConfig)
       expect(fullResult.success).toBe(true)
     })
+
+    it('should validate config with baseDir', () => {
+      const configWithBaseDir = {
+        configSync: {
+          baseDir: 'test-dir',
+        },
+      }
+      const result = ConfigSchema.safeParse(configWithBaseDir)
+      expect(result.success).toBe(true)
+      expect(result.data?.configSync?.baseDir).toBe('test-dir')
+    })
   })
 })

@@ -59,7 +59,8 @@ export const setupVault = async (overrideConfig?: Config) => {
 
   const config = await createDefaultConfig(
     configFilePath,
-    overrideConfig ?? ConfigSchema.parse({ plugins: [] }),
+    overrideConfig ??
+      ConfigSchema.parse({ plugins: [], configSync: { files: [] } }),
   )
 
   return {
