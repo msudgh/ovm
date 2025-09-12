@@ -133,6 +133,23 @@ describe('Config', () => {
 
       expect(mockExit).toHaveBeenCalledWith(1)
     })
+
+    it('should exit process and parse JSON cause when config has invalid schema', async () => {
+      const { vault, config } = await setupVault({
+        // @ts-expect-error To create an invalid config
+        invalidKey: 'invalidValue',
+      })
+
+      try {
+        await loadConfig(config.path)
+      } catch (error) {
+        expect((error as Error).message).toBe('process.exit called')
+      }
+
+      expect(mockExit).toHaveBeenCalledWith(1)
+
+      destroyVault(vault.path)
+    })
   })
 
   describe('writeConfig', () => {

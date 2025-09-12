@@ -5,6 +5,7 @@ import {
   getSelectedVaults,
   getVaultName,
   getVaultPath,
+  loadVaults,
   mapVaultsIteratorItem,
   vaultsSelector,
 } from './vaults'
@@ -94,6 +95,69 @@ describe('Vaults Provider', () => {
     })
   })
 
+  describe('loadVaults', () => {
+    it('should load vaults by pattern matching when path is provided', async () => {
+      const mockVaultPaths = ['/path/to/vault/.obsidian']
+      const mockVault = { path: '/path/to/vault/.obsidian', name: 'vault' }
+
+      vi.mocked(glob).mockResolvedValue(mockVaultPaths)
+      vi.mocked(findVault).mockResolvedValue([mockVault])
+
+      const result = await loadVaults('/path/to/vault')
+
+      expect(glob).toHaveBeenCalledWith('/path/to/vault/**/.obsidian', {
+        absolute: true,
+        dot: true,
+        nocase: true,
+      })
+      expect(result).toHaveLength(1)
+      expect(result[0].name).toBe('vault')
+    })
+
+    it('should load vaults from obsidian config when no path is provided', async () => {
+      const mockVaults = [
+        { path: '/home/user/.config/obsidian/vault1', name: 'vault1' },
+        { path: '/home/user/.config/obsidian/vault2', name: 'vault2' },
+      ]
+
+      vi.mocked(findVault).mockResolvedValue(mockVaults)
+
+      const result = await loadVaults('')
+
+      expect(findVault).toHaveBeenCalledWith()
+      expect(result).toHaveLength(2)
+      expect(result).toEqual(mockVaults)
+    })
+
+    it('should load vaults from obsidian config when whitespace-only path is provided', async () => {
+      const mockVaults = [
+        { path: '/home/user/.config/obsidian/vault1', name: 'vault1' },
+      ]
+
+      vi.mocked(findVault).mockResolvedValue(mockVaults)
+
+      const result = await loadVaults('   ')
+
+      expect(findVault).toHaveBeenCalledWith()
+      expect(result).toHaveLength(1)
+      expect(result).toEqual(mockVaults)
+    })
+
+    it('should throw error when no vaults are found with pattern matching', async () => {
+      vi.mocked(glob).mockResolvedValue([])
+
+      await expect(loadVaults('/nonexistent/path')).rejects.toThrow(
+        'No vaults found!',
+      )
+    })
+
+    it('should throw error when no vaults are found from obsidian config', async () => {
+      vi.mocked(findVault).mockResolvedValue([])
+
+      await expect(loadVaults('')).rejects.toThrow('No vaults found!')
+    })
+  })
+
   describe('vaultsSelector', () => {
     const mockVaults = [
       { name: 'vault-b', path: '/path/to/vault-b' },
@@ -125,6 +189,25 @@ describe('Vaults Provider', () => {
         required: true,
       })
       expect(result).toEqual([mockVaults[0]])
+    })
+
+    it('should validate that at least one vault is selected', async () => {
+      vi.mocked(isTestEnv).mockReturnValue(false)
+      vi.mocked(checkbox).mockResolvedValue([mockVaults[0]])
+
+      await vaultsSelector(mockVaults)
+
+      // Get the validate function that was passed to checkbox
+      const checkboxCall = vi.mocked(checkbox).mock.calls[0][0]
+      const validateFn = checkboxCall.validate
+
+      // Test validation with empty selection
+      if (validateFn) {
+        expect(validateFn([])).toBe('At least one vault must be selected')
+
+        // Test validation with valid selection (array of vault objects)
+        expect(validateFn([mockVaults[0]])).toBe(true)
+      }
     })
   })
 

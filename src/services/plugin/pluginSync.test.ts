@@ -330,7 +330,7 @@ describe('Command: plugins sync', () => {
           overwrite: true,
           backup: true,
           onlyInstalled: true,
-          mergeStrategy: 'smart', // Should be overridden by config
+          mergeStrategy: 'smart',
         },
       })
 
@@ -345,7 +345,7 @@ describe('Command: plugins sync', () => {
             path.join('configs', 'commander-config.json'),
           ),
           target: 'data.json',
-          mergeStrategy: 'replace', // Should use config's strategy
+          mergeStrategy: 'replace',
           include: undefined,
           exclude: undefined,
           overwrite: true,
@@ -421,7 +421,7 @@ describe('Command: plugins sync', () => {
               target: 'data.json',
               type: 'plugin',
               pluginId: 'dataview',
-              vaults: ['NotThisVault'], // Should be skipped for this vault
+              vaults: ['NotThisVault'],
             },
           ],
         },
@@ -518,7 +518,7 @@ describe('Command: plugins sync', () => {
       })
 
       expect(result.synced).toBe(0)
-      expect(result.skipped).toBe(1) // Should skip due to plugin not installed
+      expect(result.skipped).toBe(1)
       expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
         1,
       )
