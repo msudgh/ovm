@@ -33,7 +33,7 @@ Define plugins in your config file with the following structure:
 
 ### Configuration Sync
 
-You can define configuration synchronization entries using `configSync` to automatically sync Obsidian core settings, plugin configurations, and custom files across vaults:
+Define configuration synchronization entries using `configSync` to automatically sync core settings, plugin configurations, and custom files across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
 
 ```json
 {
@@ -84,6 +84,7 @@ You can define configuration synchronization entries using `configSync` to autom
 - **`include`** (optional): Array of JSON keys to include when using `smart` merge strategy
 - **`exclude`** (optional): Array of JSON keys to exclude when using `smart` merge strategy
 - **`backup`** (optional): Create `.bak` backup if destination exists (default: inherits from command flags)
+- **`overwrite`** (optional): Overwrite existing files without prompting (default: inherits from command flags)
 
 ##### Merge Strategies
 

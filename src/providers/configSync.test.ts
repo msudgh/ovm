@@ -22,7 +22,6 @@ describe('ConfigSync Provider', () => {
     it('should sync CSS snippets successfully (custom type)', async () => {
       const { vault } = await testVaultSetup()
 
-      // Create source snippet file
       const sourceContent = `/* Custom CSS Snippet */
 .markdown-source-view {
   font-family: 'JetBrains Mono', monospace;

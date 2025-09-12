@@ -43,7 +43,8 @@
     "dirname": "ovm",
     "commands": "./dist/commands",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-version"
     ],
     "topicSeparator": " ",
     "topics": {
@@ -74,6 +75,7 @@
     "@inquirer/prompts": "7.3.1",
     "@oclif/core": "4.2.6",
     "@oclif/plugin-help": "6.2.24",
+    "@oclif/plugin-version": "^2.2.32",
     "async": "3.2.6",
     "date-fns": "4.1.0",
     "fast-folder-size": "2.4.0",

@@ -25,7 +25,7 @@ vi.mock('fs', async () => {
   const actual = await vi.importActual('fs')
   return {
     ...actual,
-    existsSync: vi.fn().mockReturnValue(true), // Mock that plugin directories exist
+    existsSync: vi.fn().mockReturnValue(true),
   }
 })
 

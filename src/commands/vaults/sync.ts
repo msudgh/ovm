@@ -4,10 +4,11 @@ import { configSyncMergeStrategy } from '../../services/config'
 import { action } from '../../services/vault/vaultSync'
 import { FactoryFlagsWithVaults, VaultSyncFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
+import { DESCRIPTIONS } from '../../utils/constants'
 
 export default class VaultSync extends FactoryCommandWithVaults {
   static readonly aliases = ['vs', 'vaults sync']
-  static override readonly description = `Sync core and custom vault configuration files defined in ovm.json (configSync).`
+  static override readonly description = `Sync core and custom vault configuration files`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
     '<%= config.bin %> <%= command.id %> --no-backup',
@@ -15,15 +16,15 @@ export default class VaultSync extends FactoryCommandWithVaults {
   ]
   static override readonly flags = {
     overwrite: Flags.boolean({
-      description: 'Overwrite existing destination files',
+      description: DESCRIPTIONS.overwrite,
       default: true,
     }),
     backup: Flags.boolean({
-      description: 'Create a .bak backup if destination exists',
+      description: DESCRIPTIONS.backup,
       default: true,
     }),
     mergeStrategy: Flags.string({
-      description: `Strategy for merging configs: ${configSyncMergeStrategy.join(', ')}`,
+      description: DESCRIPTIONS.mergeStrategy,
       options: configSyncMergeStrategy,
       default: 'replace',
     }),

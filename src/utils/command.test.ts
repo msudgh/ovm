@@ -197,16 +197,16 @@ describe('Command utilities', () => {
       const mockExec = vi.mocked(exec)
 
       const testError = new Error('Command failed')
-      // Mock failed execution
+
       mockExec.mockImplementation((command, options, callback) => {
         if (callback) {
           callback(testError, '', '')
         }
-        return {} as ChildProcess // Return a mock ChildProcess
+        return {} as ChildProcess
       })
 
       const vault: Vault = { name: 'test-vault', path: '/test/path' }
-      const command = 'false' // Command that fails
+      const command = 'false'
       const cwd = '/test/cwd'
 
       await expect(asyncExecCustomCommand(vault, command, cwd)).rejects.toThrow(

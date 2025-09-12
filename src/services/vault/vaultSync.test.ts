@@ -29,17 +29,12 @@ describe('Command: vaults sync', () => {
   })
 
   describe('syncVaultCoreIterator', () => {
-    const testVaultSetup = async () => {
-      const { vault, config } = await setupVault()
-      return { vault, config }
-    }
-
     afterEach(() => {
       vi.clearAllMocks()
     })
 
     it('should sync core configurations successfully', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -79,7 +74,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should sync custom configurations successfully', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -114,7 +109,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should ignore plugin type entries', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -155,7 +150,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should filter by vault name', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -166,13 +161,13 @@ describe('Command: vaults sync', () => {
               source: 'configs/app.json',
               target: 'app.json',
               type: 'core',
-              vaults: [vault.name], // Should be included
+              vaults: [vault.name],
             },
             {
               source: 'configs/workspace.json',
               target: 'workspace.json',
               type: 'core',
-              vaults: ['other-vault'], // Should be excluded
+              vaults: ['other-vault'],
             },
           ],
         },
@@ -197,7 +192,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should sync CSS snippets to specific vaults using custom type', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -231,7 +226,7 @@ describe('Command: vaults sync', () => {
         },
       })
 
-      expect(result.synced).toBe(1) // Only first snippet should sync to this vault
+      expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
       expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
       expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
@@ -253,7 +248,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should sync hotkeys configuration to selected vaults using core type', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -285,11 +280,11 @@ describe('Command: vaults sync', () => {
           ...flags,
           overwrite: true,
           backup: true,
-          mergeStrategy: 'replace', // Should be overridden by config
+          mergeStrategy: 'replace',
         },
       })
 
-      expect(result.synced).toBe(1) // Only first hotkeys should sync to this vault
+      expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
       expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
       expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
@@ -299,7 +294,7 @@ describe('Command: vaults sync', () => {
         target: 'hotkeys.json',
         type: 'core',
         vaultPath: vault.path,
-        mergeStrategy: 'smart', // Should use config's merge strategy
+        mergeStrategy: 'smart',
         include: undefined,
         exclude: undefined,
         overwrite: true,
@@ -311,7 +306,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should sync multiple different configurations to overlapping vault sets', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       // Simulate scenario:
@@ -402,7 +397,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should correctly pass parameters to the sync provider', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -452,7 +447,7 @@ describe('Command: vaults sync', () => {
     })
 
     it('should skip syncing if vault is not in the list', async () => {
-      const { vault, config: testConfig } = await testVaultSetup()
+      const { vault, config: testConfig } = await setupVault()
       const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
 
       const config = ConfigSchema.parse({
@@ -483,6 +478,52 @@ describe('Command: vaults sync', () => {
       expect(result.synced).toBe(0)
       expect(result.skipped).toBe(0) // Filtered, not skipped
       expect(configSyncProvider.syncFileToVault).not.toHaveBeenCalled()
+
+      destroyVault(vault.path)
+    })
+
+    it('should use flags.mergeStrategy when entry.mergeStrategy is undefined', async () => {
+      const { vault, config: testConfig } = await setupVault()
+      const flags = getTestCommonWithVaultPathFlags(testConfig.path, vault.path)
+
+      const config = ConfigSchema.parse({
+        plugins: [],
+        configSync: {
+          files: [
+            {
+              source: 'configs/app.json',
+              target: 'app.json',
+              type: 'core',
+            },
+          ],
+        },
+      })
+
+      // Manually remove mergeStrategy to trigger the fallback logic
+      if ('mergeStrategy' in config.configSync!.files[0]) {
+        delete (config.configSync!.files[0] as { mergeStrategy?: unknown })
+          .mergeStrategy
+      }
+
+      const result = await syncVaultCoreIterator({
+        vault,
+        config,
+        flags: {
+          ...flags,
+          overwrite: true,
+          backup: true,
+          mergeStrategy: 'smart', // This should be used as fallback
+        },
+      })
+
+      expect(result.synced).toBe(1)
+      expect(result.skipped).toBe(0)
+      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+
+      // Verify that the syncFileToVault was called with the flags.mergeStrategy
+      const callArgs = vi.mocked(configSyncProvider.syncFileToVault).mock
+        .calls[0][0]
+      expect(callArgs.mergeStrategy).toBe('smart')
 
       destroyVault(vault.path)
     })

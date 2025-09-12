@@ -16,7 +16,7 @@ vi.mock('obsidian-utils', async () => {
   return {
     ...actual,
     installPluginFromGithub: vi.fn().mockResolvedValue(undefined),
-    isPluginInstalled: vi.fn().mockResolvedValue(true), // Return true to simulate plugins are installed
+    isPluginInstalled: vi.fn().mockResolvedValue(true),
   }
 })
 
@@ -42,12 +42,10 @@ describe('Command: uninstall', () => {
 
     const plugins = [{ id: plugin1Id }]
 
-    // Mock removePluginDir to succeed
     const removePluginDirSpy = vi
       .spyOn(pluginsProvider, 'removePluginDir')
       .mockResolvedValue()
 
-    // For uninstall tests, we want isPluginInstalled to return true initially
     vi.mocked(obsidianUtils.isPluginInstalled).mockResolvedValue(true)
 
     const result = await (uninstallVaultIterator as UninstallCommandIterator)({

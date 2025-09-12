@@ -43,8 +43,8 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
           flags.mergeStrategy) as ConfigSyncMergeStrategy,
         include: entry.include,
         exclude: entry.exclude,
-        overwrite: flags.overwrite,
-        backup: flags.backup,
+        overwrite: entry.overwrite ?? flags.overwrite,
+        backup: entry.backup ?? flags.backup,
         // Core configs don't need onlyIfInstalled check
         onlyIfInstalled: false,
       }

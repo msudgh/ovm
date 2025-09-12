@@ -4,10 +4,11 @@ import { configSyncMergeStrategy } from '../../services/config'
 import { action } from '../../services/plugin/pluginSync'
 import { FactoryFlagsWithVaults, PluginSyncFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
+import { DESCRIPTIONS } from '../../utils/constants'
 
 export default class PluginSync extends FactoryCommandWithVaults {
   static readonly aliases = ['ps', 'plugins sync']
-  static override readonly description = `Sync plugin configuration files (data.json) defined in ovm.json (configSync).`
+  static override readonly description = `Sync plugin configuration files (data.json)`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
     '<%= config.bin %> <%= command.id %> --plugin-id=calendar --no-backup',
@@ -15,24 +16,23 @@ export default class PluginSync extends FactoryCommandWithVaults {
   ]
   static override readonly flags = {
     overwrite: Flags.boolean({
-      description: 'Overwrite existing destination files',
+      description: DESCRIPTIONS.overwrite,
       default: true,
     }),
     backup: Flags.boolean({
-      description: 'Create a .bak backup if destination exists',
+      description: DESCRIPTIONS.backup,
       default: true,
     }),
     onlyInstalled: Flags.boolean({
-      description: 'Skip vaults where plugin is not installed',
+      description: DESCRIPTIONS.onlyInstalled,
       default: true,
     }),
     pluginId: Flags.string({
-      description:
-        'Sync only specific plugin (if not specified, sync all plugins)',
+      description: DESCRIPTIONS.performOnSpecificPlugin,
       required: false,
     }),
     mergeStrategy: Flags.string({
-      description: `Strategy for merging configs: ${configSyncMergeStrategy.join(', ')}`,
+      description: DESCRIPTIONS.mergeStrategy,
       options: configSyncMergeStrategy,
       default: 'replace',
     }),

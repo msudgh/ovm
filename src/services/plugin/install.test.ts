@@ -100,7 +100,6 @@ describe('Command: install', () => {
       vault.path,
     )
 
-    // Mock that the plugin is not found in registry
     vi.mocked(githubProvider.findPluginInRegistry).mockResolvedValue(undefined)
 
     const result = await installVaultIterator({
@@ -132,7 +131,6 @@ describe('Command: install', () => {
       vault.path,
     )
 
-    // First installation - should succeed
     const result = await installVaultIterator({
       vault,
       config,
@@ -146,10 +144,8 @@ describe('Command: install', () => {
     expect(result.failedPlugins.length).to.equal(0)
     expect(result.reinstallPlugins.length).to.equal(0)
 
-    // Mock that the plugin is now installed
     vi.mocked(obsidianUtils.isPluginInstalled).mockResolvedValue(true)
 
-    // Second attempt - should detect it's already installed
     const resultSecondAttempt = await installVaultIterator({
       vault,
       config,

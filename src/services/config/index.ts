@@ -38,7 +38,7 @@ export const ConfigSyncEntrySchema = z.object({
   pluginId: z.string().optional().describe('For plugin configs, the plugin ID'),
   mergeStrategy: z
     .custom<ConfigSyncMergeStrategy>()
-    .optional()
+    .default('replace')
     .describe('Merge strategy for this config'),
   vaults: z
     .array(z.string())
@@ -46,7 +46,7 @@ export const ConfigSyncEntrySchema = z.object({
     .describe('Only apply to specific vaults (if empty, apply to all)'),
   onlyIfInstalled: z
     .boolean()
-    .optional()
+    .default(true)
     .describe('For plugin configs, only sync if plugin is installed'),
   include: z
     .array(z.string())
@@ -56,6 +56,18 @@ export const ConfigSyncEntrySchema = z.object({
     .array(z.string())
     .optional()
     .describe('Specific keys to exclude when merging'),
+  backup: z
+    .boolean()
+    .optional()
+    .describe(
+      'Create .bak backup if destination exists (default: inherits from command flags)',
+    ),
+  overwrite: z
+    .boolean()
+    .optional()
+    .describe(
+      'Overwrite existing files without prompting (default: inherits from command flags)',
+    ),
 })
 
 export const ConfigSchema = z

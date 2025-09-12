@@ -3,10 +3,11 @@ import { FactoryCommandWithVaults } from '../../providers/factory'
 import { action } from '../../services/vault/stats'
 import { FactoryFlagsWithVaults, StatsFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
+import { DESCRIPTIONS } from '../../utils/constants'
 
 export default class Stats extends FactoryCommandWithVaults {
   static readonly aliases = ['rs', 'reports stats']
-  static override readonly description = `Statistics of vaults and installed plugins.`
+  static override readonly description = `Statistics of vaults and installed plugins`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
@@ -15,7 +16,7 @@ export default class Stats extends FactoryCommandWithVaults {
   static override readonly flags = {
     output: Flags.string({
       char: 'o',
-      description: 'Display the output with a specific transformer.',
+      description: DESCRIPTIONS.output,
       default: 'table',
       options: ['table', 'json'],
     }),
