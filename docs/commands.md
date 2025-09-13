@@ -111,7 +111,7 @@ info: Uninstalled 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidia
 
 Aliases: `ovm ps` / `ovm plugins sync`
 
-Sync plugin configuration files (data.json) defined in ovm.json (configSync) across vaults.
+Sync plugin configuration files (data.json) defined in ovm.json (sync) across vaults.
 
 - _Usage:_ `ovm help plugins sync`
 - _See code:_ [src/commands/plugins/sync.ts](src/commands/plugins/sync.ts)
@@ -248,7 +248,7 @@ Examples:
 
 Aliases: `ovm vs`
 
-Sync core and custom vault configuration files defined in ovm.json (configSync) across vaults.
+Sync core and custom vault configuration files defined in ovm.json (sync) across vaults.
 
 - _Usage:_ `ovm help vaults sync`
 - _See code:_ [src/commands/vaults/sync.ts](src/commands/vaults/sync.ts)

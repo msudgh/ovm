@@ -33,7 +33,7 @@ Define plugins in your config file with the following structure:
 
 ### Configuration Sync
 
-Define configuration synchronization entries using `configSync` to automatically sync core settings, plugin configurations, and custom files across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
+Define configuration synchronization entries using `sync` to automatically sync core settings, plugin configurations, and custom files across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
 
 ```json
 {
@@ -41,7 +41,7 @@ Define configuration synchronization entries using `configSync` to automatically
     { "id": "dataview", "version": "latest" },
     { "id": "note-toolbar", "version": "latest" }
   ],
-  "configSync": {
+  "sync": {
     "files": [
       {
         "source": "./configs/appearance.json",
@@ -104,7 +104,7 @@ Define configuration synchronization entries using `configSync` to automatically
 ```json
 {
   "plugins": [],
-  "configSync": {
+  "sync": {
     "files": []
   }
 }

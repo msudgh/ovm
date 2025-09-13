@@ -1,5 +1,5 @@
 import { each } from 'async'
-import { SyncConfigOptions, syncFileToVault } from '../../providers/configSync'
+import { SyncConfigOptions, syncFileToVault } from '../../providers/sync'
 import {
   getSelectedVaults,
   mapVaultsIteratorItem,
@@ -15,7 +15,7 @@ import { getFilteredSyncEntries } from '../../utils/config'
 import { logger } from '../../utils/logger'
 import { getSourceBaseDir, resolveSourcePath } from '../../utils/path'
 import { loadConfig } from '../config'
-import { ConfigSyncMergeStrategy } from '../config/index.types'
+import { SyncMergeStrategy } from '../config/index.types'
 
 const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
   const { vault, config, flags } = item
@@ -40,7 +40,7 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
         type: entry.type,
         vaultPath: vault.path,
         mergeStrategy: (entry.mergeStrategy ||
-          flags.mergeStrategy) as ConfigSyncMergeStrategy,
+          flags.mergeStrategy) as SyncMergeStrategy,
         include: entry.include,
         exclude: entry.exclude,
         overwrite: entry.overwrite ?? flags.overwrite,

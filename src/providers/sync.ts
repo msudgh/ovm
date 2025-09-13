@@ -6,19 +6,16 @@ import {
   writeFileSync,
 } from 'fs'
 import { dirname, join } from 'path'
-import {
-  ConfigSyncMergeStrategy,
-  ConfigSyncType,
-} from '../services/config/index.types'
+import { SyncMergeStrategy, SyncType } from '../services/config/index.types'
 import { logger } from '../utils/logger'
 
 export interface SyncConfigOptions {
   source: string
   target: string
-  type: ConfigSyncType
+  type: SyncType
   vaultPath: string
   pluginId?: string
-  mergeStrategy: ConfigSyncMergeStrategy
+  mergeStrategy: SyncMergeStrategy
   include?: string[]
   exclude?: string[]
   overwrite?: boolean
@@ -160,7 +157,7 @@ export const syncPluginConfigToVault = async (options: {
   target: string
   pluginId: string
   vaultPath: string
-  mergeStrategy: ConfigSyncMergeStrategy
+  mergeStrategy: SyncMergeStrategy
   include?: string[]
   exclude?: string[]
   overwrite?: boolean

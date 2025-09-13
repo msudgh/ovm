@@ -1,6 +1,6 @@
 import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import * as configSyncProvider from '../../providers/configSync'
+import * as syncProvider from '../../providers/sync'
 import {
   destroyVault,
   getTestCommonWithVaultPathFlags,
@@ -9,8 +9,8 @@ import {
 import { ConfigSchema } from '../config'
 import { syncVaultCoreIterator } from './vaultSync'
 
-vi.mock('../../providers/configSync', async () => {
-  const actual = await vi.importActual('../../providers/configSync')
+vi.mock('../../providers/sync', async () => {
+  const actual = await vi.importActual('../../providers/sync')
   return {
     ...actual,
     syncFileToVault: vi.fn(),
@@ -21,7 +21,7 @@ describe('Command: vaults sync', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Set default successful mock
-    vi.mocked(configSyncProvider.syncFileToVault).mockResolvedValue(true)
+    vi.mocked(syncProvider.syncFileToVault).mockResolvedValue(true)
   })
 
   afterEach(() => {
@@ -39,7 +39,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/app.json',
@@ -68,7 +68,7 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(2)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(2)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(2)
 
       destroyVault(vault.path)
     })
@@ -79,7 +79,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/custom-config.json',
@@ -103,7 +103,7 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -114,7 +114,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/app.json',
@@ -144,7 +144,7 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -155,7 +155,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/app.json',
@@ -186,7 +186,7 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -197,7 +197,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'snippets/custom-theme.css',
@@ -228,8 +228,8 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledWith({
         source: expect.stringContaining(
           path.join('snippets', 'custom-theme.css'),
         ),
@@ -253,7 +253,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/main-hotkeys.json',
@@ -286,8 +286,8 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledWith({
         source: expect.stringContaining(
           path.join('configs', 'main-hotkeys.json'),
         ),
@@ -316,7 +316,7 @@ describe('Command: vaults sync', () => {
       // - Some overlap in vault targeting
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             // CSS snippets for specific theme
             {
@@ -359,10 +359,10 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(2) // Snippets + hotkeys should sync to this vault
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(2)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(2)
 
       // Verify snippets sync call
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledWith({
         source: expect.stringContaining(
           path.join('snippets', 'dark-mode-enhancements.css'),
         ),
@@ -378,7 +378,7 @@ describe('Command: vaults sync', () => {
       })
 
       // Verify hotkeys sync call
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledWith({
         source: expect.stringContaining(
           path.join('configs', 'productivity-hotkeys.json'),
         ),
@@ -402,7 +402,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/main-hotkeys.json',
@@ -428,7 +428,7 @@ describe('Command: vaults sync', () => {
         },
       })
 
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith({
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledWith({
         source: expect.stringContaining(
           path.join('configs', 'main-hotkeys.json'),
         ),
@@ -452,7 +452,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/app.json',
@@ -477,7 +477,7 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(0)
       expect(result.skipped).toBe(0) // Filtered, not skipped
-      expect(configSyncProvider.syncFileToVault).not.toHaveBeenCalled()
+      expect(syncProvider.syncFileToVault).not.toHaveBeenCalled()
 
       destroyVault(vault.path)
     })
@@ -488,7 +488,7 @@ describe('Command: vaults sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/app.json',
@@ -500,8 +500,8 @@ describe('Command: vaults sync', () => {
       })
 
       // Manually remove mergeStrategy to trigger the fallback logic
-      if ('mergeStrategy' in config.configSync!.files[0]) {
-        delete (config.configSync!.files[0] as { mergeStrategy?: unknown })
+      if ('mergeStrategy' in config.sync!.files[0]) {
+        delete (config.sync!.files[0] as { mergeStrategy?: unknown })
           .mergeStrategy
       }
 
@@ -518,11 +518,10 @@ describe('Command: vaults sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
 
       // Verify that the syncFileToVault was called with the flags.mergeStrategy
-      const callArgs = vi.mocked(configSyncProvider.syncFileToVault).mock
-        .calls[0][0]
+      const callArgs = vi.mocked(syncProvider.syncFileToVault).mock.calls[0][0]
       expect(callArgs.mergeStrategy).toBe('smart')
 
       destroyVault(vault.path)

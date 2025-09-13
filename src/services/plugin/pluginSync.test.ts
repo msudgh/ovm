@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'fs'
 import path, { join } from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import * as configSyncProvider from '../../providers/configSync'
+import * as syncProvider from '../../providers/sync'
 import {
   destroyVault,
   getTestCommonWithVaultPathFlags,
@@ -10,8 +10,8 @@ import {
 import { ConfigSchema } from '../config'
 import { syncPluginVaultIterator } from './pluginSync'
 
-vi.mock('../../providers/configSync', async () => {
-  const actual = await vi.importActual('../../providers/configSync')
+vi.mock('../../providers/sync', async () => {
+  const actual = await vi.importActual('../../providers/sync')
   return {
     ...actual,
     syncPluginConfigToVault: vi.fn(),
@@ -22,9 +22,7 @@ describe('Command: plugins sync', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Set default successful mock
-    vi.mocked(configSyncProvider.syncPluginConfigToVault).mockResolvedValue(
-      true,
-    )
+    vi.mocked(syncProvider.syncPluginConfigToVault).mockResolvedValue(true)
   })
 
   afterEach(() => {
@@ -56,7 +54,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/test-plugin-data.json',
@@ -82,9 +80,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        1,
-      )
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -95,7 +91,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/plugin1-data.json',
@@ -128,9 +124,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        1,
-      )
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -141,7 +135,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/invalid-plugin.json',
@@ -167,7 +161,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(0)
       expect(result.skipped).toBe(1)
-      expect(configSyncProvider.syncPluginConfigToVault).not.toHaveBeenCalled()
+      expect(syncProvider.syncPluginConfigToVault).not.toHaveBeenCalled()
 
       destroyVault(vault.path)
     })
@@ -178,7 +172,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/test-plugin-data.json',
@@ -209,9 +203,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        1,
-      )
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -235,7 +227,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/note-toolbar-config.json',
@@ -273,10 +265,8 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        1,
-      )
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
         expect.objectContaining({
           source: expect.stringContaining(
             path.join('configs', 'note-toolbar-config.json'),
@@ -308,7 +298,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/commander-config.json',
@@ -336,10 +326,8 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(1)
       expect(result.skipped).toBe(0)
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        1,
-      )
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
         expect.objectContaining({
           source: expect.stringContaining(
             path.join('configs', 'commander-config.json'),
@@ -388,7 +376,7 @@ describe('Command: plugins sync', () => {
       // - This vault should get both configs
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/note-toolbar-settings.json',
@@ -441,12 +429,10 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(2) // Note Toolbar + Commander
       expect(result.skipped).toBe(0) // Dataview is filtered by vault, not skipped due to error
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        2,
-      )
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(2)
 
       // Verify Note Toolbar sync
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
         expect.objectContaining({
           source: expect.stringContaining(
             path.join('configs', 'note-toolbar-settings.json'),
@@ -462,7 +448,7 @@ describe('Command: plugins sync', () => {
       )
 
       // Verify Commander sync
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
         expect.objectContaining({
           source: expect.stringContaining(
             path.join('configs', 'commander-settings.json'),
@@ -487,7 +473,7 @@ describe('Command: plugins sync', () => {
       // Don't create plugin directory - simulate uninstalled plugin
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/uninstalled-plugin-config.json',
@@ -501,9 +487,7 @@ describe('Command: plugins sync', () => {
       })
 
       // Mock the syncPluginConfigToVault to return false (plugin not installed)
-      vi.mocked(configSyncProvider.syncPluginConfigToVault).mockResolvedValue(
-        false,
-      )
+      vi.mocked(syncProvider.syncPluginConfigToVault).mockResolvedValue(false)
 
       const result = await syncPluginVaultIterator({
         vault,
@@ -519,9 +503,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(0)
       expect(result.skipped).toBe(1)
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        1,
-      )
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(1)
 
       destroyVault(vault.path)
     })
@@ -532,7 +514,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/note-toolbar-config.json',
@@ -560,7 +542,7 @@ describe('Command: plugins sync', () => {
         },
       })
 
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
         expect.objectContaining({
           source: expect.stringContaining(
             path.join('configs', 'note-toolbar-config.json'),
@@ -586,7 +568,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/test-plugin-data.json',
@@ -613,7 +595,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(0)
       expect(result.skipped).toBe(0) // It's not a skip, it's a filter
-      expect(configSyncProvider.syncPluginConfigToVault).not.toHaveBeenCalled()
+      expect(syncProvider.syncPluginConfigToVault).not.toHaveBeenCalled()
 
       destroyVault(vault.path)
     })
@@ -640,7 +622,7 @@ describe('Command: plugins sync', () => {
 
       const config = ConfigSchema.parse({
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'configs/test-plugin-data.json',
@@ -678,9 +660,7 @@ describe('Command: plugins sync', () => {
 
       expect(result.synced).toBe(3)
       expect(result.skipped).toBe(0) // All plugins are installed, none skipped
-      expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(
-        3,
-      )
+      expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledTimes(3)
 
       destroyVault(vault.path)
     })

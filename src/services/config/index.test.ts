@@ -4,11 +4,11 @@ import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ConfigSchema,
-  ConfigSyncEntrySchema,
   createDefaultConfig,
   loadConfig,
   PluginSchema,
   safeLoadConfig,
+  syncEntrySchema,
   writeConfig,
 } from '.'
 import { OVM_CONFIG_FILENAME } from '../../utils/constants'
@@ -105,7 +105,7 @@ describe('Config', () => {
     it('should load config successfully and return data', async () => {
       const sampleConfig = ConfigSchema.parse({
         plugins: [{ id: 'test-plugin' }],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'test.json',
@@ -160,7 +160,7 @@ describe('Config', () => {
 
       const testConfig: Config = {
         plugins: [{ id: 'test-plugin', version: 'latest' }],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'source.json',
@@ -220,7 +220,7 @@ describe('Config', () => {
 
       const customConfig: Config = {
         plugins: [{ id: 'custom-plugin', repo: 'user/repo' }],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'custom.json',
@@ -264,13 +264,13 @@ describe('Config', () => {
       expect(resultWithAllFields.success).toBe(true)
     })
 
-    it('should validate ConfigSyncEntrySchema correctly', () => {
+    it('should validate syncEntrySchema correctly', () => {
       const validEntry = {
         source: 'source.json',
         target: 'target.json',
         type: 'plugin' as const,
       }
-      const result = ConfigSyncEntrySchema.safeParse(validEntry)
+      const result = syncEntrySchema.safeParse(validEntry)
       expect(result.success).toBe(true)
 
       const entryWithAllFields = {
@@ -284,8 +284,7 @@ describe('Config', () => {
         include: ['key1', 'key2'],
         exclude: ['key3', 'key4'],
       }
-      const resultWithAllFields =
-        ConfigSyncEntrySchema.safeParse(entryWithAllFields)
+      const resultWithAllFields = syncEntrySchema.safeParse(entryWithAllFields)
       expect(resultWithAllFields.success).toBe(true)
     })
 
@@ -297,7 +296,7 @@ describe('Config', () => {
 
       const fullConfig = {
         plugins: [{ id: 'test-plugin' }],
-        configSync: {
+        sync: {
           files: [
             {
               source: 'test.json',
@@ -313,13 +312,13 @@ describe('Config', () => {
 
     it('should validate config with baseDir', () => {
       const configWithBaseDir = {
-        configSync: {
+        sync: {
           baseDir: 'test-dir',
         },
       }
       const result = ConfigSchema.safeParse(configWithBaseDir)
       expect(result.success).toBe(true)
-      expect(result.data?.configSync?.baseDir).toBe('test-dir')
+      expect(result.data?.sync?.baseDir).toBe('test-dir')
     })
   })
 })

@@ -11,7 +11,7 @@ export const getSourceBaseDir = (
 ): string => {
   const configPath = flags.config || './ovm.json'
   const configDir = dirname(resolve(untildify(configPath)))
-  const baseDir = config.configSync?.baseDir
+  const baseDir = config.sync?.baseDir
 
   if (!baseDir) {
     return configDir

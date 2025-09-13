@@ -1,7 +1,7 @@
 import { homedir } from 'os'
 import path from 'path'
 import { getVaultName, getVaultPath } from '../providers/vaults'
-import { configSyncMergeStrategy } from '../services/config'
+import { syncMergeStrategy } from '../services/config'
 import { ReservedVariables } from '../types/commands'
 
 export const OVM_CONFIG_FILENAME = 'ovm.json'
@@ -19,6 +19,6 @@ export const DESCRIPTIONS = {
   overwrite: 'Overwrite existing files without prompting',
   backup: 'Create .bak backup if destination exists',
   onlyInstalled: 'Skip vaults where plugin is not installed',
-  mergeStrategy: `Strategy for merging configs: ${configSyncMergeStrategy.join(', ')}`,
+  mergeStrategy: `Strategy for merging configs: ${syncMergeStrategy.join(', ')}`,
   performOnSpecificPlugin: 'Perform action only on the specified plugin',
 }

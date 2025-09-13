@@ -1,6 +1,6 @@
 import { Flags, flush } from '@oclif/core'
 import { FactoryCommandWithVaults } from '../../providers/factory'
-import { configSyncMergeStrategy } from '../../services/config'
+import { syncMergeStrategy } from '../../services/config'
 import { action } from '../../services/plugin/pluginSync'
 import { FactoryFlagsWithVaults, PluginSyncFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
@@ -33,7 +33,7 @@ export default class PluginSync extends FactoryCommandWithVaults {
     }),
     mergeStrategy: Flags.string({
       description: DESCRIPTIONS.mergeStrategy,
-      options: configSyncMergeStrategy,
+      options: syncMergeStrategy,
       default: 'replace',
     }),
     ...this.commonFlagsWithPath,
