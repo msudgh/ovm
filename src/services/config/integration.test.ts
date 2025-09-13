@@ -3,7 +3,7 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ConfigSchema } from '.'
-import * as configSyncProvider from '../../providers/configSync'
+import * as syncProvider from '../../providers/sync'
 import {
   destroyVault,
   getTestCommonWithVaultPathFlags,
@@ -12,8 +12,8 @@ import {
 import { syncPluginVaultIterator } from '../plugin/pluginSync'
 import { syncVaultCoreIterator } from '../vault/vaultSync'
 
-vi.mock('../../providers/configSync', async () => {
-  const actual = await vi.importActual('../../providers/configSync')
+vi.mock('../../providers/sync', async () => {
+  const actual = await vi.importActual('../../providers/sync')
   return {
     ...actual,
     syncFileToVault: vi.fn(),
@@ -24,10 +24,8 @@ vi.mock('../../providers/configSync', async () => {
 describe('Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(configSyncProvider.syncFileToVault).mockResolvedValue(true)
-    vi.mocked(configSyncProvider.syncPluginConfigToVault).mockResolvedValue(
-      true,
-    )
+    vi.mocked(syncProvider.syncFileToVault).mockResolvedValue(true)
+    vi.mocked(syncProvider.syncPluginConfigToVault).mockResolvedValue(true)
   })
 
   afterEach(() => {
@@ -68,7 +66,7 @@ describe('Integration Tests', () => {
     // Define a configuration that syncs a core file to "Work" and a plugin to "Personal"
     const config = ConfigSchema.parse({
       plugins: [],
-      configSync: {
+      sync: {
         files: [
           {
             source: 'configs/app.json',
@@ -127,25 +125,25 @@ describe('Integration Tests', () => {
     })
 
     // Assertions for "Work" vault
-    expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith(
+    expect(syncProvider.syncFileToVault).toHaveBeenCalledWith(
       expect.objectContaining({
         vaultPath: workVault.path,
         target: 'app.json',
       }),
     )
-    expect(configSyncProvider.syncPluginConfigToVault).not.toHaveBeenCalledWith(
+    expect(syncProvider.syncPluginConfigToVault).not.toHaveBeenCalledWith(
       expect.objectContaining({
         vaultPath: workVault.path,
       }),
     )
 
     // Assertions for "Personal" vault
-    expect(configSyncProvider.syncFileToVault).not.toHaveBeenCalledWith(
+    expect(syncProvider.syncFileToVault).not.toHaveBeenCalledWith(
       expect.objectContaining({
         vaultPath: personalVault.path,
       }),
     )
-    expect(configSyncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
+    expect(syncProvider.syncPluginConfigToVault).toHaveBeenCalledWith(
       expect.objectContaining({
         vaultPath: personalVault.path,
         pluginId: 'test-plugin',
@@ -175,7 +173,7 @@ describe('Integration Tests', () => {
 
     const config = ConfigSchema.parse({
       plugins: [],
-      configSync: {
+      sync: {
         baseDir: tempBaseDir,
         files: [
           {
@@ -198,7 +196,7 @@ describe('Integration Tests', () => {
 
     await syncVaultCoreIterator({ vault, config, flags })
 
-    expect(configSyncProvider.syncFileToVault).toHaveBeenCalledWith(
+    expect(syncProvider.syncFileToVault).toHaveBeenCalledWith(
       expect.objectContaining({
         source: join(tempBaseDir, coreConfigFile),
         vaultPath: vault.path,

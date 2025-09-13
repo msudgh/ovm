@@ -1,14 +1,10 @@
 import { Vault } from 'obsidian-utils'
-import {
-  Config,
-  ConfigSyncEntry,
-  ConfigSyncType,
-} from '../services/config/index.types'
+import { Config, SyncEntry, SyncType } from '../services/config/index.types'
 
 type GetFilteredSyncEntriesOptions = {
   config: Config
   vault: Vault
-  types: ConfigSyncType[]
+  types: SyncType[]
   pluginId?: string
 }
 
@@ -17,12 +13,12 @@ export const getFilteredSyncEntries = ({
   vault,
   types,
   pluginId,
-}: GetFilteredSyncEntriesOptions): ConfigSyncEntry[] => {
-  const entries = config.configSync?.files || []
+}: GetFilteredSyncEntriesOptions): SyncEntry[] => {
+  const entries = config.sync?.files || []
 
   // Filter by entry type
   let filteredEntries = entries.filter((entry) =>
-    types.includes(entry.type as ConfigSyncType),
+    types.includes(entry.type as SyncType),
   )
 
   // Filter by specific plugin if provided

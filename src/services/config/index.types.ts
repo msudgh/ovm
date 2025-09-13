@@ -1,16 +1,16 @@
 import { z } from 'zod'
 import {
   ConfigSchema,
-  ConfigSyncEntrySchema,
-  configSyncMergeStrategy,
-  configSyncType,
   PluginSchema,
+  syncEntrySchema,
+  syncMergeStrategy,
+  syncType,
 } from '.'
 
 export type Plugin = z.infer<typeof PluginSchema>
-export type ConfigSyncType = (typeof configSyncType)[number]
-export type ConfigSyncMergeStrategy = (typeof configSyncMergeStrategy)[number]
-export type ConfigSyncEntry = z.infer<typeof ConfigSyncEntrySchema>
+export type SyncType = (typeof syncType)[number]
+export type SyncMergeStrategy = (typeof syncMergeStrategy)[number]
+export type SyncEntry = z.infer<typeof syncEntrySchema>
 export type Config = z.infer<typeof ConfigSchema>
 export type SafeLoadConfigResultSuccess = {
   success: true

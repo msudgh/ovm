@@ -8,9 +8,9 @@ import { untildify } from '../../utils/shell'
 import { stringToJSONSchema } from '../../utils/transformer'
 import {
   Config,
-  ConfigSyncMergeStrategy,
-  ConfigSyncType,
   SafeLoadConfigResult,
+  SyncMergeStrategy,
+  SyncType,
 } from './index.types'
 
 export const PluginSchema = z.object({
@@ -21,9 +21,9 @@ export const PluginSchema = z.object({
   author: z.string().optional(),
   description: z.string().optional(),
 })
-export const configSyncType = ['plugin', 'core', 'custom', 'all'] as const
-export const configSyncMergeStrategy = ['replace', 'merge', 'smart'] as const
-export const ConfigSyncEntrySchema = z.object({
+export const syncType = ['plugin', 'core', 'custom', 'all'] as const
+export const syncMergeStrategy = ['replace', 'merge', 'smart'] as const
+export const syncEntrySchema = z.object({
   source: z
     .string()
     .describe(
@@ -33,11 +33,11 @@ export const ConfigSyncEntrySchema = z.object({
     .string()
     .describe("Target file path (relative to vault's .obsidian directory)"),
   type: z
-    .custom<ConfigSyncType>()
+    .custom<SyncType>()
     .describe('Type of configuration for special handling'),
   pluginId: z.string().optional().describe('For plugin configs, the plugin ID'),
   mergeStrategy: z
-    .custom<ConfigSyncMergeStrategy>()
+    .custom<SyncMergeStrategy>()
     .default('replace')
     .describe('Merge strategy for this config'),
   vaults: z
@@ -74,7 +74,7 @@ export const ConfigSchema = z
   .object({
     $schema: z.string().optional().describe('JSON Schema for the config'),
     plugins: z.array(PluginSchema).default([]),
-    configSync: z
+    sync: z
       .object({
         baseDir: z
           .string()
@@ -82,7 +82,7 @@ export const ConfigSchema = z
           .describe(
             'Base directory for config files (relative to ovm config directory or absolute)',
           ),
-        files: z.array(ConfigSyncEntrySchema).default([]),
+        files: z.array(syncEntrySchema).default([]),
       })
       .optional(),
   })

@@ -1,10 +1,6 @@
 import { Vault } from 'obsidian-utils'
 import { describe, expect, it } from 'vitest'
-import {
-  Config,
-  ConfigSyncEntry,
-  ConfigSyncType,
-} from '../services/config/index.types'
+import { Config, SyncEntry, SyncType } from '../services/config/index.types'
 import { getFilteredSyncEntries } from './config'
 
 describe('Config utilities', () => {
@@ -14,16 +10,16 @@ describe('Config utilities', () => {
       path: '/path/to/test-vault',
     }
 
-    const mockConfigSyncEntries: ConfigSyncEntry[] = [
+    const mockEntries: SyncEntry[] = [
       {
-        type: 'core' as ConfigSyncType,
+        type: 'core' as SyncType,
         source: 'source1.json',
         target: 'dest1.json',
         mergeStrategy: 'replace',
         onlyIfInstalled: false,
       },
       {
-        type: 'plugin' as ConfigSyncType,
+        type: 'plugin' as SyncType,
         source: 'source2.json',
         target: 'dest2.json',
         mergeStrategy: 'replace',
@@ -31,7 +27,7 @@ describe('Config utilities', () => {
         pluginId: 'plugin-1',
       },
       {
-        type: 'plugin' as ConfigSyncType,
+        type: 'plugin' as SyncType,
         source: 'source3.json',
         target: 'dest3.json',
         mergeStrategy: 'replace',
@@ -39,7 +35,7 @@ describe('Config utilities', () => {
         pluginId: 'plugin-2',
       },
       {
-        type: 'custom' as ConfigSyncType,
+        type: 'custom' as SyncType,
         source: 'source4.json',
         target: 'dest4.json',
         mergeStrategy: 'replace',
@@ -47,7 +43,7 @@ describe('Config utilities', () => {
         vaults: ['test-vault', 'other-vault'],
       },
       {
-        type: 'custom' as ConfigSyncType,
+        type: 'custom' as SyncType,
         source: 'source5.json',
         target: 'dest5.json',
         mergeStrategy: 'replace',
@@ -55,7 +51,7 @@ describe('Config utilities', () => {
         vaults: ['other-vault'],
       },
       {
-        type: 'core' as ConfigSyncType,
+        type: 'core' as SyncType,
         source: 'source6.json',
         target: 'dest6.json',
         mergeStrategy: 'replace',
@@ -66,8 +62,8 @@ describe('Config utilities', () => {
 
     const mockConfig: Config = {
       plugins: [],
-      configSync: {
-        files: mockConfigSyncEntries,
+      sync: {
+        files: mockEntries,
       },
     }
 
@@ -92,7 +88,7 @@ describe('Config utilities', () => {
       expect(result).toHaveLength(4)
       expect(
         result.every((entry) =>
-          ['core', 'plugin'].includes(entry.type as ConfigSyncType),
+          ['core', 'plugin'].includes(entry.type as SyncType),
         ),
       ).toBe(true)
     })
@@ -124,17 +120,17 @@ describe('Config utilities', () => {
     it('should return all matching entries when no vault restriction exists', () => {
       const configWithoutVaultRestrictions: Config = {
         plugins: [],
-        configSync: {
+        sync: {
           files: [
             {
-              type: 'core' as ConfigSyncType,
+              type: 'core' as SyncType,
               source: 'source1.json',
               target: 'dest1.json',
               mergeStrategy: 'replace',
               onlyIfInstalled: false,
             },
             {
-              type: 'core' as ConfigSyncType,
+              type: 'core' as SyncType,
               source: 'source2.json',
               target: 'dest2.json',
               mergeStrategy: 'replace',
@@ -157,13 +153,13 @@ describe('Config utilities', () => {
       const result = getFilteredSyncEntries({
         config: mockConfig,
         vault: mockVault,
-        types: ['nonexistent' as ConfigSyncType],
+        types: ['nonexistent' as SyncType],
       })
 
       expect(result).toHaveLength(0)
     })
 
-    it('should return empty array when config has no configSync', () => {
+    it('should return empty array when config has no sync', () => {
       const configWithoutSync: Config = {
         plugins: [],
       }
@@ -177,10 +173,10 @@ describe('Config utilities', () => {
       expect(result).toHaveLength(0)
     })
 
-    it('should return empty array when configSync has no files', () => {
+    it('should return empty array when sync has no files', () => {
       const configWithEmptySync: Config = {
         plugins: [],
-        configSync: {
+        sync: {
           files: [],
         },
       }

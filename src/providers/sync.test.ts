@@ -2,9 +2,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { destroyVault, setupVault } from '../utils/testing'
-import { syncFileToVault, syncPluginConfigToVault } from './configSync'
+import { syncFileToVault, syncPluginConfigToVault } from './sync'
 
-describe('ConfigSync Provider', () => {
+describe('Sync Provider', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
