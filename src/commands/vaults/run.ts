@@ -6,7 +6,7 @@ import { flagsInterceptor } from '../../utils/command'
 import { DESCRIPTIONS } from '../../utils/constants'
 
 export default class Run extends FactoryCommandWithVaults {
-  static readonly aliases = ['r', 'run', 'vr', 'vaults run']
+  static readonly aliases = ['vr', 'vaults run']
   static override readonly description = `Run a shell command on selected vaults (using Node.js child_process).\nDisclaimer: Any input containing shell metacharacters may be used to trigger arbitrary command execution, using of this command is at risk of command's caller`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',

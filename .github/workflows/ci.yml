@@ -1,0 +1,223 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Pre-release version (e.g., 0.7.0-beta.1)'
+        required: false
+        type: string
+jobs:
+  unit-tests:
+    name: Run Tests
+    strategy:
+      matrix:
+        os:
+          - 'ubuntu-latest'
+          - 'windows-latest'
+          - 'macos-latest'
+        node_version:
+          - 'lts/*'
+      fail-fast: false
+      max-parallel: 2
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: 'pnpm'
+      - run: pnpm run test:coverage
+      - name: Codecov Scan
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit.xml,!./cache
+          fail_ci_if_error: true
+
+  pre-release:
+    name: Create Pre-Release
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Extract version and create pre-release version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          PRE_VERSION="${VERSION}-beta.${TIMESTAMP}"
+
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "pre_version=${PRE_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ steps.version.outputs.pre_version }} --no-git-tag-version
+
+      - name: Build package
+        run: |
+          pnpm run build:release
+          pnpm oclif manifest
+          pnpm pack
+          ls -la *.tgz
+
+      - name: Generate dynamic changelog
+        id: changelog
+        run: |
+          # Get the latest semantic version tag (not pre-release)
+          LATEST_SEMVER_TAG=$(git tag -l | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || echo "")
+
+          # If no semver tag found, fallback to any tag
+          if [ -z "$LATEST_SEMVER_TAG" ]; then
+            LATEST_SEMVER_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          fi
+
+          # Generate changelog from commits since last semantic version
+          if [ -z "$LATEST_SEMVER_TAG" ]; then
+            # No previous tags, get commits from last 30 days
+            COMMITS=$(git log --oneline --since="30 days ago" --pretty=format:"- %s (%h)")
+            COMPARISON_TEXT="the last 30 days"
+          else
+            # Get commits since last semantic version tag
+            COMMITS=$(git log ${LATEST_SEMVER_TAG}..HEAD --oneline --pretty=format:"- %s (%h)")
+            COMPARISON_TEXT="v${LATEST_SEMVER_TAG#v}"
+          fi
+
+          # Count commits
+          COMMIT_COUNT=$(echo "$COMMITS" | wc -l | tr -d ' ')
+
+          # Detect if we have breaking changes, features, or fixes from conventional commits
+          BREAKING_CHANGES=$(echo "$COMMITS" | grep -i "BREAKING CHANGE\|!" | wc -l | tr -d ' ')
+          FEATURES=$(echo "$COMMITS" | grep -E "^- feat" | wc -l | tr -d ' ')
+          FIXES=$(echo "$COMMITS" | grep -E "^- fix" | wc -l | tr -d ' ')
+          CHORES=$(echo "$COMMITS" | grep -E "^- chore" | wc -l | tr -d ' ')
+
+          # Create changelog
+          cat > CHANGELOG.md << EOF
+          ## Pre-Release v${{ steps.version.outputs.pre_version }}
+
+          This pre-release contains **${COMMIT_COUNT} commits** since ${COMPARISON_TEXT} built from branch: \`${GITHUB_REF#refs/heads/}\` on \`$(date -u +"%Y-%m-%d %H:%M:%S UTC")\`.
+
+          ### Change Summary
+          - **Features**: ${FEATURES}
+          - **Fixes**: ${FIXES} 
+          - **Chores**: ${CHORES}
+          - **Breaking**: ${BREAKING_CHANGES}
+
+          ### Changes Since ${COMPARISON_TEXT}
+
+          Commits list include changes that can be used to identify potential points of interest for compatibility testing.
+
+          ${COMMITS}
+
+          ### Installation
+          \`\`\`bash
+          npm install -g https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.pre_version }}/ovm-${{ steps.version.outputs.pre_version }}.tgz
+          \`\`\`
+
+          ### Testing Instructions
+
+          Steps to test the pre-release:
+
+          1. Install the pre-release using the command above
+          2. Test your existing workflows and configurations
+          3. Test new features introduced in this pre-release
+
+          ### Feedback & Issues
+
+          You could report issues by using repository issue tracker: ${{ github.server_url }}/${{ github.repository }}/issues
+
+          EOF
+
+          echo "Generated changelog with ${COMMIT_COUNT} commits"
+
+      - name: Create GitHub Pre-Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.pre_version }}
+          name: OVM ${{ steps.version.outputs.pre_version }} (Pre-Release)
+          body_path: CHANGELOG.md
+          files: '*.tgz'
+          prerelease: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  manual-pre-release:
+    name: Manual Pre-Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Build and package
+        run: |
+          pnpm install
+          npm version ${{ inputs.version }} --no-git-tag-version
+          pnpm run build:release
+          pnpm oclif manifest
+          pnpm pack
+          ls -la *.tgz
+
+      - name: Create Manual Pre-Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: OVM ${{ inputs.version }} (Manual Pre-Release)
+          body: |
+            ## Manual Pre-Release v${{ inputs.version }}
+
+            ### 📦 Installation
+            ```bash
+            npm install -g https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/ovm-${{ inputs.version }}.tgz
+            ```
+          files: '*.tgz'
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,7 +4,7 @@
   "type": "commonjs",
   "version": "0.7.0",
   "license": "GPL-3.0-only",
-  "author": "Masoud Ghorbani",
+  "author": "Masoud Ghorbani Sarini",
   "homepage": "https://github.com/masoudgs/ovm",
   "bugs": "https://github.com/masoudgs/ovm/issues",
   "repository": "https://github.com/masoudgs/ovm.git",
@@ -22,15 +22,19 @@
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "oclif manifest && pnpm run build:release && pnpm run test",
     "test": "pnpm vitest",
+    "test:watch": "pnpm vitest --watch",
     "test:coverage": "pnpm run test --coverage",
     "prepare": "husky",
-    "generate:schema": "ts-node src/scripts/json-schema-export.ts"
+    "generate:schema": "ts-node src/scripts/json-schema-export.ts",
+    "dev": "pnpm run build:watch",
+    "clean": "rm -rf dist node_modules/.cache cache coverage"
   },
   "keywords": [
     "obsidian",
     "vaults",
     "cli",
-    "oclif"
+    "oclif",
+    "markdown"
   ],
   "bin": {
     "ovm": "./bin/run.js"

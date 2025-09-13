@@ -117,7 +117,7 @@ export const createMockDirent = (
 
 export const replaceVersionInfo = (input: string): string => {
   return input.replace(
-    /ovm\/[\d.]+\s+\w+-\w+\s+node-v[\d.]+/,
+    /ovm\/[\d.]+(?:-[\w.]+)?\s+\w+-\w+\s+node-v[\d.]+/,
     'ovm/X.X.X platform-arch node-vX.X.X',
   )
 }

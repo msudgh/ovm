@@ -37,9 +37,7 @@ COMMANDS
   pp Prune existing plugin(s) from vaults that are unspecified in the config file
   ps Sync plugin configuration files (data.json)
   pu Uninstall plugin(s) from vaults
-  r Run a shell command on selected vaults (using Node.js child_process).
   rs Statistics of vaults and installed plugins
-  run Run a shell command on selected vaults (using Node.js child_process).
   version
   vr Run a shell command on selected vaults (using Node.js child_process).
   vs Sync core and custom vault configuration files

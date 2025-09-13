@@ -3,7 +3,7 @@ import { platform, tmpdir } from 'os'
 import { isTestEnv } from '../utils/env'
 import { PluginRegistry } from './registry.types'
 
-const isProduction = !isTestEnv
+const isProduction = !isTestEnv()
 const cacheSubdir = isProduction ? 'obsidian-utils' : 'obsidian-utils-test'
 
 // 1 hour for production, 24 hours for tests

@@ -173,7 +173,7 @@ $ ovm reports stats
 
 ## `ovm vaults run`
 
-Aliases: `ovm vr` / `ovm r` / `ovm run`
+Aliases: `ovm vr` / `ovm vaults run`
 
 Run a shell command on selected vaults (using Node.js child_process).
 
@@ -232,17 +232,17 @@ List of placeholders:
 Examples:
 
 - Echo vault(s) path
-  - `ovm run "echo 'Path: {0}'"`
+  - `ovm vaults run "echo 'Path: {0}'"`
 - Echo vault(s) path and name
-  - `ovm run "echo 'Path: {0}, Name: {1}'"`
+  - `ovm vaults run "echo 'Path: {0}, Name: {1}'"`
 - Echo vault(s) name and silent the command's result
-  - `ovm run -s "echo 'Path: {0}'"`
+  - `ovm vaults run -s "echo 'Path: {0}'"`
 - Create an archive of vault(s) by `tar` command
-  - `ovm run "tar -cf '{0}.tar' '{0}'"`
+  - `ovm vaults run "tar -cf '{0}.tar' '{0}'"`
 - Encrypt vault(s) directory by `gpg` command [algo: `AES256`, passphrase `password`]
-  - `ovm run "tar -cf '{0}.tar' '{0}' && gpg --batch --symmetric --cipher-algo AES256 --passphrase 'password' '{0}.tar'"`
+  - `ovm vaults run "tar -cf '{0}.tar' '{0}' && gpg --batch --symmetric --cipher-algo AES256 --passphrase 'password' '{0}.tar'"`
 - Decrypt the archive of vault(s) by `gpg` command [passphrase: `password`]
-  - `ovm run "gpg -q --batch --decrypt --passphrase 'password' -o '{0}.tar' '{0}.tar.gpg'"`
+  - `ovm vaults run "gpg -q --batch --decrypt --passphrase 'password' -o '{0}.tar' '{0}.tar.gpg'"`
 
 ## `ovm vaults sync`
 
