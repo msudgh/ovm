@@ -4,6 +4,10 @@
     "ConfigSchema": {
       "type": "object",
       "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "JSON Schema for the config"
+        },
         "plugins": {
           "type": "array",
           "items": {
@@ -59,6 +63,7 @@
                     "description": "For plugin configs, the plugin ID"
                   },
                   "mergeStrategy": {
+                    "default": "replace",
                     "description": "Merge strategy for this config"
                   },
                   "vaults": {
@@ -70,6 +75,7 @@
                   },
                   "onlyIfInstalled": {
                     "type": "boolean",
+                    "default": true,
                     "description": "For plugin configs, only sync if plugin is installed"
                   },
                   "include": {
@@ -85,6 +91,14 @@
                       "type": "string"
                     },
                     "description": "Specific keys to exclude when merging"
+                  },
+                  "backup": {
+                    "type": "boolean",
+                    "description": "Create .bak backup if destination exists (default: inherits from command flags)"
+                  },
+                  "overwrite": {
+                    "type": "boolean",
+                    "description": "Overwrite existing files without prompting (default: inherits from command flags)"
                   }
                 },
                 "required": ["source", "target"],
