@@ -103,13 +103,18 @@ const action = async (
           return acc
         }, {})
 
+      const totalInstalledPlugins = Object.keys(sortedInstalledPlugins).length
+
       if (flags.output === 'table') {
         console.table(result.totalStats)
-        console.table(sortedInstalledPlugins)
+
+        if (totalInstalledPlugins > 0) {
+          console.log(sortedInstalledPlugins)
+        }
       } else if (flags.output === 'json') {
         console.log(JSON.stringify(result.totalStats, null, 2))
 
-        if (Object.keys(sortedInstalledPlugins).length > 0) {
+        if (totalInstalledPlugins > 0) {
           console.log(JSON.stringify(sortedInstalledPlugins, null, 2))
         }
       }
