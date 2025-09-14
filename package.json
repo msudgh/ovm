@@ -14,7 +14,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.release.json",
     "build:watch": "rm -rf dist && tsc -p tsconfig.release.json -w",
     "build:release": "rm -rf dist && tsc -p tsconfig.release.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.release.json --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier -c \"**/*.{ts,json,md}\"",
