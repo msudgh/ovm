@@ -78,7 +78,7 @@
     "@inquirer/core": "10.1.6",
     "@inquirer/prompts": "7.3.1",
     "@oclif/core": "4.2.6",
-    "@oclif/plugin-help": "6.2.24",
+    "@oclif/plugin-help": "6.2.33",
     "@oclif/plugin-version": "^2.2.32",
     "async": "3.2.6",
     "date-fns": "4.1.0",
@@ -151,5 +151,5 @@
       "pnpm run format:write"
     ]
   },
-  "packageManager": "pnpm@10.16.0"
+  "packageManager": "pnpm@10.16.1"
 }
