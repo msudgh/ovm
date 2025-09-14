@@ -51,17 +51,13 @@ jobs:
           node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
       - run: pnpm run test:coverage
-      - name: Codecov Scan
-        uses: codecov/codecov-action@v5
+      - name: Upload test results artifact
+        if: matrix.os == 'ubuntu-latest' && matrix.node_version == 'lts/*'
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: junit.xml,!./cache
-          fail_ci_if_error: true
+          name: test-results
+          path: junit.xml
+          retention-days: 1
 
   pre-release:
     name: Create Pre-Release
@@ -266,3 +262,26 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm audit --audit-level moderate
+
+  codecov-upload:
+    name: Upload Test Coverage to Codecov
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download test results artifact (Ubuntu LTS)
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+      - name: Codecov Scan
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: test-results/junit.xml
+          fail_ci_if_error: true
