@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Obsidian**: For managing Obsidian vaults
-- **Node.js**: Version 18.0.0 or higher
+- **Node.js**: Version 20.0.0 or higher
 - **npm**: Pre-installed with Node.js
 
 ## Global Installation

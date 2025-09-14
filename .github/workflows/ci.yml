@@ -28,13 +28,13 @@ jobs:
           - 'windows-latest'
           - 'macos-latest'
         node_version:
-          - '18'
+          - '20'
           - 'lts/*'
         exclude:
           - os: 'windows-latest'
-            node_version: '18'
+            node_version: '20'
           - os: 'macos-latest'
-            node_version: '18'
+            node_version: '20'
       fail-fast: false
       max-parallel: 4
     runs-on: ${{ matrix.os }}
@@ -237,7 +237,7 @@ jobs:
           run_install: true
       - uses: actions/setup-node@v4
         with:
-          node-version: 'lts'
+          node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm run lint
       - run: pnpm run typecheck
@@ -263,6 +263,6 @@ jobs:
           run_install: true
       - uses: actions/setup-node@v4
         with:
-          node-version: 'lts'
+          node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm audit --audit-level moderate
