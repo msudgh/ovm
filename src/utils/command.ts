@@ -5,6 +5,7 @@ import { Vault } from 'obsidian-utils'
 import { CommonFlags } from '../types/commands'
 import { RESERVED_VARIABLES } from './constants'
 import { enableDebugLogLevel, enableLoggingTimestamp, logger } from './logger'
+
 export const flagsInterceptor = <T extends CommonFlags>(flags: T): T => {
   const { debug, timestamp } = flags
 
