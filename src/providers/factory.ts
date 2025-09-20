@@ -1,6 +1,8 @@
 import { Command, Flags } from '@oclif/core'
+import { OutputFormat } from '../types/commands'
 import { handlerCommandError } from '../utils/command'
 import { DEFAULT_CONFIG_PATH, DESCRIPTIONS } from '../utils/constants'
+import { outputFormats } from '../utils/flags'
 
 const commonFlags = {
   debug: Flags.boolean({
@@ -20,6 +22,13 @@ const commonFlags = {
     required: false,
   }),
 }
+
+const outputFlag = Flags.string({
+  char: 'o',
+  description: DESCRIPTIONS.output,
+  default: 'table' as OutputFormat,
+  options: outputFormats,
+})
 
 class FactoryCommand extends Command {
   static readonly commonFlags = commonFlags
@@ -54,4 +63,4 @@ class FactoryCommandWithVaults extends Command {
   }
 }
 
-export { FactoryCommand, FactoryCommandWithVaults }
+export { FactoryCommand, FactoryCommandWithVaults, outputFlag }

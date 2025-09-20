@@ -1,3 +1,5 @@
+import { checkbox } from '@inquirer/prompts'
+import { access, readdir, readFile, writeFile } from 'fs/promises'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMockDirent } from '../utils/testing'
 import {
@@ -38,9 +40,6 @@ vi.mock('../utils/logger', () => ({
     })),
   },
 }))
-
-import { checkbox } from '@inquirer/prompts'
-import { access, readdir, readFile, writeFile } from 'fs/promises'
 
 describe('Plugins Provider', () => {
   beforeEach(() => {
@@ -109,8 +108,8 @@ describe('Plugins Provider', () => {
 
     it('should validate that at least one plugin is selected', async () => {
       const mockPlugins = [
-        { id: 'plugin-a', name: 'Plugin A' },
-        { id: 'plugin-b', name: 'Plugin B' },
+        { id: 'plugin-a', name: 'Plugin A', value: 'plugin-a' },
+        { id: 'plugin-b', name: 'Plugin B', value: 'plugin-b' },
       ]
 
       vi.mocked(checkbox).mockResolvedValue([mockPlugins[0]])

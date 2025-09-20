@@ -45,10 +45,8 @@ vi.mock('fs/promises', async () => {
   }
 })
 
-vi.mock('fast-folder-size', () => ({
-  default: vi.fn().mockImplementation((path, callback) => {
-    callback(null, 1024) // Mock 1KB folder size
-  }),
+vi.mock('../../utils/fs', () => ({
+  getFileSize: vi.fn().mockResolvedValue(1024n), // Mock 1KB folder size as bigint
 }))
 
 describe('Command: stats', () => {
