@@ -11,6 +11,8 @@ export type CommonFlags = {
   config: string
 }
 
+export type OutputFormat = 'table' | 'json'
+
 export type CommonFlagsWithPath = CommonFlags & {
   path: string
   async?: boolean
@@ -88,7 +90,8 @@ export interface UninstallPluginVaultOpts {
 }
 
 export interface StatsFlags {
-  output: string
+  // Assume OutputFormat type is populated at runtime
+  output?: string
 }
 
 export type StatsArgs = Record<string, unknown>

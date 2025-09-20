@@ -11,10 +11,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.release.json",
-    "build:watch": "rm -rf dist && tsc -p tsconfig.release.json -w",
-    "build:release": "rm -rf dist && tsc -p tsconfig.release.json",
-    "typecheck": "tsc -p tsconfig.release.json --noEmit",
+    "build": "tsc -p tsconfig.release.json",
+    "build:watch": "pnpm run build -w",
+    "build:release": "rm -rf dist && pnpm run build",
+    "build:check": "pnpm run build --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier -c \"**/*.{ts,json,md}\"",
@@ -82,8 +82,6 @@
     "@oclif/plugin-version": "^2.2.32",
     "async": "3.2.6",
     "date-fns": "4.1.0",
-    "fast-folder-size": "2.4.0",
-    "filesize": "10.1.6",
     "glob": "11.0.1",
     "inquirer": "12.4.1",
     "node-fetch-cache": "5.0.2",
@@ -146,5 +144,5 @@
       "pnpm run format:write"
     ]
   },
-  "packageManager": "pnpm@10.16.1"
+  "packageManager": "pnpm@10.17.0"
 }

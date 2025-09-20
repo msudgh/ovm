@@ -5,6 +5,7 @@ import { platform, tmpdir } from 'os'
 import path from 'path'
 import { ConfigSchema, createDefaultConfig } from '../services/config/index'
 import { Config } from '../services/config/index.types'
+import { OutputFormat } from '../types/commands'
 import { OVM_CONFIG_FILENAME } from './constants'
 import { CUSTOM_COMMAND_LOGGER_FILE } from './logger'
 
@@ -80,7 +81,7 @@ export const getTestCommonWithVaultPathFlags = (
   timestamp: false,
   config: configFilePath,
   path: vaultPath,
-  output: 'json',
+  output: 'json' as OutputFormat,
 })
 
 export const destroyVault = (vaultPath: string) => {

@@ -33,6 +33,7 @@ module.exports = [
     languageOptions: {
       globals: {
         ...globals.node,
+        NodeJS: 'readonly',
         // Vitest globals
         describe: 'readonly',
         it: 'readonly',

@@ -7,8 +7,6 @@ import { RESERVED_VARIABLES } from './constants'
 import { isTestEnv } from './env'
 import { enableDebugLogLevel, enableLoggingTimestamp, logger } from './logger'
 
-const isTest = isTestEnv()
-
 export const flagsInterceptor = <T extends CommonFlags>(flags: T): T => {
   const { debug, timestamp } = flags
 
@@ -33,7 +31,7 @@ export const handlerCommandError = (error: unknown) => {
     logger.debug('Exit prompt error:', { error })
     console.log('Selection canceled.')
 
-    if (!isTest) {
+    if (!isTestEnv()) {
       process.exit(0)
     }
   } else {

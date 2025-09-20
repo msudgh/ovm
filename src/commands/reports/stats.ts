@@ -1,9 +1,8 @@
-import { Flags, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/factory'
+import { flush } from '@oclif/core'
+import { FactoryCommandWithVaults, outputFlag } from '../../providers/factory'
 import { action } from '../../services/vault/stats'
 import { FactoryFlagsWithVaults, StatsFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-import { DESCRIPTIONS } from '../../utils/constants'
 
 export default class Stats extends FactoryCommandWithVaults {
   static readonly aliases = ['rs', 'reports stats']
@@ -14,12 +13,7 @@ export default class Stats extends FactoryCommandWithVaults {
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
   ]
   static override readonly flags = {
-    output: Flags.string({
-      char: 'o',
-      description: DESCRIPTIONS.output,
-      default: 'table',
-      options: ['table', 'json'],
-    }),
+    output: outputFlag,
     ...this.commonFlags,
   }
 

@@ -1,12 +1,9 @@
 import { ArgInput } from '@oclif/core/lib/interfaces'
 import { each } from 'async'
-import fastFolderSize from 'fast-folder-size'
-import { filesize } from 'filesize'
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
 import { isPluginInstalled, vaultPathToPluginsPath } from 'obsidian-utils'
 import { join } from 'path'
-import { promisify } from 'util'
 import {
   getSelectedVaults,
   mapVaultsIteratorItem,
@@ -21,6 +18,7 @@ import {
   StatsFlags,
 } from '../../types/commands'
 import { handlerCommandError } from '../../utils/command'
+import { getFileSize } from '../../utils/fs'
 import { logger } from '../../utils/logger'
 import { loadConfig } from '../config'
 
@@ -51,8 +49,8 @@ const statsVaultIterator: StatsCommandIterator = async (item) => {
     const manifestFile = await readFile(pluginDir + '/manifest.json', 'utf8')
     const manifestVersion = (JSON.parse(manifestFile) as { version: string })
       .version
-    const pluginDirSize = await promisify(fastFolderSize)(pluginDir)
-    const pluginNameWithSize = `${stagePlugin.id}@${manifestVersion} (${filesize(pluginDirSize as number)})`
+    const pluginSize = await getFileSize(pluginDir)
+    const pluginNameWithSize = `${stagePlugin.id}@${manifestVersion} (${pluginSize})`
 
     if (await isPluginInstalled(stagePlugin.id, vault.path)) {
       stats.installedPlugins += 1
@@ -63,6 +61,11 @@ const statsVaultIterator: StatsCommandIterator = async (item) => {
         ]),
       ]
     }
+  }
+
+  if (!stats.installedPlugins) {
+    childLogger.debug('No plugins installed')
+    return stats
   }
 
   return stats
