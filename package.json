@@ -79,7 +79,7 @@
     "@inquirer/prompts": "7.3.1",
     "@oclif/core": "4.2.6",
     "@oclif/plugin-help": "6.2.33",
-    "@oclif/plugin-version": "^2.2.32",
+    "@oclif/plugin-version": "^2.2.33",
     "async": "3.2.6",
     "date-fns": "4.1.0",
     "glob": "11.0.1",
