@@ -1,17 +1,16 @@
 import { Args, Flags, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import installService from '../../services/install'
+import { FactoryCommandWithVaults } from '../../providers/factory'
+import { action } from '../../services/plugin/install'
 import { FactoryFlagsWithVaults, InstallFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-
-const { action } = installService
+import { DESCRIPTIONS } from '../../utils/constants'
 
 /**
  * Install command installs specified plugins in vaults.
  */
 export default class Install extends FactoryCommandWithVaults {
   static readonly aliases = ['pi', 'plugins install']
-  static override readonly description = `Install plugin(s) in specified vaults.`
+  static override readonly description = `Install plugin(s) in specified vaults`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
@@ -28,7 +27,7 @@ export default class Install extends FactoryCommandWithVaults {
   }
   static override readonly args = {
     pluginId: Args.string({
-      description: 'Specific Plugin ID to install',
+      description: DESCRIPTIONS.performOnSpecificPlugin,
       required: false,
     }),
   }
@@ -44,7 +43,7 @@ export default class Install extends FactoryCommandWithVaults {
   public async run(): Promise<void> {
     try {
       const { args, flags } = await this.parse(Install)
-      return action(
+      await action(
         args,
         flagsInterceptor<FactoryFlagsWithVaults<InstallFlags>>(flags),
       )

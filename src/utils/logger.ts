@@ -1,6 +1,6 @@
 import { tmpdir } from 'os'
 import { join } from 'path'
-import { createLogger, format, transports } from 'winston'
+import { createLogger, format, Logform, transports } from 'winston'
 import {
   CommonFlags,
   FactoryFlags,
@@ -12,7 +12,7 @@ export const CUSTOM_COMMAND_LOGGER_FILE = join(
   'ovm-custom-command.json',
 )
 
-const getFormat = () => {
+export const getFormat = (): Logform.Format => {
   const jsonLogging = process.env.OVM_ENABLE_LOG_JSON === 'true'
   const enableTimestamp = process.env.OVM_ENABLE_LOG_TIMESTAMP === 'true'
   return format.combine(

@@ -1,11 +1,8 @@
 import { flush } from '@oclif/core'
 import { ArgInput } from '@oclif/core/lib/parser'
-import { FactoryCommand } from '../../providers/command'
-import {
-  Config,
-  createDefaultConfig,
-  safeLoadConfig,
-} from '../../services/config'
+import { FactoryCommand } from '../../providers/factory'
+import { createDefaultConfig, safeLoadConfig } from '../../services/config'
+import { Config } from '../../services/config/index.types'
 import {
   FactoryFlags,
   InitCommandCallback,
@@ -18,7 +15,7 @@ import { flagsInterceptor } from '../../utils/command'
  */
 export default class Init extends FactoryCommand {
   static readonly aliases = ['ci', 'config init']
-  static override readonly description = `Configure an ovm.json config file in user's home dir.`
+  static override readonly description = `Configure an ovm.json config file in user's home dir`
   static override readonly examples = ['<%= config.bin %> <%= command.id %>']
   static override readonly flags = {
     ...this.commonFlags,
@@ -32,7 +29,7 @@ export default class Init extends FactoryCommand {
   public async run() {
     try {
       const { args, flags } = await this.parse(Init)
-      return action(args, flagsInterceptor<FactoryFlags<InitFlags>>(flags))
+      await action(args, flagsInterceptor<FactoryFlags<InitFlags>>(flags))
     } catch (error) {
       this.handleError(error)
     } finally {

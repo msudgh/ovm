@@ -1,4 +1,4 @@
-import { Plugin } from '../../services/config'
+import { Plugin } from '../../services/config/index.types'
 
 export const plugin1: Plugin = {
   id: 'obsidian-linter',

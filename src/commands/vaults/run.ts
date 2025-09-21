@@ -1,14 +1,12 @@
 import { Args, Flags, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import runService from '../../services/run'
+import { FactoryCommandWithVaults, outputFlag } from '../../providers/factory'
+import { action } from '../../services/vault/run'
 import { FactoryFlagsWithVaults, RunFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
 
-const { action } = runService
-
 export default class Run extends FactoryCommandWithVaults {
-  static readonly aliases = ['r', 'run', 'vr', 'vaults run']
-  static override readonly description = `Run a shell command on selected vaults (using Node.js child_process).\nDisclaimer: Any input containing shell metacharacters may be used to trigger arbitrary command execution, using of this command is at risk of command's caller.`
+  static readonly aliases = ['vr', 'vaults run']
+  static override readonly description = `Run a shell command on selected vaults (using Node.js child_process).\nDisclaimer: Any input containing shell metacharacters may be used to trigger arbitrary command execution, using of this command is at risk of command's caller`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian --output=json',
@@ -18,32 +16,27 @@ export default class Run extends FactoryCommandWithVaults {
     '<%= config.bin %> <%= command.id %> --output=json --cwd=/path/to/vaults',
   ]
   static override readonly flags = {
-    output: Flags.string({
-      char: 'o',
-      description: 'Display the output with a specific transformer.',
-      default: 'table',
-      options: ['table', 'json'],
-    }),
+    output: outputFlag,
     unescape: Flags.boolean({
       char: 'u',
       description:
-        'Unescape special characters in a command to run as a single command.',
+        'Unescape special characters in a command to run as a single command',
       default: true,
     }),
     async: Flags.boolean({
       char: 'a',
-      description: 'Run the command in parallel on the vault(s).',
+      description: 'Run the command in parallel on the vault(s)',
       default: true,
     }),
     silent: Flags.boolean({
       char: 's',
-      description: 'Silent on results of the custom command on vault(s).',
+      description: 'Silent on results of the custom command on vault(s)',
       default: false,
     }),
     cwd: Flags.string({
       char: 'w',
       description:
-        '[default: vault path] Set working directory for custom command.',
+        '[default: vault path] Set working directory for custom command',
     }),
     ...this.commonFlagsWithPath,
   }
@@ -51,7 +44,7 @@ export default class Run extends FactoryCommandWithVaults {
   static override readonly args = {
     command: Args.string({
       description:
-        'Command to run and use specified vaults with each execution.',
+        'Command to run and use specified vaults with each execution',
       required: true,
       default: '',
     }),

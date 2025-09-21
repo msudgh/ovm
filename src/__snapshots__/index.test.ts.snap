@@ -1,0 +1,46 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ovm CLI > help > prints for a topic 1`] = `
+"Manage plugins of the vaults
+
+USAGE
+  $ ovm plugins COMMAND
+
+COMMANDS
+  plugins install Install plugin(s) in specified vaults
+  plugins prune Prune existing plugin(s) from vaults that are unspecified in the config file
+  plugins sync Sync plugin configuration files (data.json)
+  plugins uninstall Uninstall plugin(s) from vaults
+
+"
+`;
+
+exports[`ovm CLI > help > prints top-level 1`] = `
+"OVM is a CLI application for managing Obsidian vaults.
+
+VERSION
+  ovm/X.X.X platform-arch node-vX.X.X
+
+USAGE
+  $ ovm [COMMAND]
+
+TOPICS
+  config Configure an ovm.json config file in user's home dir
+  plugins Manage plugins of the vaults
+  reports Reports on vaults
+  vaults Perform tasks on vaults
+
+COMMANDS
+  ci Configure an ovm.json config file in user's home dir
+  help Display help for ovm.
+  pi Install plugin(s) in specified vaults
+  pp Prune existing plugin(s) from vaults that are unspecified in the config file
+  ps Sync plugin configuration files (data.json)
+  pu Uninstall plugin(s) from vaults
+  rs Statistics of vaults and installed plugins
+  version
+  vr Run a shell command on selected vaults (using Node.js child_process).
+  vs Sync core and custom vault configuration files
+
+"
+`;

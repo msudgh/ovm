@@ -1,3 +1,23 @@
 # Exclude test files
 *.test.js
 *.spec.js
+
+# Exclude testing utilities from published package
+dist/utils/testing.d.ts
+dist/utils/testing.js
+dist/utils/testing.js.map
+
+# Exclude scripts directory from published package
+dist/scripts/
+
+# Exclude additional test-related files
+**/*.test.js
+**/*.test.d.ts
+**/*.test.js.map
+
+# Exclude development and build artifacts
+src/
+coverage/
+junit.xml
+cache/
+tsconfig.tsbuildinfo

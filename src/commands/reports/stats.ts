@@ -1,26 +1,19 @@
-import { Flags, flush } from '@oclif/core'
-import { FactoryCommandWithVaults } from '../../providers/command'
-import statsService from '../../services/stats'
+import { flush } from '@oclif/core'
+import { FactoryCommandWithVaults, outputFlag } from '../../providers/factory'
+import { action } from '../../services/vault/stats'
 import { FactoryFlagsWithVaults, StatsFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
 
-const { action } = statsService
-
 export default class Stats extends FactoryCommandWithVaults {
   static readonly aliases = ['rs', 'reports stats']
-  static override readonly description = `Statistics of vaults and installed plugins.`
+  static override readonly description = `Statistics of vaults and installed plugins`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/*/.obsidian',
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
   ]
   static override readonly flags = {
-    output: Flags.string({
-      char: 'o',
-      description: 'Display the output with a specific transformer.',
-      default: 'table',
-      options: ['table', 'json'],
-    }),
+    output: outputFlag,
     ...this.commonFlags,
   }
 
@@ -35,7 +28,7 @@ export default class Stats extends FactoryCommandWithVaults {
   public async run(): Promise<void> {
     try {
       const { args, flags } = await this.parse(Stats)
-      return await action(
+      await action(
         args,
         flagsInterceptor<FactoryFlagsWithVaults<StatsFlags>>(flags),
       )

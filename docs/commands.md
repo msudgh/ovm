@@ -3,7 +3,7 @@
 > OVM automatically detects Obsidian vaults for related commands and by using the `-p` flag with a path or a Glob pattern specify custom vaults (e.g., ~/Documents/obsidian/\*).
 > The content used in the examples below is for illustrative purposes only. e.g. In the output sections, the vaults are stored in `~/Documents/` directory.
 
-All commands have a common set of options:
+All of the commands have a common set of options:
 
 ```bash
   -c, --config=<value>  [default: ~/ovm.json] Path to the config file.
@@ -107,6 +107,41 @@ info: Removed plugin {"pluginId":"dataview","vaultPath":"~/Documents/obsidian/Go
 info: Uninstalled 3 plugins {"vault":{"name":"Goals","path":"~/Documents/obsidian/Goals"}}
 ```
 
+## `ovm plugins sync`
+
+Aliases: `ovm ps` / `ovm plugins sync`
+
+Sync plugin configuration files (data.json) defined in ovm.json (sync) across vaults.
+
+- _Usage:_ `ovm help plugins sync`
+- _See code:_ [src/commands/plugins/sync.ts](src/commands/plugins/sync.ts)
+
+Options:
+
+- `--overwrite`: Overwrite existing destination files (default: true)
+- `--backup`: Create a .bak backup if destination exists (default: true)
+- `--only-installed`: Skip vaults where plugin is not installed (default: true)
+- `--plugin-id`: Sync only specific plugin (if not specified, sync all plugins)
+- `--merge-strategy`: Strategy for merging configs - replace, merge, smart (default: replace)
+
+Output
+
+```bash
+$ ovm plugins sync --path=/path/to/vaults/**/.obsidian
+? Select the vaults: Career, Work, Personal
+info: Syncing plugin configs on selected vaults... {"vaults":3,"pluginId":"all plugins"}
+info: Merged ./configs/dataview-settings.json into ~/Documents/obsidian/Career/.obsidian/plugins/dataview/data.json using strategy: replace
+info: Merged ./configs/calendar-settings.json into ~/Documents/obsidian/Career/.obsidian/plugins/calendar/data.json using strategy: replace
+info: Skipped dataview config, plugin not installed in ~/Documents/obsidian/Work
+info: Plugin config sync finished!
+```
+
+Examples:
+
+- Sync all plugin configurations: `ovm plugins sync`
+- Sync specific plugin: `ovm plugins sync --plugin-id=dataview --no-backup`
+- Use smart merge strategy: `ovm plugins sync --merge-strategy=smart`
+
 ## `ovm reports stats`
 
 Aliases: `ovm rs`
@@ -138,7 +173,7 @@ $ ovm reports stats
 
 ## `ovm vaults run`
 
-Aliases: `ovm vr` / `ovm r` / `ovm run`
+Aliases: `ovm vr` / `ovm vaults run`
 
 Run a shell command on selected vaults (using Node.js child_process).
 
@@ -197,14 +232,47 @@ List of placeholders:
 Examples:
 
 - Echo vault(s) path
-  - `ovm run "echo 'Path: {0}'"`
+  - `ovm vaults run "echo 'Path: {0}'"`
 - Echo vault(s) path and name
-  - `ovm run "echo 'Path: {0}, Name: {1}'"`
+  - `ovm vaults run "echo 'Path: {0}, Name: {1}'"`
 - Echo vault(s) name and silent the command's result
-  - `ovm run -s "echo 'Path: {0}'"`
+  - `ovm vaults run -s "echo 'Path: {0}'"`
 - Create an archive of vault(s) by `tar` command
-  - `ovm run "tar -cf '{0}.tar' '{0}'"`
+  - `ovm vaults run "tar -cf '{0}.tar' '{0}'"`
 - Encrypt vault(s) directory by `gpg` command [algo: `AES256`, passphrase `password`]
-  - `ovm run "tar -cf '{0}.tar' '{0}' && gpg --batch --symmetric --cipher-algo AES256 --passphrase 'password' '{0}.tar'"`
+  - `ovm vaults run "tar -cf '{0}.tar' '{0}' && gpg --batch --symmetric --cipher-algo AES256 --passphrase 'password' '{0}.tar'"`
 - Decrypt the archive of vault(s) by `gpg` command [passphrase: `password`]
-  - `ovm run "gpg -q --batch --decrypt --passphrase 'password' -o '{0}.tar' '{0}.tar.gpg'"`
+  - `ovm vaults run "gpg -q --batch --decrypt --passphrase 'password' -o '{0}.tar' '{0}.tar.gpg'"`
+
+## `ovm vaults sync`
+
+Aliases: `ovm vs`
+
+Sync core and custom vault configuration files defined in ovm.json (sync) across vaults.
+
+- _Usage:_ `ovm help vaults sync`
+- _See code:_ [src/commands/vaults/sync.ts](src/commands/vaults/sync.ts)
+
+Options:
+
+- `--overwrite`: Overwrite existing destination files (default: true)
+- `--backup`: Create a .bak backup if destination exists (default: true)
+- `--merge-strategy`: Strategy for merging configs - replace, merge, smart (default: replace)
+
+Output
+
+```bash
+$ ovm vaults sync --path=/path/to/vaults/**/.obsidian
+? Select the vaults: Career, Work, Personal
+info: Syncing core vault configs on selected vaults... {"vaults":3}
+info: Copied ./configs/appearance.json to ~/Documents/obsidian/Goals/.obsidian/appearance.json
+info: Copied ./configs/app.json to ~/Documents/obsidian/Notes/.obsidian/app.json
+info: Merged ./configs/workspace.json into ~/Documents/obsidian/Career/.obsidian/workspace.json using strategy: replace
+info: Vault core config sync finished!
+```
+
+Examples:
+
+- Sync all core configurations: `ovm vaults sync`
+- No backup: `ovm vaults sync --no-backup`
+- Use smart merge strategy: `ovm vaults sync --merge-strategy=smart`

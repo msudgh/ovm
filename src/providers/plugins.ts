@@ -8,7 +8,7 @@ import {
   writeFile,
 } from 'fs/promises'
 import { vaultPathToPluginsPath } from 'obsidian-utils'
-import { Plugin } from '../services/config'
+import { Plugin } from '../services/config/index.types'
 import { logger } from '../utils/logger'
 
 export const removePluginDir = async (pluginId: string, vaultPath: string) => {

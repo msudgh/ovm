@@ -25,15 +25,25 @@ const rulesConfig = [
   },
 ]
 
-const ignoresConfig = [{ ignores: ['dist', 'bin', 'eslint.config.cjs', 'coverage'] }]
+const ignoresConfig = [{ ignores: ['dist', 'bin', 'eslint.config.cjs', 'coverage', 'vitest.config.ts'] }]
 
 module.exports = [
   {
-    files: ['**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
+    files: ['**/*.ts', '**/*.mts', '**/*.test.ts', '**/*.test.mts', '**/*.spec.ts'],
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.mocha,
+        NodeJS: 'readonly',
+        // Vitest globals
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        vi: 'readonly',
       },
       parserOptions: {
         projectService: true,
