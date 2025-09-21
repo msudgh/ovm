@@ -4,11 +4,11 @@ import { syncMergeStrategy } from '../../services/config'
 import { action } from '../../services/plugin/pluginSync'
 import { FactoryFlagsWithVaults, PluginSyncFlags } from '../../types/commands'
 import { flagsInterceptor } from '../../utils/command'
-import { DESCRIPTIONS } from '../../utils/constants'
+import { DESCRIPTIONS, PLUGIN_CONFIG_FILE_NAME } from '../../utils/constants'
 
 export default class PluginSync extends FactoryCommandWithVaults {
   static readonly aliases = ['ps', 'plugins sync']
-  static override readonly description = `Sync plugin configuration files (data.json)`
+  static override readonly description = `Sync plugin configuration files (${PLUGIN_CONFIG_FILE_NAME})`
   static override readonly examples = [
     '<%= config.bin %> <%= command.id %> --path=/path/to/vaults/**/.obsidian',
     '<%= config.bin %> <%= command.id %> --plugin-id=calendar --no-backup',

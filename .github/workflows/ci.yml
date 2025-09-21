@@ -236,7 +236,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - run: pnpm run lint
-      - run: pnpm run typecheck
+      - run: pnpm run build:check
       - run: pnpm run format:check
 
   dependency-review:

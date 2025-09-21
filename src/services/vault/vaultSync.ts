@@ -1,5 +1,5 @@
 import { each } from 'async'
-import { SyncConfigOptions, syncFileToVault } from '../../providers/sync'
+import { syncFileToVault } from '../../providers/sync'
 import {
   getSelectedVaults,
   mapVaultsIteratorItem,
@@ -34,7 +34,7 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
         entry.source,
         getSourceBaseDir(config, flags),
       )
-      const options: SyncConfigOptions = {
+      const result = await syncFileToVault({
         source: sourcePath,
         target: entry.target,
         type: entry.type,
@@ -47,8 +47,7 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
         backup: entry.backup ?? flags.backup,
         // Core configs don't need onlyIfInstalled check
         onlyIfInstalled: false,
-      }
-      const result = await syncFileToVault(options)
+      })
 
       if (result) {
         synced++
@@ -60,7 +59,9 @@ const syncVaultCoreIterator: VaultSyncCommandIterator = async (item) => {
         `Failed to sync core config ${entry.source} to ${vault.name}:`,
         error,
       )
-      skipped++
+
+      // Propagate error
+      throw error as Error
     }
   }
 
