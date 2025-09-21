@@ -16,7 +16,7 @@ COMMANDS
 `;
 
 exports[`ovm CLI > help > prints top-level 1`] = `
-"Obsidian Vaults Manager
+"OVM is a CLI application for managing Obsidian vaults.
 
 VERSION
   ovm/X.X.X platform-arch node-vX.X.X

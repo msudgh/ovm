@@ -1,6 +1,6 @@
 {
   "name": "ovm",
-  "description": "Obsidian Vaults Manager",
+  "description": "OVM is a CLI application for managing Obsidian vaults.",
   "type": "commonjs",
   "version": "0.7.0",
   "license": "GPL-3.0-only",
