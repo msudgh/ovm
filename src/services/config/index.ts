@@ -1,5 +1,4 @@
-import fse from 'fs-extra'
-import { readFile, writeFile } from 'fs/promises'
+import { mkdir, readFile, writeFile } from 'fs/promises'
 import { GitHubPluginVersion } from 'obsidian-utils'
 import { dirname } from 'path'
 import z from 'zod'
@@ -147,9 +146,8 @@ export const writeConfig = async (
 ): Promise<void> => {
   logger.debug('Writing config', { path })
 
-  // Ensure the directory exists before writing the file
   const configDir = dirname(path)
-  await fse.ensureDir(configDir)
+  await mkdir(configDir, { recursive: true })
 
   const content = JSON.stringify(config, null, 2)
 

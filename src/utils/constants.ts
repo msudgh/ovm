@@ -23,3 +23,4 @@ export const DESCRIPTIONS = {
   mergeStrategy: `Strategy for merging configs: ${syncMergeStrategy.join(', ')}`,
   performOnSpecificPlugin: 'Perform action only on the specified plugin',
 }
+export const PLUGIN_CONFIG_FILE_NAME = 'data.json'

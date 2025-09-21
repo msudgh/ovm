@@ -4,6 +4,7 @@ import { exec } from 'child_process'
 import { Vault } from 'obsidian-utils'
 import { CommonFlags } from '../types/commands'
 import { RESERVED_VARIABLES } from './constants'
+import { isTestEnv } from './env'
 import { enableDebugLogLevel, enableLoggingTimestamp, logger } from './logger'
 
 export const flagsInterceptor = <T extends CommonFlags>(flags: T): T => {
@@ -22,12 +23,17 @@ export const handlerCommandError = (error: unknown) => {
     throw error
   }
 
-  // Detect ExitPromptError by instanceof or by name to handle mocked or real errors
-  const isExitPrompt =
+  // Detect ExitPromptError to gracefully exit with a user-friendly message
+  if (
     error instanceof ExitPromptError ||
     (error instanceof Error && error.name === 'ExitPromptError')
-  if (isExitPrompt) {
+  ) {
     logger.debug('Exit prompt error:', { error })
+    console.log('Selection canceled.')
+
+    if (!isTestEnv()) {
+      process.exit(0)
+    }
   } else {
     logger.debug('An error occurred while installation:', { error })
     return handle(error as Error)

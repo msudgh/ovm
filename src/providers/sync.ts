@@ -6,21 +6,41 @@ import {
   writeFileSync,
 } from 'fs'
 import { dirname, join } from 'path'
-import { SyncMergeStrategy, SyncType } from '../services/config/index.types'
+import { SyncMergeStrategy } from '../services/config/index.types'
+import { SyncConfigOptions } from '../types/sync'
 import { logger } from '../utils/logger'
 
-export interface SyncConfigOptions {
-  source: string
-  target: string
-  type: SyncType
-  vaultPath: string
-  pluginId?: string
-  mergeStrategy: SyncMergeStrategy
-  include?: string[]
-  exclude?: string[]
-  overwrite?: boolean
-  backup?: boolean
-  onlyIfInstalled?: boolean
+// Helper for deep merging with include/exclude support
+// A good candidate to be extracted into a utility function or 3rd party library
+const deepMerge = (
+  target: Record<string, unknown>,
+  source: Record<string, unknown>,
+  options?: { include?: string[]; exclude?: string[] },
+): Record<string, unknown> => {
+  const result = { ...target }
+  for (const [key, value] of Object.entries(source)) {
+    // Skip excluded keys
+    if (options?.exclude?.includes(key)) continue
+    // Only include specific keys if include is set
+    if (options?.include && !options.include.includes(key)) continue
+    // Recursively merge objects
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      typeof result[key] === 'object' &&
+      result[key] !== null &&
+      !Array.isArray(result[key])
+    ) {
+      result[key] = deepMerge(
+        result[key] as Record<string, unknown>,
+        value as Record<string, unknown>,
+      )
+    } else {
+      result[key] = value
+    }
+  }
+  return result
 }
 
 export const syncFileToVault = async (
@@ -118,40 +138,7 @@ export const syncFileToVault = async (
   return true
 }
 
-// Helper for deep merging with include/exclude support
-// A good candidate to be extracted into a utility function or 3rd party library
-const deepMerge = (
-  target: Record<string, unknown>,
-  source: Record<string, unknown>,
-  options?: { include?: string[]; exclude?: string[] },
-): Record<string, unknown> => {
-  const result = { ...target }
-  for (const [key, value] of Object.entries(source)) {
-    // Skip excluded keys
-    if (options?.exclude?.includes(key)) continue
-    // Only include specific keys if include is set
-    if (options?.include && !options.include.includes(key)) continue
-    // Recursively merge objects
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value) &&
-      typeof result[key] === 'object' &&
-      result[key] !== null &&
-      !Array.isArray(result[key])
-    ) {
-      result[key] = deepMerge(
-        result[key] as Record<string, unknown>,
-        value as Record<string, unknown>,
-      )
-    } else {
-      result[key] = value
-    }
-  }
-  return result
-}
-
-// Specialized function for syncing plugin configs (specifically data.json files)
+// Specialized function for syncing plugin configs
 export const syncPluginConfigToVault = async (options: {
   source: string
   target: string

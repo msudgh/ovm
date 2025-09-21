@@ -31,9 +31,9 @@ Define plugins in your config file with the following structure:
 
 > Versioning of plugins follows [Semantic Versioning](https://semver.org/) and [Obsidian Plugin Guidelines](https://publish.obsidian.md/api/Plugin+Development/Plugin+Guidelines). `latest` is a valid version specifier that always resolves to the latest compatible version.
 
-### Configuration Sync
+### Sync
 
-Define configuration synchronization entries using `sync` to automatically sync core settings, plugin configurations, and custom files across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
+Define synchronization entries using `sync` to automatically sync core settings, plugin configurations, and custom files across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
 
 ```json
 {

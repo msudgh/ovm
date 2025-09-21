@@ -40,7 +40,7 @@ export default defineConfig({
     },
   },
   esbuild: {
-    target: 'node18',
+    target: 'node20',
   },
   define: {
     'process.env.NODE_ENV': '"test"',

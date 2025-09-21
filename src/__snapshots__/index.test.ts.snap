@@ -16,7 +16,7 @@ COMMANDS
 `;
 
 exports[`ovm CLI > help > prints top-level 1`] = `
-"Obsidian Vaults Manager
+"OVM is a CLI application for managing Obsidian vaults.
 
 VERSION
   ovm/X.X.X platform-arch node-vX.X.X
@@ -37,9 +37,7 @@ COMMANDS
   pp Prune existing plugin(s) from vaults that are unspecified in the config file
   ps Sync plugin configuration files (data.json)
   pu Uninstall plugin(s) from vaults
-  r Run a shell command on selected vaults (using Node.js child_process).
   rs Statistics of vaults and installed plugins
-  run Run a shell command on selected vaults (using Node.js child_process).
   version
   vr Run a shell command on selected vaults (using Node.js child_process).
   vs Sync core and custom vault configuration files

@@ -1,0 +1,287 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Pre-release version (e.g., 0.7.0-beta.1)'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Run Tests
+    strategy:
+      matrix:
+        os:
+          - 'ubuntu-latest'
+          - 'windows-latest'
+          - 'macos-latest'
+        node_version:
+          - '20'
+          - 'lts/*'
+        exclude:
+          - os: 'windows-latest'
+            node_version: '20'
+          - os: 'macos-latest'
+            node_version: '20'
+      fail-fast: false
+      max-parallel: 4
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: 'pnpm'
+      - run: pnpm run test:coverage
+      - name: Upload test results artifact
+        if: matrix.os == 'ubuntu-latest' && matrix.node_version == 'lts/*'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: junit.xml
+          retention-days: 1
+
+  pre-release:
+    name: Create Pre-Release
+    needs: [unit-tests, lint, security-audit]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Extract version and create pre-release version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          PRE_VERSION="${VERSION}-beta.${TIMESTAMP}"
+
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "pre_version=${PRE_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ steps.version.outputs.pre_version }} --no-git-tag-version
+
+      - name: Build package
+        run: |
+          pnpm run build:release
+          pnpm oclif manifest
+          pnpm pack
+          ls -la *.tgz
+
+      - name: Generate dynamic changelog
+        id: changelog
+        run: ./scripts/generate-changelog.sh pre-release ${{ steps.version.outputs.version }} ${{ steps.version.outputs.pre_version }}
+
+      - name: Create GitHub Pre-Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.pre_version }}
+          name: OVM ${{ steps.version.outputs.pre_version }} (Pre-Release)
+          body_path: CHANGELOG.md
+          files: '*.tgz'
+          prerelease: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    name: Create Release
+    needs: [unit-tests, lint, security-audit]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Build package
+        run: |
+          pnpm run build:release
+          pnpm oclif manifest
+          pnpm pack
+          ls -la *.tgz
+
+      - name: Publish to npm
+        run: |
+          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          npm publish --access public
+
+      - name: Generate dynamic changelog
+        id: changelog
+        run: ./scripts/generate-changelog.sh release ${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: OVM ${{ steps.version.outputs.version }}
+          body_path: CHANGELOG.md
+          files: '*.tgz'
+          prerelease: false
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  manual-pre-release:
+    name: Manual Pre-Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Build and package
+        run: |
+          pnpm install
+          npm version ${{ inputs.version }} --no-git-tag-version
+          pnpm run build:release
+          pnpm oclif manifest
+          pnpm pack
+          ls -la *.tgz
+
+      - name: Generate dynamic changelog
+        id: changelog
+        run: ./scripts/generate-changelog.sh pre-release ${{ inputs.version }} ${{ inputs.version }}
+
+      - name: Create Manual Pre-Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: OVM ${{ inputs.version }} (Manual Pre-Release)
+          body_path: CHANGELOG.md
+          files: '*.tgz'
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  lint:
+    name: Lint and Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+      - run: pnpm run lint
+      - run: pnpm run build:check
+      - run: pnpm run format:check
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+      - run: pnpm audit --audit-level moderate
+
+  codecov-upload:
+    name: Upload Test Coverage to Codecov
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download test results artifact (Ubuntu LTS)
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+      - name: Codecov Scan
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: test-results/junit.xml
+          fail_ci_if_error: true

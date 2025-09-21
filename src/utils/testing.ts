@@ -1,4 +1,4 @@
-import { Dirent, existsSync } from 'fs'
+import { Dirent, existsSync, mkdirSync, writeFileSync } from 'fs'
 import fse from 'fs-extra'
 import fsp from 'fs/promises'
 import { platform, tmpdir } from 'os'
@@ -117,7 +117,7 @@ export const createMockDirent = (
 
 export const replaceVersionInfo = (input: string): string => {
   return input.replace(
-    /ovm\/[\d.]+\s+\w+-\w+\s+node-v[\d.]+/,
+    /ovm\/[\d.]+(?:-[\w.]+)?\s+\w+-\w+\s+node-v[\d.]+/,
     'ovm/X.X.X platform-arch node-vX.X.X',
   )
 }
@@ -194,4 +194,18 @@ export const normalizeHelpOutput = (input: string): string => {
   }
 
   return result.join('\n')
+}
+
+export const createTestPlugin = (
+  vaultPath: string,
+  pluginId: string,
+  pluginName?: string,
+) => {
+  const pluginDir = path.join(vaultPath, '.obsidian', 'plugins', pluginId)
+  mkdirSync(pluginDir, { recursive: true })
+  writeFileSync(
+    path.join(pluginDir, 'manifest.json'),
+    JSON.stringify({ id: pluginId, name: pluginName || pluginId }),
+  )
+  return pluginDir
 }
