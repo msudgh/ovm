@@ -58,6 +58,14 @@ jobs:
           name: test-results
           path: junit.xml
           retention-days: 1
+          
+      - name: Upload coverage artifact
+        if: matrix.os == 'ubuntu-latest' && matrix.node_version == 'lts/*'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage/
+          retention-days: 1
 
   pre-release:
     name: Create Pre-Release
@@ -267,19 +275,32 @@ jobs:
     name: Upload Test Coverage to Codecov
     needs: unit-tests
     runs-on: ubuntu-latest
-    if: success()
+    if: success() && !cancelled()
     steps:
       - uses: actions/checkout@v5
-      - name: Download test results artifact (Ubuntu LTS)
+        with:
+          fetch-depth: 0
+          
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage/
+          
+      - name: Download test results artifact
         uses: actions/download-artifact@v4
         with:
           name: test-results
-          path: test-results
-      - name: Codecov Scan
+          path: test-results/
+          
+      - name: Codecov Coverage Upload
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Upload test results to Codecov
+          directory: coverage/
+          fail_ci_if_error: true
+          
+      - name: Codecov Test Results Upload
         uses: codecov/test-results-action@v1.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
