@@ -1,6 +1,6 @@
 # Obsidian Vaults Manager
 
-[![NPM Version](https://img.shields.io/npm/v/ovm)](http://npmjs.com/package/ovm) ![NPM License](https://img.shields.io/npm/l/ovm) [![GitHub Actions Test Workflow Status](https://github.com/masoudgs/ovm/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/masoudgs/ovm/actions/workflows/test.yml) [![Codecov](https://img.shields.io/codecov/c/github/masoudgs/ovm/main)](https://codecov.io/gh/masoudgs/ovm)
+[![NPM Version](https://img.shields.io/npm/v/ovm)](http://npmjs.com/package/ovm) ![NPM License](https://img.shields.io/npm/l/ovm) [![GitHub Actions Test Workflow Status](https://github.com/masoudgs/ovm/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/masoudgs/ovm/actions/workflows/ci.yml) [![Codecov](https://img.shields.io/codecov/c/github/masoudgs/ovm/main)](https://codecov.io/gh/masoudgs/ovm)
 
 OVM is a CLI application designed to streamline management of vaults for
 Obsidian end-users to enhance productivity and efficiency in workflows.
