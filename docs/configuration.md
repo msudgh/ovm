@@ -33,7 +33,7 @@ Define plugins in your config file with the following structure:
 
 ### Sync
 
-Define synchronization entries using `sync` to automatically sync core settings, plugin configurations, and custom files across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
+Define synchronization entries using `sync` to automatically sync core settings, plugin configurations, custom files, and themes across vaults of Obsidian. `ovm vault sync` and `ovm plugins sync` in [commands](commands.md) can be used to initiate the synchronization process.
 
 ```json
 {
@@ -96,7 +96,7 @@ Define synchronization entries using `sync` to automatically sync core settings,
 
 - **`core`**: Obsidian core settings (placed directly in `.obsidian/`)
 - **`plugin`**: Plugin-specific configurations (placed in `.obsidian/plugins/<pluginId>/`)
-- **`custom`**: Custom files (placed according to target path within `.obsidian/`)
+- **`custom`**: Custom files and themes (placed according to target path within `.obsidian/`)
 - **`all`**: Matches all configuration types (used for filtering)
 
 ## Default Configuration

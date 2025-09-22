@@ -32,7 +32,7 @@ Generate statistics of vaults and installed plugins.
 
 Easy wizard interface to select vaults and plugins for each command.
 
-### Sync core, plugins, and custom files
+### Sync core, plugins, custom files, and themes
 
 Sync local files to specific vaults with advanced options and flexible configuration.
 

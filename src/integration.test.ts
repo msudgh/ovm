@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as syncProvider from './providers/sync'
 import { ConfigSchema } from './services/config'
@@ -253,6 +253,7 @@ describe('Integration Tests', () => {
           type: 'core',
           vaults: [vault.name],
           mergeStrategy: 'smart',
+          onlyIfInstalled: false,
         },
         {
           source: 'configs/workspace.json',
@@ -260,6 +261,7 @@ describe('Integration Tests', () => {
           type: 'core',
           vaults: [vault.name],
           mergeStrategy: 'replace',
+          onlyIfInstalled: false,
         },
         {
           source: 'configs/note-toolbar-settings.json',
@@ -268,6 +270,7 @@ describe('Integration Tests', () => {
           pluginId: 'note-toolbar',
           vaults: [vault.name],
           mergeStrategy: 'merge',
+          onlyIfInstalled: true,
         },
         {
           source: 'configs/commander-settings.json',
@@ -277,6 +280,7 @@ describe('Integration Tests', () => {
           vaults: [vault.name],
           mergeStrategy: 'smart',
           include: ['commands'],
+          onlyIfInstalled: true,
         },
       ])
 
@@ -931,6 +935,8 @@ describe('Integration Tests', () => {
             target: 'app.json',
             type: 'core',
             vaults: [vault.name],
+            onlyIfInstalled: false,
+            mergeStrategy: 'smart',
           },
           {
             source: 'configs/plugin-data.json',
@@ -938,6 +944,8 @@ describe('Integration Tests', () => {
             type: 'plugin',
             pluginId: 'test-plugin',
             vaults: [vault.name],
+            onlyIfInstalled: false,
+            mergeStrategy: 'merge',
           },
         ])
 
@@ -1121,6 +1129,7 @@ describe('Integration Tests', () => {
             mergeStrategy: 'smart',
             include: ['main', 'active'],
             exclude: ['lastOpenFiles'], // Exclude dynamic data
+            onlyIfInstalled: false,
           },
         ])
 
@@ -1139,6 +1148,66 @@ describe('Integration Tests', () => {
         destroyVault(vault.path)
         destroyVault(tempBaseDir)
       })
+    })
+
+    it('should install and uninstall a theme by syncing with replaced config', async () => {
+      const { vault, config: vaultConfig } = await setupVault()
+
+      const tempSourceDir = join(tmpdir(), `ovm-theme-test-${Date.now()}`)
+      mkdirSync(tempSourceDir, { recursive: true })
+
+      const themeFile = join(tempSourceDir, 'themes', 'custom-theme.css')
+      mkdirSync(dirname(themeFile), { recursive: true })
+      writeFileSync(themeFile, '/* custom theme */')
+
+      const configWithTheme = ConfigSchema.parse({
+        plugins: [],
+        sync: {
+          baseDir: tempSourceDir,
+          files: [
+            {
+              source: 'themes/custom-theme.css',
+              target: 'themes/custom-theme.css',
+              type: 'core',
+              vaults: [vault.name],
+              mergeStrategy: 'replace',
+              onlyIfInstalled: false,
+            },
+          ],
+        },
+      })
+
+      const flags = getDefaultFlags(vaultConfig.path, vault.path)
+
+      // Install theme
+      await syncVaultCoreIterator({ vault, config: configWithTheme, flags })
+
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(1)
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target: 'themes/custom-theme.css',
+          vaultPath: vault.path,
+        }),
+      )
+
+      // Now, "uninstall" by replacing config with one that doesn't have the theme
+      const configWithoutTheme = ConfigSchema.parse({
+        plugins: [],
+        sync: {
+          baseDir: tempSourceDir,
+          files: [], // no sync entries
+        },
+      })
+
+      vi.clearAllMocks()
+
+      // Sync again
+      await syncVaultCoreIterator({ vault, config: configWithoutTheme, flags })
+
+      expect(syncProvider.syncFileToVault).toHaveBeenCalledTimes(0)
+
+      // Cleanup
+      destroyVault(vault.path)
     })
   })
 })

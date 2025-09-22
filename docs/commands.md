@@ -248,7 +248,7 @@ Examples:
 
 Aliases: `ovm vs`
 
-Sync core and custom vault configuration files defined in ovm.json (sync) across vaults.
+Sync core, custom, and theme configuration files defined in ovm.json (sync) across vaults.
 
 - _Usage:_ `ovm help vaults sync`
 - _See code:_ [src/commands/vaults/sync.ts](src/commands/vaults/sync.ts)
